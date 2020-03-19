@@ -6,7 +6,8 @@
   "scripts": {
     "test": "cross-env NODE_ENV=testing jest --watch",
     "start": "node index.js",
-    "server": "nodemon"
+    "server": "nodemon",
+    "coverage": "jest --coverage --detectOpenHandles --forceExit || true"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
