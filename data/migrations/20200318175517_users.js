@@ -56,7 +56,7 @@ exports.up = function (knex) {
 
       tbl.integer('platform_id')
         .unsigned()
-        .notNullable()
+        // .notNullable()
         .references('id')
         .inTable('platforms')
         .onUpdate('CASCADE')
@@ -66,14 +66,15 @@ exports.up = function (knex) {
         .notNullable();
 
       tbl.boolean('completed')
-        .notNullable();
+        // .notNullable()
+        .defaultsTo(false);
 
       tbl.datetime('datestamp')
-        .notNullable();
+        // .notNullable()
+        .defaultsTo(knex.fn.now(6));
 
       tbl.integer('topic_id')
         .unsigned()
-        .notNullable()
         .references('id')
         .inTable('topics')
         .onUpdate('CASCADE')
