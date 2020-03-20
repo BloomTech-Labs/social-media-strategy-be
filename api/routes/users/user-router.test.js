@@ -1,5 +1,5 @@
 const request = require('supertest');
-
+require('dotenv').config();
 const server = require('../../server');
 
 let token;
@@ -22,8 +22,8 @@ describe('testing user router', () => {
       request(server)
         .post('/api/auth/login')
         .send({
-          email: 'hello@hello.com',
-          password: 'hello'
+          email: process.env.EMAIL_TEST,
+          password: process.env.PASSWORD_TEST
         })
         .end((err, res) => {
           token = res.body.token;
