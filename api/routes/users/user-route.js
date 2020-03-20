@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../users/user-Modal');
+const User = require('../users/user-model');
 
 router.get('/', (req, res) => {
   User.find()
