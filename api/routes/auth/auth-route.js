@@ -16,7 +16,6 @@ const schema = Joi.object({
     .max(30)
 });
 
-
 router.post('/register', (req, res) => {
   let user = req.body;
 
