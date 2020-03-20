@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { jwtSecret } = require('../../config/secrets');
 const router = express.Router();
-const Users = require('../users/user-Modal');
+const Users = require('../users/user-model');
 const Joi = require('@hapi/joi');
 
 const schema = Joi.object({
