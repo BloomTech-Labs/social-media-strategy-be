@@ -22,6 +22,7 @@ describe('Test Auth + header /GET /api /users', () => {
     beforeAll(done => {
 
         request(server)
+        .post('')
     })
 })
 
