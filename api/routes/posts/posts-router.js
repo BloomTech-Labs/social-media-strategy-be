@@ -63,12 +63,12 @@ router.post('/:id/user', async (req, res) => {
   } else {
     try {
       let post = await Posts.add(postbody);
-      // let ax = await axios.post(
-      //   ' https://social-media-strategy-ds.herokuapp.com/recommand',
-      //   post
-      // );
+      let ax = await axios.post(
+        ' https://social-media-strategy-ds.herokuapp.com/recommend',
+        post
+      );
 
-      // console.log(post, ax, postbody, 'TESTING');
+      console.log(post, ax, postbody, 'TESTING');
       return res.status(201).json(post);
     } catch (error) {
       res.status(500).json({
