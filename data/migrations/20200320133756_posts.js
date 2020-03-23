@@ -41,7 +41,19 @@ exports.up = function(knex) {
       .inTable('topics')
       .onUpdate('CASCADE')
       .onDelete('CASCADE');
+
+
+      tbl
+      .text('optimal_time'); 
+
+      tbl
+      .text('post_score'); 
+      
+
   });
+
+
+  
 };
 
 exports.down = function(knex) {
