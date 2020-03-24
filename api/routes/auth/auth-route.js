@@ -114,6 +114,7 @@ router.post('/register', async (req, res) => {
         error: error.stack,
         name: error.name,
         code: error.code
+
       });
     }
 

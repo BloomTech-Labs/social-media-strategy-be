@@ -57,6 +57,7 @@ router.get('/:id/user', (req, res) => {
 });
 
 router.post('/:id/user', validate.validateuserid, async (req, res) => {
+
   const { id } = req.params;
   const postbody = { ...req.body, user_id: id };
   if (Object.keys(postbody).length === 0 || schema.validate(postbody).error) {
@@ -81,6 +82,8 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
     }
   }
 });
+
+
 
 router.put('/:id', (req, res) => {
   const { id } = req.params;
