@@ -7,5 +7,8 @@ router.get('/', (req, res) => {
     .then(users => res.status(200).json(users))
     .catch(err => res.status(500).json(err.message));
 });
+router.get('/user', (req, res) => {
+  res.status(200).json(req.decodedToken);
+});
 
 module.exports = router;
