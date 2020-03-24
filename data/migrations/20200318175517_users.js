@@ -6,6 +6,7 @@ exports.up = function(knex) {
       .notNullable()
       .unique();
     tbl.text('password').notNullable();
+    tbl.text('okta_userid').notNullable();
   });
 };
 

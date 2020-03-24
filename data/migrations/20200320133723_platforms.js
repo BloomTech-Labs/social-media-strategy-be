@@ -13,8 +13,7 @@ exports.up = function(knex) {
       .onUpdate('CASCADE')
       .onDelete('CASCADE');
 
-    // tbl.text('oauth_cred')
-    // .notNullable();
+    // tbl.text('okta_userid').notNullable();
   });
 };
 
