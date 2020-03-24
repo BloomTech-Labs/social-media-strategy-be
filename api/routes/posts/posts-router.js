@@ -3,6 +3,7 @@ const Posts = require('./posts-model.js');
 const Joi = require('@hapi/joi');
 const router = express.Router();
 const axios = require('axios');
+const validate = require('../auth/middleware');
 
 const schema = Joi.object({
   user_id: Joi.number(),
@@ -55,7 +56,7 @@ router.get('/:id/user', (req, res) => {
     });
 });
 
-router.post('/:id/user', async (req, res) => {
+router.post('/:id/user', validate.validateuserid, async (req, res) => {
   const { id } = req.params;
   const postbody = { ...req.body, user_id: id };
   if (Object.keys(postbody).length === 0 || schema.validate(postbody).error) {
