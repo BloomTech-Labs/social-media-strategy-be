@@ -55,6 +55,31 @@ router.get('/:id/user', (req, res) => {
     });
 });
 
+router.post('/', async (req, res) => {
+  const postbody = req.body;
+  if (Object.keys(postbody).length === 0 || schema.validate(postbody).error) {
+    res.status(500).json(schema.validate(postbody).error);
+  } else {
+    try {
+      let post = await Posts.add(postbody);
+      let ax = await axios.post(
+        ' https://social-media-strategy-ds.herokuapp.com/recommend',
+        post
+      );
+
+      console.log(post, ax, postbody, 'TESTING');
+      return res.status(201).json(post);
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
+        error: error.stack,
+        name: error.name,
+        code: error.code
+      });
+    }
+  }
+});
+
 router.post('/:id/user', async (req, res) => {
   const { id } = req.params;
   const postbody = { ...req.body, user_id: id };
@@ -80,6 +105,8 @@ router.post('/:id/user', async (req, res) => {
     }
   }
 });
+
+
 
 router.put('/:id', (req, res) => {
   const { id } = req.params;
