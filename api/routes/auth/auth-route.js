@@ -30,7 +30,7 @@ router.get('/:id/test', validateuserid, async (req, res) => {
 
   try {
     let twit = await client.getRequestToken(
-      'https://social-media-strategy.herokuapp.com'
+      'https://post-route-feature.herokuapp.com/api/auth/verify'
     );
 
     let ax = axios.post(
@@ -54,26 +54,14 @@ router.get('/:id/test', validateuserid, async (req, res) => {
       reqTkn: twit.oauth_token,
       reqTknSecret: twit.oauth_token_secret
     });
-    // .then(
-    //   twit =>
-    //     console.log({
-    //       reqTkn: twit.oauth_token,
-    //       reqTknSecret: twit.oauth_token_secret
-    //     }) &
-    //     res.status(200).json({
-    //       reqTkn: twit.oauth_token,
-    //       reqTknSecret: twit.oauth_token_secret
-    //     })
-    // )
-    // .catch(console.error);
   } catch (error) {
     res.status(500).json(console.error);
   }
 });
 
 router.post('/verify', (req, res) => {
-  console.log(res);
-  res.status(200).json({ message: res });
+  console.log(req, 'REQUEST TO VERIFY');
+  res.status(200).json({ message: req });
 });
 
 router.post('/register', async (req, res) => {
