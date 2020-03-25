@@ -35,7 +35,7 @@ router.get('/:id/test', validateuserid, async (req, res) => {
     );
 
     let ax = axios.post(
-      `https://dev-966011.okta.com/api/v1/users/${req.oktaid}`,
+      `https://${process.env.OKTA_DOMAIN}/users/${req.oktaid}`,
       {
         profile: {
           Oauth_token: twit.oauth_token,
@@ -60,8 +60,30 @@ router.get('/:id/test', validateuserid, async (req, res) => {
   }
 });
 
-router.get('/verify', (req, res) => {
+router.get('/verify', async (req, res) => {
+  let { oauth_verifier } = req.query;
+  let { okta_userid } = req.decodedToken;
+  console.log(req, 'REQQ');
+
   console.log(req.query, 'TESTING OAUTH');
+
+  res.redirect('https://post-route-feature.herokuapp.com');
+
+  let ax = axios.post(
+    `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
+    {
+      profile: {
+        Oauth_token: twit.oauth_token,
+        Oauth_secret: twit.oauth_token_secret
+      }
+    },
+    {
+      headers: {
+        Authorization: process.env.OKTA_AUTH
+      }
+    }
+  );
+
   res.status(200).json({ message: req.query });
 });
 
@@ -75,7 +97,7 @@ router.post('/register', async (req, res) => {
       newuser.password = hash;
 
       let ax = await axios.post(
-        'https://dev-966011.okta.com/api/v1/users?activate=true',
+        `https://${process.env.OKTA_DOMAIN}/users?activate=true`,
         {
           profile: {
             email: req.body.email,
@@ -141,7 +163,8 @@ router.post('/login', (req, res) => {
 function generateToken(user) {
   const payload = {
     subject: user.id,
-    email: user.email
+    email: user.email,
+    okta_userid: user.okta_userid
   };
   const options = {
     expiresIn: '1d' // probably change for shorter time, esp if doing refresh tokens
