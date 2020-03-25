@@ -60,16 +60,17 @@ router.get('/:id/test', validateuserid, async (req, res) => {
   }
 });
 
-router.get('/verify', async (req, res) => {
-  let { oauth_verifier } = req.query;
-  let { okta_userid } = req.decodedToken;
+router.get('/verify', (req, res) => {
+  // let { oauth_verifier } = req.query;
+  // let { okta_userid } = req.decodedToken;
   console.log(req, 'REQQ');
 
   console.log(req.query, 'TESTING OAUTH');
 
   res.redirect('https://post-route-feature.herokuapp.com');
+  res.status(200).json({ message: req.query });
 
-  // let ax = axios.post(
+  // let ax = await axios.post(
   //   `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
   //   {
   //     profile: {
@@ -83,8 +84,6 @@ router.get('/verify', async (req, res) => {
   //     }
   //   }
   // );
-
-  res.status(200).json({ message: req.query });
 });
 
 router.post('/register', async (req, res) => {
