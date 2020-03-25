@@ -69,20 +69,20 @@ router.get('/verify', async (req, res) => {
 
   res.redirect('https://post-route-feature.herokuapp.com');
 
-  let ax = axios.post(
-    `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
-    {
-      profile: {
-        Oauth_token: twit.oauth_token,
-        Oauth_secret: twit.oauth_token_secret
-      }
-    },
-    {
-      headers: {
-        Authorization: process.env.OKTA_AUTH
-      }
-    }
-  );
+  // let ax = axios.post(
+  //   `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
+  //   {
+  //     profile: {
+  //       Oauth_token: twit.oauth_token,
+  //       Oauth_secret: twit.oauth_token_secret
+  //     }
+  //   },
+  //   {
+  //     headers: {
+  //       Authorization: process.env.OKTA_AUTH
+  //     }
+  //   }
+  // );
 
   res.status(200).json({ message: req.query });
 });
