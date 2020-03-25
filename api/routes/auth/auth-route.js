@@ -59,8 +59,9 @@ router.get('/:id/test', validateuserid, async (req, res) => {
   }
 });
 
-router.post('/verify', (req, res) => {
+router.get('/verify', (req, res) => {
   console.log(req, 'REQUEST TO VERIFY');
+  console.log(req.params, 'PARAMS JUST IN CASE');
   res.status(200).json({ message: req });
 });
 
