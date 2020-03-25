@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -10,8 +11,8 @@ const Twitterlite = require('twitter-lite');
 const { validateuserid } = require('../auth/middleware');
 
 const client = new Twitterlite({
-  consumer_key: 'qwxfZ7keDWO6vTlqxr7ZFCxzC',
-  consumer_secret: 'jtMjwQu2UPztxIbjnEdBVglgJK47cAhJ9bmLpXFD86fhjC3fqa'
+  consumer_key: process.env.CONSUMER_KEY,
+  consumer_secret: process.env.CONSUMER_SECRET
 });
 
 const schema = Joi.object({
@@ -43,7 +44,7 @@ router.get('/:id/test', validateuserid, async (req, res) => {
       },
       {
         headers: {
-          Authorization: 'SSWS007i8tncM4Z-bN6fiP6fvu0AbKS-tvql3lFtxy-6vd'
+          Authorization: process.env.OKTA_AUTH
         }
       }
     );
@@ -55,14 +56,13 @@ router.get('/:id/test', validateuserid, async (req, res) => {
       reqTknSecret: twit.oauth_token_secret
     });
   } catch (error) {
-    res.status(500).json(console.error);
+    res.status(500).json(error.message);
   }
 });
 
 router.get('/verify', (req, res) => {
-  console.log(req, 'REQUEST TO VERIFY');
-  console.log(req.query, 'PARAMS JUST IN CASE');
-  res.status(200).json({ message: req });
+  console.log(req.query, 'TESTING OAUTH');
+  res.status(200).json({ message: req.query });
 });
 
 router.post('/register', async (req, res) => {
@@ -87,7 +87,7 @@ router.post('/register', async (req, res) => {
         },
         {
           headers: {
-            Authorization: 'SSWS007i8tncM4Z-bN6fiP6fvu0AbKS-tvql3lFtxy-6vd'
+            Authorization: process.env.OKTA_AUTH
           }
         }
       );
@@ -105,14 +105,6 @@ router.post('/register', async (req, res) => {
         code: error.code
       });
     }
-
-    // Users.add(newuser)
-    //   .then(saved => {
-    //     res.status(201).json(saved);
-    //   })
-    //   .catch(error => {
-    //     res.status(500).json(error.message);
-    //   });
   } else {
     res.status(500).json(schema.validate(user).error);
   }
