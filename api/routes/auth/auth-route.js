@@ -9,6 +9,8 @@ const Joi = require('@hapi/joi');
 const axios = require('axios');
 const Twitterlite = require('twitter-lite');
 const { validateuserid } = require('../auth/middleware');
+const restricted = require('../auth/restricted-middleware');
+const queryString = require('query-string');
 
 const client = new Twitterlite({
   consumer_key: process.env.CONSUMER_KEY,
@@ -26,20 +28,44 @@ const schema = Joi.object({
   okta_userid: Joi.string()
 });
 
-router.get('/:id/test', validateuserid, async (req, res) => {
+router.get('/:id/oauth', validateuserid, async (req, res) => {
   console.log(req.oktaid, 'CHECKING ID');
 
   try {
     let twit = await client.getRequestToken(
-      'https://post-route-feature.herokuapp.com/api/auth/verify'
+      'https://mddcab.jrivera6869.now.sh/callback'
     );
 
-    let ax = axios.post(
-      `https://${process.env.OKTA_DOMAIN}/users/${req.oktaid}`,
+    res.redirect(
+      `https://api.twitter.com/oauth/authorize?oauth_token=${twit.oauth_token}`
+    );
+    res.status(200).json({ message: 'success' });
+  } catch (error) {
+    res.status(500).json(error.message);
+  }
+});
+
+router.post('/:id/callback', restricted, async (req, res) => {
+  const { okta_userid } = req.decodedToken;
+  console.log(okta_userid, 'REQQ');
+
+  try {
+    let twitaccess = await axios.post(
+      `https://api.twitter.com/oauth/access_token${req.body.location.search}`
+    );
+    // PARSE DATA OF TWITTER AXIOS CALL
+    const parsed_data = queryString.parse(twitaccess.data);
+
+    // Sends Okta user profile Oauth information
+    let ax = await axios.post(
+      `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
       {
         profile: {
-          Oauth_token: twit.oauth_token,
-          Oauth_secret: twit.oauth_token_secret
+          Oauth_token: parsed_data.oauth_token,
+          Oauth_secret: parsed_data.oauth_token_secret,
+          twitter_userId: parsed_data.user_id,
+          twitter_screenName: parsed_data.screen_name,
+          oauth_verifier: req.body.parse.oauth_verifier
         }
       },
       {
@@ -49,41 +75,30 @@ router.get('/:id/test', validateuserid, async (req, res) => {
       }
     );
 
-    console.log(ax, 'POST TO OKTA');
-
-    res.status(200).json({
-      reqTkn: twit.oauth_token,
-      reqTknSecret: twit.oauth_token_secret
+    console.log(twitaccess);
+    console.log({
+      accTkn: parsed_data.oauth_token,
+      accTknSecret: parsed_data.oauth_token_secret,
+      userId: parsed_data.user_id,
+      screenName: parsed_data.screen_name
     });
+    // console.log(ax);
+    console.log(req.body.location.search, 'BODDY');
+    res.status(200).json({ message: req.body });
   } catch (error) {
-    res.status(500).json(error.message);
+    console.log({
+      message: error.message,
+      error: error.stack,
+      name: error.name,
+      code: error.code
+    });
+    res.status(500).json({
+      message: error.message,
+      error: error.stack,
+      name: error.name,
+      code: error.code
+    });
   }
-});
-
-router.get('/verify', (req, res) => {
-  // let { oauth_verifier } = req.query;
-  // let { okta_userid } = req.decodedToken;
-  console.log(req, 'REQQ');
-
-  console.log(req.query, 'TESTING OAUTH');
-
-  res.redirect('https://post-route-feature.herokuapp.com');
-  res.status(200).json({ message: req.query });
-
-  // let ax = await axios.post(
-  //   `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
-  //   {
-  //     profile: {
-  //       Oauth_token: twit.oauth_token,
-  //       Oauth_secret: twit.oauth_token_secret
-  //     }
-  //   },
-  //   {
-  //     headers: {
-  //       Authorization: process.env.OKTA_AUTH
-  //     }
-  //   }
-  // );
 });
 
 router.post('/register', async (req, res) => {
