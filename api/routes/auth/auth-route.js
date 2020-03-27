@@ -29,7 +29,7 @@ const schema = Joi.object({
   okta_userid: Joi.string()
 });
 
-router.get('/:id/oauth', validateuserid, async (req, res) => {
+router.get('/:id/oauth', validateuserid, async (req, res, next) => {
   console.log(req.oktaid, 'CHECKING ID');
 
   try {
@@ -37,10 +37,11 @@ router.get('/:id/oauth', validateuserid, async (req, res) => {
       'https://dev-oauth.duosa5dkjv93b.amplifyapp.com/callback'
     );
 
-    res.redirect(
-      `https://api.twitter.com/oauth/authorize?oauth_token=${twit.oauth_token}`
-    );
-    res.status(200).json({ message: 'success' });
+    const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${twit.oauth_token}`;
+
+    res.redirect(redirecturl);
+    next;
+    // res.status(200).json({ message: 'success' });
   } catch (error) {
     res.status(500).json(error.message);
   }
