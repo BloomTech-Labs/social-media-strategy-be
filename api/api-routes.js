@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 const AuthRouter = require('../api/routes/auth/auth-route');
 const restricted = require('../api/routes/auth/restricted-middleware');
+const PostsRouter = require('../api/routes/posts/posts-router');
 const UserRouter = require('../api/routes/users/user-route');
+const TopicsRouter = require('../api/routes/topics/topics-router');
+const PlatformsRouter = require('../api/routes/platforms/platforms-router');
 
 router.get('/', (req, res) => {
   res.status(200).json({ welcome: 'API router' });
@@ -10,6 +13,9 @@ router.get('/', (req, res) => {
 
 router.use('/auth', AuthRouter);
 router.use('/users', restricted, UserRouter);
+router.use('/posts', PostsRouter);
+router.use('/topics', TopicsRouter);
+router.use('/platforms', restricted, PlatformsRouter);
 
 module.exports = router;
 

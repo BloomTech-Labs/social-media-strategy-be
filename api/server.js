@@ -5,6 +5,10 @@ const morgan = require('morgan');
 const cors = require('cors');
 
 const ApiRouter = require('../api/api-routes');
+// Access-Control-Expose-Headers: Access-Control-Allow-Origin
+// var corsOptions = {
+//   origin: '*'
+// };
 
 server.use(express.json());
 server.use(morgan('combined'));
