@@ -34,7 +34,7 @@ router.get('/:id/oauth', validateuserid, async (req, res) => {
 
   try {
     let twit = await client.getRequestToken(
-      'https://mddcab.jrivera6869.now.sh/callback'
+      'https://dev-oauth.duosa5dkjv93b.amplifyapp.com/callback'
     );
 
     res.redirect(
