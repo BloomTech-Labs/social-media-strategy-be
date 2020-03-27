@@ -11,6 +11,7 @@ const Twitterlite = require('twitter-lite');
 const { validateuserid } = require('../auth/middleware');
 const restricted = require('../auth/restricted-middleware');
 const queryString = require('query-string');
+var Twit = require('twit');
 
 const client = new Twitterlite({
   consumer_key: process.env.CONSUMER_KEY,
@@ -75,23 +76,8 @@ router.post('/:id/callback', restricted, async (req, res) => {
       }
     );
 
-    console.log(twitaccess);
-    console.log({
-      accTkn: parsed_data.oauth_token,
-      accTknSecret: parsed_data.oauth_token_secret,
-      userId: parsed_data.user_id,
-      screenName: parsed_data.screen_name
-    });
-    // console.log(ax);
-    console.log(req.body.location.search, 'BODDY');
     res.status(200).json({ message: req.body });
   } catch (error) {
-    console.log({
-      message: error.message,
-      error: error.stack,
-      name: error.name,
-      code: error.code
-    });
     res.status(500).json({
       message: error.message,
       error: error.stack,
@@ -100,6 +86,23 @@ router.post('/:id/callback', restricted, async (req, res) => {
     });
   }
 });
+
+// console.log(twitaccess);
+// console.log({
+//   accTkn: parsed_data.oauth_token,
+//   accTknSecret: parsed_data.oauth_token_secret,
+//   userId: parsed_data.user_id,
+//   screenName: parsed_data.screen_name
+// });
+// // console.log(ax);
+// console.log(req.body.location.search, 'BODDY');
+
+// console.log({
+//   message: error.message,
+//   error: error.stack,
+//   name: error.name,
+//   code: error.code
+// });
 
 router.post('/register', async (req, res) => {
   let user = req.body;
@@ -186,5 +189,37 @@ function generateToken(user) {
 
   return jwt.sign(payload, jwtSecret, options);
 }
+
+// Twitter post -----
+router.get('/:id/twitpost', restricted, async (req, res) => {
+  const { okta_userid } = req.decodedToken;
+
+  let ax = await axios.get(
+    `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
+    {
+      headers: {
+        Authorization: process.env.OKTA_AUTH
+      }
+    }
+  );
+
+  console.log(ax.data.profile, 'Axios call');
+
+  var T = new Twit({
+    consumer_key: process.env.CONSUMER_KEY,
+    consumer_secret: process.env.CONSUMER_SECRET,
+    access_token: ax.data.profile.Oauth_token,
+    access_token_secret: ax.data.profile.Oauth_secret
+  });
+
+  T.post('statuses/update', { status: 'Web > DS!!!!!!' }, function(
+    err,
+    data,
+    response
+  ) {
+    console.log(data);
+  });
+  res.status(200).json('success');
+});
 
 module.exports = router;
