@@ -60,11 +60,10 @@ router.get(
 
     try {
       let twit = await client.getRequestToken(
-        'https://mddcab.jrivera6869.now.sh/callback'
+        'https://dev-oauth.duosa5dkjv93b.amplifyapp.com/callback'
       );
 
       const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${twit.oauth_token}`;
-      // const redirecturl = `https://wwww.google.com`;
 
       res.redirect(redirecturl);
       next();
