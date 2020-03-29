@@ -82,7 +82,7 @@ router.post('/:id/callback', restricted, async (req, res) => {
       access_token: parsed_data.oauth_token,
       access_token_secret: parsed_data.oauth_token_secret
     });
-    await T.get(
+    T.get(
       'followers/ids',
       { screen_name: `${parsed_data.screen_name}` },
       function(err, data, response) {
