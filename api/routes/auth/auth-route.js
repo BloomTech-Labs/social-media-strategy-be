@@ -86,15 +86,12 @@ router.post('/:id/callback', restricted, async (req, res) => {
       { screen_name: `${parsed_data.screen_name}` },
       function(err, data, response) {
         console.log(data, 'FOLLOWER GET');
+        res.status(200).json({
+          twitter_screenName: parsed_data.screen_name,
+          totalfollowers: data.ids.length
+        });
       }
     );
-
-    res
-      .status(200)
-      .json({
-        twitter_screenName: parsed_data.screen_name,
-        totalfollowers: data.ids.length
-      });
   } catch (error) {
     res.status(500).json({
       message: error.message,
