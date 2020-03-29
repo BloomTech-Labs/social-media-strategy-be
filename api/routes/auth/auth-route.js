@@ -39,8 +39,6 @@ router.get('/:id/oauth', validateuserid, async (req, res, next) => {
 
     const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${twit.oauth_token}`;
 
-    // res.redirect(redirecturl);
-    // next();
     res.status(200).json(redirecturl);
   } catch (error) {
     res.status(500).json(error.message);
@@ -77,6 +75,15 @@ router.post('/:id/callback', restricted, async (req, res) => {
       }
     );
 
+    console.log(twitaccess);
+
+    // var T = new Twit({
+    //   consumer_key: process.env.CONSUMER_KEY,
+    //   consumer_secret: process.env.CONSUMER_SECRET,
+    //   access_token: parsed_data.oauth_token,
+    //   access_token_secret: parsed_data.oauth_token_secret
+    // });
+
     res.status(200).json({ message: req.body });
   } catch (error) {
     res.status(500).json({
@@ -87,23 +94,6 @@ router.post('/:id/callback', restricted, async (req, res) => {
     });
   }
 });
-
-// console.log(twitaccess);
-// console.log({
-//   accTkn: parsed_data.oauth_token,
-//   accTknSecret: parsed_data.oauth_token_secret,
-//   userId: parsed_data.user_id,
-//   screenName: parsed_data.screen_name
-// });
-// // console.log(ax);
-// console.log(req.body.location.search, 'BODDY');
-
-// console.log({
-//   message: error.message,
-//   error: error.stack,
-//   name: error.name,
-//   code: error.code
-// });
 
 router.post('/register', async (req, res) => {
   let user = req.body;
