@@ -89,7 +89,12 @@ router.post('/:id/callback', restricted, async (req, res) => {
       }
     );
 
-    res.status(200).json({ twitter_screenName: parsed_data.screen_name });
+    res
+      .status(200)
+      .json({
+        twitter_screenName: parsed_data.screen_name,
+        totalfollowers: data.ids.length
+      });
   } catch (error) {
     res.status(500).json({
       message: error.message,
