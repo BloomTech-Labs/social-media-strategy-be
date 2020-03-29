@@ -87,7 +87,7 @@ router.post('/:id/callback', restricted, async (req, res) => {
       { screen_name: `${parsed_data.screen_name}` },
       function(err, data, response) {
         console.log(data, 'FOLLOWER GET');
-        return (followers = data.id.length);
+        return (followers = data.ids.length);
       }
     );
     res.status(200).json({
