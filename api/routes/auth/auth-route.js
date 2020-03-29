@@ -45,7 +45,7 @@ router.get('/:id/oauth', validateuserid, async (req, res, next) => {
   }
 });
 
-router.post('/:id/callback', restricted, async (req, res) => {
+router.post('/:id/callback', restricted, async (req, res, next) => {
   const { okta_userid } = req.decodedToken;
   console.log(okta_userid, 'REQQ');
 
@@ -88,6 +88,7 @@ router.post('/:id/callback', restricted, async (req, res) => {
       function(err, data, response) {
         console.log(data, 'FOLLOWER GET');
         followers = data.ids.length;
+        next();
       }
     );
     console.log(a, 'AAAA');
