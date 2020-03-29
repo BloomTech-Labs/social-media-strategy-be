@@ -75,16 +75,21 @@ router.post('/:id/callback', restricted, async (req, res) => {
       }
     );
 
-    console.log(twitaccess);
+    var T = await new Twit({
+      consumer_key: process.env.CONSUMER_KEY,
+      consumer_secret: process.env.CONSUMER_SECRET,
+      access_token: parsed_data.oauth_token,
+      access_token_secret: parsed_data.oauth_token_secret
+    });
+    T.get('followers/ids', { screen_name: 'tolga_tezel' }, function(
+      err,
+      data,
+      response
+    ) {
+      console.log(data, 'FOLLOWER GET');
+    });
 
-    // var T = new Twit({
-    //   consumer_key: process.env.CONSUMER_KEY,
-    //   consumer_secret: process.env.CONSUMER_SECRET,
-    //   access_token: parsed_data.oauth_token,
-    //   access_token_secret: parsed_data.oauth_token_secret
-    // });
-
-    res.status(200).json({ message: req.body });
+    res.status(200).json({ twitter_screenName: parsed_data.screen_name });
   } catch (error) {
     res.status(500).json({
       message: error.message,
