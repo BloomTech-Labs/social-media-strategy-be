@@ -12,11 +12,6 @@ const { validateuserid } = require('../auth/middleware');
 const restricted = require('../auth/restricted-middleware');
 const queryString = require('query-string');
 var Twit = require('twit');
-const cors = require('cors');
-
-const corsOptions = {
-  origin: '*'
-};
 
 const client = new Twitterlite({
   consumer_key: process.env.CONSUMER_KEY,
@@ -34,45 +29,23 @@ const schema = Joi.object({
   okta_userid: Joi.string()
 });
 
-function corssolve(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
-  res.set('Access-Control-Allow-Origin', '*');
-  // if (isPreflight(req)) {
-  //   res.set('Access-Control-Allow-Methods', 'GET'); // Add this!
-  //   res.status(204).end();
-  //   return;
-  // }
+router.get('/:id/oauth', validateuserid, async (req, res, next) => {
+  console.log(req.oktaid, 'CHECKING ID');
 
-  next();
-}
+  try {
+    let twit = await client.getRequestToken(
+      'https://dev-oauth.duosa5dkjv93b.amplifyapp.com/callback'
+    );
 
-router.get(
-  '/:id/oauth',
-  validateuserid,
-  cors(corsOptions),
-  corssolve,
-  async (req, res, next) => {
-    console.log(req.oktaid, 'CHECKING ID');
+    const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${twit.oauth_token}`;
 
-    try {
-      let twit = await client.getRequestToken(
-        'https://dev-oauth.duosa5dkjv93b.amplifyapp.com/callback'
-      );
-
-      const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${twit.oauth_token}`;
-
-      res.redirect(redirecturl);
-      next();
-      res.status(200).json({ message: 'success' });
-    } catch (error) {
-      res.status(500).json(error.message);
-    }
+    // res.redirect(redirecturl);
+    // next();
+    res.status(200).json(redirecturl);
+  } catch (error) {
+    res.status(500).json(error.message);
   }
-);
+});
 
 router.post('/:id/callback', restricted, async (req, res) => {
   const { okta_userid } = req.decodedToken;
