@@ -90,6 +90,7 @@ router.post('/:id/callback', restricted, async (req, res) => {
         return (followers = data.ids.length);
       }
     );
+    console.log(a, 'AAAAA');
     res.status(200).json({
       twitter_screenName: parsed_data.screen_name,
       totalfollowers: followers
