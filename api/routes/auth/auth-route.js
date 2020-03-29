@@ -74,6 +74,7 @@ router.post('/:id/callback', restricted, async (req, res) => {
         }
       }
     );
+    let followers = '';
 
     var T = await new Twit({
       consumer_key: process.env.CONSUMER_KEY,
@@ -86,12 +87,13 @@ router.post('/:id/callback', restricted, async (req, res) => {
       { screen_name: `${parsed_data.screen_name}` },
       function(err, data, response) {
         console.log(data, 'FOLLOWER GET');
-        res.status(200).json({
-          twitter_screenName: parsed_data.screen_name,
-          totalfollowers: data.ids.length
-        });
+        followers = data.id.length;
       }
     );
+    res.status(200).json({
+      twitter_screenName: parsed_data.screen_name,
+      totalfollowers: followers
+    });
   } catch (error) {
     res.status(500).json({
       message: error.message,
