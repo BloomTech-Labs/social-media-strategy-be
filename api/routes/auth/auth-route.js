@@ -43,7 +43,6 @@ const schema = Joi.object({
 });
 
 router.get('/:id/oauth', validateuserid, async (req, res, next) => {
-
   try {
     let twit = await client.getRequestToken(
       'https://dev-oauth.duosa5dkjv93b.amplifyapp.com/callback'
@@ -142,7 +141,10 @@ router.post('/register', async (req, res) => {
       newuser.okta_userid = ax.data.id;
       let saved = await Users.add(newuser);
 
-      res.status(201).json(saved);
+      let tokenuser = await Users.findBy({ email: req.body.email }).first();
+      const token = generateToken(tokenuser);
+
+      res.status(201).json({ saved: tokenuser, token });
     } catch (error) {
       res.status(500).json({
         message: error.message,
