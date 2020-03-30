@@ -144,7 +144,7 @@ router.post('/register', async (req, res) => {
       let tokenuser = await Users.findBy({ email: req.body.email }).first();
       const token = generateToken(tokenuser);
 
-      res.status(201).json({ saved: tokenuser, token });
+      res.status(201).json({ user: tokenuser, token });
     } catch (error) {
       res.status(500).json({
         message: error.message,
