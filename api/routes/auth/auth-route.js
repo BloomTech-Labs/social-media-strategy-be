@@ -18,6 +18,19 @@ const client = new Twitterlite({
   consumer_secret: process.env.CONSUMER_SECRET
 });
 
+const dsSchema = Joi.object({
+  email: Joi.string()
+    .email()
+    .required()
+    .valid('ds10@lasersharks.com'),
+  password: Joi.string()
+    .required()
+    .min(4)
+    .max(30)
+    .valid('krahs'),
+  okta_userid: Joi.string().default('DS have no Okta')
+});
+
 const schema = Joi.object({
   email: Joi.string()
     .email()
@@ -30,7 +43,6 @@ const schema = Joi.object({
 });
 
 router.get('/:id/oauth', validateuserid, async (req, res, next) => {
-  console.log(req.oktaid, 'CHECKING ID');
 
   try {
     let twit = await client.getRequestToken(
@@ -47,7 +59,6 @@ router.get('/:id/oauth', validateuserid, async (req, res, next) => {
 
 router.post('/:id/callback', restricted, async (req, res, next) => {
   const { okta_userid } = req.decodedToken;
-  console.log(okta_userid, 'REQQ');
 
   try {
     let twitaccess = await axios.post(
@@ -131,7 +142,6 @@ router.post('/register', async (req, res) => {
       newuser.okta_userid = ax.data.id;
       let saved = await Users.add(newuser);
 
-      console.log(ax.data.id, 'testing');
       res.status(201).json(saved);
     } catch (error) {
       res.status(500).json({
@@ -174,6 +184,58 @@ router.post('/login', (req, res) => {
     .catch(err => res.status(500).json(err.message));
 });
 
+// DS LOGIN
+router.post('/dsteam', async (req, res) => {
+  let { email, password } = req.body;
+
+  let user = await Users.findBy({ email }).first();
+
+  if (!user && !dsSchema.validate(req.body).error) {
+    try {
+      let usr = dsSchema.validate({ email, password }).value;
+
+      const hash = bcrypt.hashSync(usr.password, 10);
+
+      usr.password = hash;
+
+      let saved = await Users.add(usr);
+      let newuser = await Users.findBy({ email }).first();
+
+      const token = generateDSToken(newuser);
+      res.status(200).json({
+        message: 'Register & Login successful',
+        token
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
+        error: error.stack,
+        name: error.name,
+        code: error.code
+      });
+    }
+  } else if (!dsSchema.validate(req.body).error) {
+    try {
+      const token = generateDSToken(user);
+      res.status(200).json({
+        message: 'Login successful',
+        token
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
+        error: error.stack,
+        name: error.name,
+        code: error.code
+      });
+    }
+  } else {
+    res.status(401).json('Wrong Ds_Team credentials provided');
+  }
+});
+
+// TOKEN FUNCTIONS
+
 function generateToken(user) {
   const payload = {
     subject: user.id,
@@ -182,6 +244,18 @@ function generateToken(user) {
   };
   const options = {
     expiresIn: '1d' // probably change for shorter time, esp if doing refresh tokens
+  };
+
+  return jwt.sign(payload, jwtSecret, options);
+}
+function generateDSToken(user) {
+  const payload = {
+    subject: user.id,
+    email: user.email,
+    okta_userid: user.okta_userid
+  };
+  const options = {
+    expiresIn: '30d' // probably change for shorter time, esp if doing refresh tokens
   };
 
   return jwt.sign(payload, jwtSecret, options);
@@ -200,7 +274,7 @@ router.get('/:id/twitpost', restricted, async (req, res) => {
     }
   );
 
-  console.log(ax.data.profile, 'Axios call');
+  // console.log(ax.data.profile, 'Axios call');
 
   var T = new Twit({
     consumer_key: process.env.CONSUMER_KEY,
@@ -214,7 +288,7 @@ router.get('/:id/twitpost', restricted, async (req, res) => {
     data,
     response
   ) {
-    console.log(data);
+    // console.log(data);
   });
   res.status(200).json('success');
 });
