@@ -8,7 +8,7 @@
     "start": "node index.js",
     "server": "nodemon",
     "coverage": "jest --coverage --detectOpenHandles --forceExit || true",
-    "prestart": "node ./node_modules/knex/lib/bin/cli.js migrate:latest"
+    "prestart": "npx knex migrate:latest"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
