@@ -209,12 +209,7 @@ router.post('/dsteam', async (req, res) => {
         token
       });
     } catch (error) {
-      res.status(500).json({
-        message: error.message,
-        error: error.stack,
-        name: error.name,
-        code: error.code
-      });
+      res.status(500).json(dsSchema.validate(req.body).error);
     }
   } else if (!dsSchema.validate(req.body).error) {
     try {
@@ -224,12 +219,7 @@ router.post('/dsteam', async (req, res) => {
         token
       });
     } catch (error) {
-      res.status(500).json({
-        message: error.message,
-        error: error.stack,
-        name: error.name,
-        code: error.code
-      });
+      res.status(500).json(dsSchema.validate(req.body).error);
     }
   } else {
     res.status(401).json('Wrong Ds_Team credentials provided');
