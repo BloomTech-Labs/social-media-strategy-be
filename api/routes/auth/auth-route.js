@@ -222,6 +222,7 @@ router.post('/dsteam', async (req, res) => {
       res.status(500).json(dsSchema.validate(req.body).error);
     }
   } else {
+    console.log(dsSchema.validate(req.body).error);
     res.status(401).json('Wrong Ds_Team credentials provided');
   }
 });
