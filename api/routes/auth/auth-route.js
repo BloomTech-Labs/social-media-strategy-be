@@ -209,7 +209,9 @@ router.post('/dsteam', async (req, res) => {
         token
       });
     } catch (error) {
-      res.status(500).json(dsSchema.validate(req.body).error);
+      res
+        .status(500)
+        .json('Wrong credentials or is req.body is in wrong format');
     }
   } else if (!dsSchema.validate(req.body).error) {
     try {
@@ -219,7 +221,9 @@ router.post('/dsteam', async (req, res) => {
         token
       });
     } catch (error) {
-      res.status(500).json(dsSchema.validate(req.body).error);
+      res
+        .status(500)
+        .json('Wrong credentials or is req.body is in wrong format');
     }
   } else {
     res.status(401).json('Wrong Ds_Team credentials provided');
