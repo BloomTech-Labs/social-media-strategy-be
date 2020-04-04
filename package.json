@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "cross-env NODE_ENV=testing jest --watch",
+    "prestart": "node ./node_modules/knex/lib/bin/cli.js migrate:latest",
     "start": "node index.js",
     "server": "nodemon",
     "coverage": "jest --coverage --detectOpenHandles --forceExit || true",
