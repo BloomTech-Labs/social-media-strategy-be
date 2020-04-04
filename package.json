@@ -8,7 +8,7 @@
     "start": "node index.js",
     "server": "nodemon",
     "coverage": "jest --coverage --detectOpenHandles --forceExit || true",
-    "db:migration:run": "knex migrate:latest"
+    "db:migration:run": "sudo knex migrate:latest"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
