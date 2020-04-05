@@ -4,14 +4,7 @@ require('dotenv').config();
 module.exports = {
   development: {
     client: 'pg',
-    // connection: process.env.DATABASE_URL,
-    connection: {
-      user: process.env.DB_USER,
-      password: process.env.DB_PW,
-      database: process.env.DB_DB,
-      host: process.env.DB_HOST,
-      port: 5432,
-    },
+    connection: process.env.DATABASE_URL,
     pool: {
       min: 2,
       max: 10,
@@ -43,10 +36,10 @@ module.exports = {
     client: 'postgresql',
     // connection: process.env.DATABASE_URL,
     connection: {
-      user: 'jrivera6869',
-      password: 'postgres',
-      database: 'ebdb',
-      host: 'aa1xxezbq1ezyd0.cst1ktu0kueb.us-east-1.rds.amazonaws.com',
+      user: process.env.DB_USER,
+      password: process.env.DB_PW,
+      database: process.env.DB_DB,
+      host: process.env.DB_HOST,
       port: 5432,
     },
     pool: {
