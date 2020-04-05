@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "cross-env NODE_ENV=testing jest --watch",
-    "start": "sudo npx knex migrate:latest && node index.js",
+    "start": "npx knex migrate:latest && node index.js",
     "server": "nodemon",
     "coverage": "jest --coverage --detectOpenHandles --forceExit || true",
     "db:migration:run": "sudo knex migrate:latest"
