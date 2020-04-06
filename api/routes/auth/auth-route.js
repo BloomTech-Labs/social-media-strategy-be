@@ -15,31 +15,19 @@ var Twit = require('twit');
 
 const client = new Twitterlite({
   consumer_key: process.env.CONSUMER_KEY,
-  consumer_secret: process.env.CONSUMER_SECRET
+  consumer_secret: process.env.CONSUMER_SECRET,
 });
 
 const dsSchema = Joi.object({
-  email: Joi.string()
-    .email()
-    .required()
-    .valid('ds10@lasersharks.com'),
-  password: Joi.string()
-    .required()
-    .min(4)
-    .max(30)
-    .valid('krahs'),
-  okta_userid: Joi.string().default('DS have no Okta')
+  email: Joi.string().email().required().valid('ds10@lasersharks.com'),
+  password: Joi.string().required().min(4).max(30).valid('krahs'),
+  okta_userid: Joi.string().default('DS have no Okta'),
 });
 
 const schema = Joi.object({
-  email: Joi.string()
-    .email()
-    .required(),
-  password: Joi.string()
-    .required()
-    .min(4)
-    .max(30),
-  okta_userid: Joi.string()
+  email: Joi.string().email().required(),
+  password: Joi.string().required().min(4).max(30),
+  okta_userid: Joi.string(),
 });
 
 router.get('/:id/oauth', validateuserid, async (req, res, next) => {
@@ -75,38 +63,38 @@ router.post('/:id/callback', restricted, async (req, res, next) => {
           Oauth_secret: parsed_data.oauth_token_secret,
           twitter_userId: parsed_data.user_id,
           twitter_screenName: parsed_data.screen_name,
-          oauth_verifier: req.body.parse.oauth_verifier
-        }
+          oauth_verifier: req.body.parse.oauth_verifier,
+        },
       },
       {
         headers: {
-          Authorization: process.env.OKTA_AUTH
-        }
+          Authorization: process.env.OKTA_AUTH,
+        },
       }
     );
-    let followers = '';
+    // let followers = '';
 
     var T = new Twit({
       consumer_key: process.env.CONSUMER_KEY,
       consumer_secret: process.env.CONSUMER_SECRET,
       access_token: parsed_data.oauth_token,
-      access_token_secret: parsed_data.oauth_token_secret
+      access_token_secret: parsed_data.oauth_token_secret,
     });
     let a = await T.get('followers/ids', {
-      screen_name: `${parsed_data.screen_name}`
+      screen_name: `${parsed_data.screen_name}`,
     });
-    let totalfollowers = await (followers = a.data.ids.length);
+    let totalfollowers = await a.data.ids.length;
 
     res.status(200).json({
       twitter_screenName: parsed_data.screen_name,
-      total_followers: totalfollowers
+      total_followers: totalfollowers,
     });
   } catch (error) {
     res.status(500).json({
       message: error.message,
       error: error.stack,
       name: error.name,
-      code: error.code
+      code: error.code,
     });
   }
 });
@@ -125,16 +113,16 @@ router.post('/register', async (req, res) => {
         {
           profile: {
             email: req.body.email,
-            login: req.body.email
+            login: req.body.email,
           },
           credentials: {
-            password: { value: req.body.password }
-          }
+            password: { value: req.body.password },
+          },
         },
         {
           headers: {
-            Authorization: process.env.OKTA_AUTH
-          }
+            Authorization: process.env.OKTA_AUTH,
+          },
         }
       );
 
@@ -150,7 +138,7 @@ router.post('/register', async (req, res) => {
         message: error.message,
         error: error.stack,
         name: error.name,
-        code: error.code
+        code: error.code,
       });
     }
   } else {
@@ -163,27 +151,27 @@ router.post('/login', (req, res) => {
 
   Users.findBy({ email })
     .first()
-    .then(user => {
+    .then((user) => {
       if (user && bcrypt.compareSync(password, user.password)) {
         try {
           const token = generateToken(user);
           res.status(200).json({
             message: 'Login successful',
-            token
+            token,
           });
         } catch (error) {
           res.status(500).json({
             message: error.message,
             error: error.stack,
             name: error.name,
-            code: error.code
+            code: error.code,
           });
         }
       } else {
         res.status(500).json({ error: 'login error' });
       }
     })
-    .catch(err => res.status(500).json(err.message));
+    .catch((err) => res.status(500).json(err.message));
 });
 
 // DS LOGIN
@@ -206,7 +194,7 @@ router.post('/dsteam', async (req, res) => {
       const token = generateDSToken(newuser);
       res.status(200).json({
         message: 'Register & Login successful',
-        token
+        token,
       });
     } catch (error) {
       res
@@ -218,7 +206,7 @@ router.post('/dsteam', async (req, res) => {
       const token = generateDSToken(user);
       res.status(200).json({
         message: 'Login successful',
-        token
+        token,
       });
     } catch (error) {
       res
@@ -236,10 +224,10 @@ function generateToken(user) {
   const payload = {
     subject: user.id,
     email: user.email,
-    okta_userid: user.okta_userid
+    okta_userid: user.okta_userid,
   };
   const options = {
-    expiresIn: '1d' // probably change for shorter time, esp if doing refresh tokens
+    expiresIn: '1d', // probably change for shorter time, esp if doing refresh tokens
   };
 
   return jwt.sign(payload, jwtSecret, options);
@@ -248,10 +236,10 @@ function generateDSToken(user) {
   const payload = {
     subject: user.id,
     email: user.email,
-    okta_userid: user.okta_userid
+    okta_userid: user.okta_userid,
   };
   const options = {
-    expiresIn: '30d' // probably change for shorter time, esp if doing refresh tokens
+    expiresIn: '30d', // probably change for shorter time, esp if doing refresh tokens
   };
 
   return jwt.sign(payload, jwtSecret, options);
@@ -265,8 +253,8 @@ router.get('/:id/twitpost', restricted, async (req, res) => {
     `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
     {
       headers: {
-        Authorization: process.env.OKTA_AUTH
-      }
+        Authorization: process.env.OKTA_AUTH,
+      },
     }
   );
 
@@ -276,10 +264,10 @@ router.get('/:id/twitpost', restricted, async (req, res) => {
     consumer_key: process.env.CONSUMER_KEY,
     consumer_secret: process.env.CONSUMER_SECRET,
     access_token: ax.data.profile.Oauth_token,
-    access_token_secret: ax.data.profile.Oauth_secret
+    access_token_secret: ax.data.profile.Oauth_secret,
   });
 
-  T.post('statuses/update', { status: 'Web > DS!!!!!!' }, function(
+  T.post('statuses/update', { status: 'Web > DS!!!!!!' }, function (
     err,
     data,
     response

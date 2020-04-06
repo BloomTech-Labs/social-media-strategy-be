@@ -7,8 +7,7 @@
     "test": "cross-env NODE_ENV=testing jest --watch",
     "start": "node index.js",
     "server": "nodemon",
-    "coverage": "jest --coverage --detectOpenHandles --forceExit || true",
-    "db:migration:run": "knex migrate:latest"
+    "coverage": "jest --coverage --detectOpenHandles --forceExit || true"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
