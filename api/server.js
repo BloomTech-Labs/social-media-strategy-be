@@ -9,11 +9,24 @@ const ApiRouter = require('../api/api-routes');
 // var corsOptions = {
 //   origin: '*'
 // };
+// const corsOptions = {
+//   origin: '*',
+//   allowedHeaders: [
+//     'Content-Type',
+//     'Authorization',
+//     'Access-Control-Allow-Methods',
+//     'Access-Control-Request-Headers'
+//   ],
+//   credentials: true,
+//   enablePreflight: true
+// };
+
+// server.options('*', cors(corsOptions)); // Enable options for preflight
+server.use(cors());
 
 server.use(express.json());
 server.use(morgan('combined'));
 server.use(helmet());
-server.use(cors());
 
 server.get('/', (req, res) => {
   res.status(200).json({ message: 'ITS WORKING!!!' });

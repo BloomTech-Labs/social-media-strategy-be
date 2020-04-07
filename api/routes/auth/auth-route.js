@@ -11,73 +11,43 @@ const Twitterlite = require('twitter-lite');
 const { validateuserid } = require('../auth/middleware');
 const restricted = require('../auth/restricted-middleware');
 const queryString = require('query-string');
+var moment = require('moment-timezone');
+var schedule = require('node-schedule');
 var Twit = require('twit');
-const cors = require('cors');
-
-const corsOptions = {
-  origin: '*'
-};
 
 const client = new Twitterlite({
   consumer_key: process.env.CONSUMER_KEY,
-  consumer_secret: process.env.CONSUMER_SECRET
+  consumer_secret: process.env.CONSUMER_SECRET,
+});
+
+const dsSchema = Joi.object({
+  email: Joi.string().email().required().valid('ds10@lasersharks.com'),
+  password: Joi.string().required().min(4).max(30).valid('krahs'),
+  okta_userid: Joi.string().default('DS have no Okta'),
 });
 
 const schema = Joi.object({
-  email: Joi.string()
-    .email()
-    .required(),
-  password: Joi.string()
-    .required()
-    .min(4)
-    .max(30),
-  okta_userid: Joi.string()
+  email: Joi.string().email().required(),
+  password: Joi.string().required().min(4).max(30),
+  okta_userid: Joi.string(),
 });
 
-function corssolve(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
-  res.set('Access-Control-Allow-Origin', '*');
-  // if (isPreflight(req)) {
-  //   res.set('Access-Control-Allow-Methods', 'GET'); // Add this!
-  //   res.status(204).end();
-  //   return;
-  // }
+router.get('/:id/oauth', validateuserid, async (req, res, next) => {
+  try {
+    let twit = await client.getRequestToken(
+      'https://dev-oauth.duosa5dkjv93b.amplifyapp.com/callback'
+    );
 
-  next();
-}
+    const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${twit.oauth_token}`;
 
-router.get(
-  '/:id/oauth',
-  validateuserid,
-  cors(corsOptions),
-  corssolve,
-  async (req, res, next) => {
-    console.log(req.oktaid, 'CHECKING ID');
-
-    try {
-      let twit = await client.getRequestToken(
-        'https://mddcab.jrivera6869.now.sh/callback'
-      );
-
-      const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${twit.oauth_token}`;
-      // const redirecturl = `https://wwww.google.com`;
-
-      res.redirect(redirecturl);
-      next();
-      res.status(200).json({ message: 'success' });
-    } catch (error) {
-      res.status(500).json(error.message);
-    }
+    res.status(200).json(redirecturl);
+  } catch (error) {
+    res.status(500).json(error.message);
   }
-);
+});
 
-router.post('/:id/callback', restricted, async (req, res) => {
+router.post('/:id/callback', restricted, async (req, res, next) => {
   const { okta_userid } = req.decodedToken;
-  console.log(okta_userid, 'REQQ');
 
   try {
     let twitaccess = await axios.post(
@@ -95,43 +65,41 @@ router.post('/:id/callback', restricted, async (req, res) => {
           Oauth_secret: parsed_data.oauth_token_secret,
           twitter_userId: parsed_data.user_id,
           twitter_screenName: parsed_data.screen_name,
-          oauth_verifier: req.body.parse.oauth_verifier
-        }
+          oauth_verifier: req.body.parse.oauth_verifier,
+        },
       },
       {
         headers: {
-          Authorization: process.env.OKTA_AUTH
-        }
+          Authorization: process.env.OKTA_AUTH,
+        },
       }
     );
+    // let followers = '';
 
-    res.status(200).json({ message: req.body });
+    var T = new Twit({
+      consumer_key: process.env.CONSUMER_KEY,
+      consumer_secret: process.env.CONSUMER_SECRET,
+      access_token: parsed_data.oauth_token,
+      access_token_secret: parsed_data.oauth_token_secret,
+    });
+    let a = await T.get('followers/ids', {
+      screen_name: `${parsed_data.screen_name}`,
+    });
+    let totalfollowers = await a.data.ids.length;
+
+    res.status(200).json({
+      twitter_screenName: parsed_data.screen_name,
+      total_followers: totalfollowers,
+    });
   } catch (error) {
     res.status(500).json({
       message: error.message,
       error: error.stack,
       name: error.name,
-      code: error.code
+      code: error.code,
     });
   }
 });
-
-// console.log(twitaccess);
-// console.log({
-//   accTkn: parsed_data.oauth_token,
-//   accTknSecret: parsed_data.oauth_token_secret,
-//   userId: parsed_data.user_id,
-//   screenName: parsed_data.screen_name
-// });
-// // console.log(ax);
-// console.log(req.body.location.search, 'BODDY');
-
-// console.log({
-//   message: error.message,
-//   error: error.stack,
-//   name: error.name,
-//   code: error.code
-// });
 
 router.post('/register', async (req, res) => {
   let user = req.body;
@@ -147,30 +115,32 @@ router.post('/register', async (req, res) => {
         {
           profile: {
             email: req.body.email,
-            login: req.body.email
+            login: req.body.email,
           },
           credentials: {
-            password: { value: req.body.password }
-          }
+            password: { value: req.body.password },
+          },
         },
         {
           headers: {
-            Authorization: process.env.OKTA_AUTH
-          }
+            Authorization: process.env.OKTA_AUTH,
+          },
         }
       );
 
       newuser.okta_userid = ax.data.id;
       let saved = await Users.add(newuser);
 
-      console.log(ax.data.id, 'testing');
-      res.status(201).json(saved);
+      let tokenuser = await Users.findBy({ email: req.body.email }).first();
+      const token = generateToken(tokenuser);
+
+      res.status(201).json({ user: tokenuser, token });
     } catch (error) {
       res.status(500).json({
         message: error.message,
         error: error.stack,
         name: error.name,
-        code: error.code
+        code: error.code,
       });
     }
   } else {
@@ -183,37 +153,95 @@ router.post('/login', (req, res) => {
 
   Users.findBy({ email })
     .first()
-    .then(user => {
+    .then((user) => {
       if (user && bcrypt.compareSync(password, user.password)) {
         try {
           const token = generateToken(user);
           res.status(200).json({
             message: 'Login successful',
-            token
+            token,
           });
         } catch (error) {
           res.status(500).json({
             message: error.message,
             error: error.stack,
             name: error.name,
-            code: error.code
+            code: error.code,
           });
         }
       } else {
         res.status(500).json({ error: 'login error' });
       }
     })
-    .catch(err => res.status(500).json(err.message));
+    .catch((err) => res.status(500).json(err.message));
 });
+
+// DS LOGIN
+router.post('/dsteam', async (req, res) => {
+  let { email, password } = req.body;
+
+  let user = await Users.findBy({ email }).first();
+
+  if (!user && !dsSchema.validate(req.body).error) {
+    try {
+      let usr = dsSchema.validate({ email, password }).value;
+
+      const hash = bcrypt.hashSync(usr.password, 10);
+
+      usr.password = hash;
+
+      let saved = await Users.add(usr);
+      let newuser = await Users.findBy({ email }).first();
+
+      const token = generateDSToken(newuser);
+      res.status(200).json({
+        message: 'Register & Login successful',
+        token,
+      });
+    } catch (error) {
+      res
+        .status(500)
+        .json('Wrong credentials or is req.body is in wrong format');
+    }
+  } else if (!dsSchema.validate(req.body).error) {
+    try {
+      const token = generateDSToken(user);
+      res.status(200).json({
+        message: 'Login successful',
+        token,
+      });
+    } catch (error) {
+      res
+        .status(500)
+        .json('Wrong credentials or is req.body is in wrong format');
+    }
+  } else {
+    res.status(401).json('Wrong Ds_Team credentials provided');
+  }
+});
+
+// TOKEN FUNCTIONS
 
 function generateToken(user) {
   const payload = {
     subject: user.id,
     email: user.email,
-    okta_userid: user.okta_userid
+    okta_userid: user.okta_userid,
   };
   const options = {
-    expiresIn: '1d' // probably change for shorter time, esp if doing refresh tokens
+    expiresIn: '1d', // probably change for shorter time, esp if doing refresh tokens
+  };
+
+  return jwt.sign(payload, jwtSecret, options);
+}
+function generateDSToken(user) {
+  const payload = {
+    subject: user.id,
+    email: user.email,
+    okta_userid: user.okta_userid,
+  };
+  const options = {
+    expiresIn: '30d', // probably change for shorter time, esp if doing refresh tokens
   };
 
   return jwt.sign(payload, jwtSecret, options);
@@ -227,28 +255,45 @@ router.get('/:id/twitpost', restricted, async (req, res) => {
     `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
     {
       headers: {
-        Authorization: process.env.OKTA_AUTH
-      }
+        Authorization: process.env.OKTA_AUTH,
+      },
     }
   );
 
-  console.log(ax.data.profile, 'Axios call');
+  // console.log(ax.data.profile, 'Axios call');
 
   var T = new Twit({
     consumer_key: process.env.CONSUMER_KEY,
     consumer_secret: process.env.CONSUMER_SECRET,
     access_token: ax.data.profile.Oauth_token,
-    access_token_secret: ax.data.profile.Oauth_secret
+    access_token_secret: ax.data.profile.Oauth_secret,
   });
 
-  T.post('statuses/update', { status: 'Web > DS!!!!!!' }, function(
+  T.post('statuses/update', { status: 'Web > DS!!!!!!' }, function (
     err,
     data,
     response
   ) {
-    console.log(data);
+    // console.log(data);
   });
   res.status(200).json('success');
+});
+
+// TEST CRON
+
+router.post('/test', (req, res) => {
+  var a = moment.tz(`${req.body.date}`,`${req.body.tz}`);
+
+  // var date = new Date(2020, 3, 5, 22, 2, 0);
+
+  let x = 'TESTING STUFF';
+  schedule.scheduleJob(`${a}`, function () {
+    console.log(
+      'The answer to life, the universe, and everything!',
+      new Date(),req.body.test
+    );
+  });
+  res.status(201).json({ message: x });
 });
 
 module.exports = router;
