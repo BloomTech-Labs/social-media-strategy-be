@@ -12,6 +12,15 @@ exports.up = function(knex) {
       .inTable('users')
       .onUpdate('CASCADE')
       .onDelete('CASCADE');
+
+
+      // tbl
+      // .integer('post_id')
+      // .references('id')
+      // .inTable('posts')
+      // .onUpdate('CASCADE')
+      // .onDelete('CASCADE');
+      
   });
 };
 
