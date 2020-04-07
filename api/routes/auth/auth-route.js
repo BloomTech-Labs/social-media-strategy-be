@@ -281,7 +281,7 @@ router.get('/:id/twitpost', restricted, async (req, res) => {
 // TEST CRON
 
 router.get('/test', (req, res) => {
-  var date = new Date(2020, 3, 5, 22, 02, 0);
+  var date = new Date(2020, 3, 5, 22, 2, 0);
   console.log('TEST');
 
   let x = '';
