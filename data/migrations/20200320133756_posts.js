@@ -29,22 +29,9 @@ exports.up = function(knex) {
       // .notNullable()
       .defaultsTo(false);
 
-    tbl
-      .datetime('date')
-      // .notNullable()
-      .defaultsTo(knex.fn.now(6));
-
-      tbl
-      .text('tz');
-
-    tbl
-      .integer('topic_id')
-      .unsigned()
-      .references('id')
-      .inTable('topics')
-      .onUpdate('CASCADE')
-      .onDelete('CASCADE');
-
+    tbl.text('date')
+    tbl.text('tz');
+    // tbl.integer('topic_id').unsigned().references('id').inTable('topics').onUpdate('CASCADE').onDelete('CASCADE');
 
       tbl
       .text('optimal_time'); 

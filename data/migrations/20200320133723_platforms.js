@@ -2,8 +2,7 @@ exports.up = function(knex) {
   return knex.schema.createTable('platforms', tbl => {
     tbl.increments('id');
 
-    tbl.text('platform', 64).notNullable();
-
+    tbl.text('platform', 64);
     tbl
       .integer('user_id')
       .unsigned()

@@ -9,8 +9,8 @@ const schema = Joi.object({
   user_id: Joi.number(),
   platform_id: Joi.number(),
   post_text: Joi.string().required(),
-  datestamp: Joi.any(),
-  topic_id: Joi.number().allow('')
+  datestamp: Joi.any()
+  // topic_id: Joi.number().allow('')
 });
 
 router.get('/', (req, res) => {

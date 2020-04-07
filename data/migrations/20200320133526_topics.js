@@ -13,14 +13,8 @@ exports.up = function(knex) {
       .onUpdate('CASCADE')
       .onDelete('CASCADE');
 
+      tbl.specificType('cards', 'text ARRAY');
 
-      // tbl
-      // .integer('post_id')
-      // .references('id')
-      // .inTable('posts')
-      // .onUpdate('CASCADE')
-      // .onDelete('CASCADE');
-      
   });
 };
 
