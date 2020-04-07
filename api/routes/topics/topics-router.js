@@ -5,7 +5,8 @@ const router = express.Router();
 
 const schema = Joi.object({
   user_id: Joi.number(),
-  name: Joi.string().required()
+  name: Joi.string().required(),
+  cards: Joi.array()
 });
 
 router.get('/', (req, res) => {
@@ -45,11 +46,29 @@ router.get('/:id/user', (req, res) => {
     })
     .catch(err => {
       res.status(404).json({
-        message: 'topic with specified ID not found',
+        message: 'User with specified ID not found',
         Error: err
       });
     });
 });
+
+
+router.get('/:id/test', (req, res) => {
+  const { id } = req.params;
+
+  Topics.getCards({ user_id: id })
+    .then(topics => {
+      res.status(200).json({ 'Topic by specified user': topics });
+    })
+    .catch(err => {
+      res.status(404).json({
+        message: 'User with specified ID not found',
+        Error: err
+      });
+    });
+});
+
+// POST START HERE ----------------
 
 router.post('/:id/user', (req, res) => {
   const { id } = req.params;
@@ -73,6 +92,7 @@ router.post('/:id/user', (req, res) => {
   }
 });
 
+// PUT START HERE --------------
 router.put('/:id', (req, res) => {
   const { id } = req.params;
   const update = req.body;
@@ -89,6 +109,7 @@ router.put('/:id', (req, res) => {
     });
 });
 
+// DELETE START HERE ------------
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
 
