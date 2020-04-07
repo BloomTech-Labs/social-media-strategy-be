@@ -286,11 +286,11 @@ router.post('/test', (req, res) => {
 
   // var date = new Date(2020, 3, 5, 22, 2, 0);
 
-  let x = '';
+  let x = 'TESTING STUFF';
   schedule.scheduleJob(`${a}`, function () {
     console.log(
       'The answer to life, the universe, and everything!',
-      new Date()
+      new Date(),req.body.test
     );
   });
   res.status(201).json({ message: x });
