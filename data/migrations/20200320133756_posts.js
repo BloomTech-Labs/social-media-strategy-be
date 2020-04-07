@@ -14,9 +14,9 @@ exports.up = function(knex) {
     tbl
       .integer('platform_id')
       .unsigned()
-      .notNullable()
       .references('id')
       .inTable('platforms')
+      .defaultsTo(1)
       .onUpdate('CASCADE')
       .onDelete('CASCADE');
 
