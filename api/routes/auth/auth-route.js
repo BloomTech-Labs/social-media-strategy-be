@@ -11,6 +11,7 @@ const Twitterlite = require('twitter-lite');
 const { validateuserid } = require('../auth/middleware');
 const restricted = require('../auth/restricted-middleware');
 const queryString = require('query-string');
+var moment = require('moment-timezone');
 var schedule = require('node-schedule');
 var Twit = require('twit');
 
@@ -280,12 +281,13 @@ router.get('/:id/twitpost', restricted, async (req, res) => {
 
 // TEST CRON
 
-router.get('/test', (req, res) => {
-  var date = new Date(2020, 3, 5, 22, 2, 0);
-  console.log('TEST');
+router.post('/test', (req, res) => {
+  var a = moment.tz(`${req.body.date}`,`${req.body.tz}`);
+
+  // var date = new Date(2020, 3, 5, 22, 2, 0);
 
   let x = '';
-  schedule.scheduleJob('*/5 * * * * *', function () {
+  schedule.scheduleJob(`${a}`, function () {
     console.log(
       'The answer to life, the universe, and everything!',
       new Date()
