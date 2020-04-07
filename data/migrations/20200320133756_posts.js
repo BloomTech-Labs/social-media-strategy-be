@@ -30,9 +30,12 @@ exports.up = function(knex) {
       .defaultsTo(false);
 
     tbl
-      .datetime('datestamp')
+      .datetime('date')
       // .notNullable()
       .defaultsTo(knex.fn.now(6));
+
+      tbl
+      .text('tz');
 
     tbl
       .integer('topic_id')
