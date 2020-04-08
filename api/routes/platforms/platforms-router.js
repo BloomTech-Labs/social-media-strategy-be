@@ -2,6 +2,7 @@ const express = require('express');
 const Platforms = require('./platforms-model.js');
 const Joi = require('@hapi/joi');
 const router = express.Router();
+const {joivalidation,joivalidationError} = require('../../helper')
 
 const schema = Joi.object({
   user_id: Joi.number(),
@@ -54,8 +55,8 @@ router.get('/:id/user', (req, res) => {
 router.post('/:id/user', (req, res) => {
   const { id } = req.params;
   const platformbody = { ...req.body, user_id: id };
-  if (Object.keys(platformbody).length === 0 || schema.validate(platformbody).error) {
-    res.status(500).json(schema.validate(platformbody).error);
+  if (joivalidation(platformbody,schema)) {
+    res.status(500).json(joivalidationError(platformbody,schema));
   } else {
     Platforms.add(platformbody) //May need to change depending on payload
       .then(value => {

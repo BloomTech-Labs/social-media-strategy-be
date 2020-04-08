@@ -282,9 +282,10 @@ router.get('/:id/twitpost', restricted, async (req, res) => {
 // TEST CRON
 
 router.post('/test', (req, res) => {
+  
+  // FORMAT for : "date":"2020-04-07 00:29",  "tz":"America/New_York",
   var a = moment.tz(`${req.body.date}`,`${req.body.tz}`);
 
-  // var date = new Date(2020, 3, 5, 22, 2, 0);
 
   let x = 'TESTING STUFF';
   schedule.scheduleJob(`${a}`, function () {
