@@ -9,10 +9,18 @@ const schema = Joi.object({
   platform: Joi.string().required(),
 });
 
+async function lengthcheck(model) {
+  let lengthcheck = await model;
+  return lengthcheck.length;
+}
+
 function platformModals(modal, req, res) {
   modal
     .then((platforms) => {
-      res.status(200).json(platforms);
+      console.log(platforms);
+      platforms
+        ? res.status(200).json(platforms)
+        : res.status(404).json("Nothing found");
     })
     .catch((error) => {
       res.status(500).json({
@@ -38,10 +46,13 @@ router.get("/", (req, res) => {
   //   });
 });
 
-router.get("/:id", (req, res) => {
-  const { id } = req.params;
-
-  platformModals(Platforms.find({ id }), req, res);
+router.get("/:id", async (req, res) => {
+  if ((await lengthcheck(Platforms.find({ id: req.params.id }))) === 0) {
+    return res.status(404).json("not found");
+  } else {
+    platformModals(Platforms.find({ id: req.params.id }), req, res);
+  }
+  // let lengthcheck = await Platforms.find({ id: req.params.id });
 
   // Platforms.find({ id })
   //   .then((platforms) => {
