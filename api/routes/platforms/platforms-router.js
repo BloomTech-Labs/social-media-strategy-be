@@ -14,7 +14,7 @@ async function lengthcheck(model) {
   return lengthcheck.length;
 }
 
-function platformModals(modal, req, res) {
+function platformModels(modal, req, res) {
   modal
     .then((platforms) => {
       console.log(platforms);
@@ -33,7 +33,7 @@ function platformModals(modal, req, res) {
 }
 
 router.get("/", (req, res) => {
-  platformModals(Platforms.find(), req, res);
+  platformModels(Platforms.find(), req, res);
   // Platforms.find()
   //   .then((platforms) => {
   //     res.status(200).json({ "All platforms": platforms });
@@ -50,7 +50,7 @@ router.get("/:id", async (req, res) => {
   if ((await lengthcheck(Platforms.find({ id: req.params.id }))) === 0) {
     return res.status(404).json("not found");
   } else {
-    platformModals(Platforms.find({ id: req.params.id }), req, res);
+    platformModels(Platforms.find({ id: req.params.id }), req, res);
   }
   // let lengthcheck = await Platforms.find({ id: req.params.id });
 
@@ -69,7 +69,7 @@ router.get("/:id", async (req, res) => {
 router.get("/:id/user", (req, res) => {
   const { id } = req.params;
 
-  platformModals(Platforms.find({ user_id: id }), req, res);
+  platformModels(Platforms.find({ user_id: id }), req, res);
 
   // Platforms.find({ user_id: id })
   //   .then((platforms) => {
@@ -90,7 +90,7 @@ router.post("/:id/user", (req, res) => {
   if (joivalidation(platformbody, schema)) {
     res.status(500).json(joivalidationError(platformbody, schema));
   } else {
-    platformModals(Platforms.add(platformbody), req, res);
+    platformModels(Platforms.add(platformbody), req, res);
 
     // Platforms.add(platformbody) //May need to change depending on payload
     //   .then((value) => {
@@ -112,7 +112,7 @@ router.put("/:id", (req, res) => {
   const { id } = req.params;
   const update = req.body;
 
-  platformModals(Platforms.update(update, id), req, res);
+  platformModels(Platforms.update(update, id), req, res);
 
   // Platforms.update(update, id) //May need to change depending on payload
   //   .then((value) => {
@@ -129,7 +129,7 @@ router.put("/:id", (req, res) => {
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
 
-  platformModals(Platforms.remove(id), req, res);
+  platformModels(Platforms.remove(id), req, res);
 
   // Platforms.remove(id)
   //   .then((response) => {
