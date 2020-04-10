@@ -13,6 +13,7 @@ const restricted = require('../auth/restricted-middleware');
 const queryString = require('query-string');
 var schedule = require('node-schedule');
 var Twit = require('twit');
+var moment = require('moment-timezone');
 
 const client = new Twitterlite({
   consumer_key: process.env.CONSUMER_KEY,
@@ -280,18 +281,32 @@ router.get('/:id/twitpost', restricted, async (req, res) => {
 
 // TEST CRON
 
-router.get('/test', (req, res) => {
-  var date = new Date(2020, 3, 5, 22, 02, 0);
-  console.log('TEST');
+router.post('/test', async (req, res) => {
+  // "America/New_York has to be their time zone"
+  var a = moment.tz(`${req.body.date}`, `${req.body.tz}`);
 
-  let x = '';
-  schedule.scheduleJob('*/5 * * * * *', function () {
-    console.log(
-      'The answer to life, the universe, and everything!',
-      new Date()
-    );
-  });
-  res.status(201).json({ message: x });
+  a.utc().format();
+
+  var date = new Date(req.body.date);
+
+  // "date":"April 05, 2020 23:20:00"   FORMAT
+
+  console.log('TEST');
+  console.log(req.body.test, date, a);
+
+  if (req.body.email === 'hello@hello.com') {
+    schedule.scheduleJob(`${a}`, function () {
+      console.log(
+        a.utc().format(),
+        'The answer to life, the universe, and everything!',
+        new Date(),
+        req.body.date
+      );
+    });
+    res.status(201).json({ message: `IF,${req.body.date}` });
+  } else {
+    res.status(201).json({ message: 'ELSE ' });
+  }
 });
 
 module.exports = router;
