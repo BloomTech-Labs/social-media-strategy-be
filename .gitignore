@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-node_modules
-=======
 .DS_Store
 node_modules/# Logs
 logs
@@ -111,4 +108,3 @@ dist
 .vscode-test
 
 coverage/
->>>>>>> 24723620f06ecfddef11039e30305e0d5d398762
