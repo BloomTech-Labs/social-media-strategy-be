@@ -63,23 +63,24 @@ router.get("/:id/user", (req, res) => {
 router.post("/:id/user", (req, res) => {
   const { id } = req.params;
   const topicbody = { ...req.body, user_id: id };
-  if (Object.keys(topicbody).length === 0 || schema.validate(topicbody).error) {
-    res.status(500).json(schema.validate(topicbody).error);
-  } else {
-    Topics.add(topicbody) //May need to change depending on payload
-      .then((value) => {
-        res.status(200).json({ value });
-      })
-      .catch((err) => {
-        console.log("HELLO TOPICS");
-        res.status(500).json({
-          message: "topic cannot be added",
-          Error: err.message,
-          stack: err.stack,
-          code: err.code,
-        });
+  console.log(req.body);
+  // if (Object.keys(topicbody).length === 0 || schema.validate(topicbody).error) {
+  //   res.status(500).json(schema.validate(topicbody).error);
+  // } else {
+  // }
+  Topics.add(req.body) //May need to change depending on payload
+    .then((value) => {
+      res.status(200).json(value);
+    })
+    .catch((err) => {
+      console.log("HELLO TOPICS");
+      res.status(500).json({
+        message: "topic cannot be added",
+        Error: err.message,
+        stack: err.stack,
+        code: err.code,
       });
-  }
+    });
 });
 
 // PUT START HERE --------------

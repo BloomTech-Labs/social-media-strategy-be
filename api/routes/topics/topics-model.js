@@ -13,9 +13,10 @@ function find(filter) {
 }
 
 async function add(topics) {
-  await db("topics").insert(topics);
+  let addTopic = await db("topics").insert(topics);
 
-  return find(topics).first();
+  // return find(topics);
+  return addTopic.rowCount;
 }
 
 function remove(id) {
