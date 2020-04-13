@@ -6,7 +6,7 @@ const router = express.Router();
 const schema = Joi.object({
   user_id: Joi.number(),
   name: Joi.string().required(),
-  cards: Joi.string(),
+  cards: Joi.array(),
 });
 
 router.get("/", (req, res) => {
