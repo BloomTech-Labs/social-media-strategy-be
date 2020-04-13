@@ -5,7 +5,7 @@ const router = express.Router();
 
 const schema = Joi.object({
   user_id: Joi.number(),
-  name: Joi.string().required(),
+  title: Joi.string().required(),
   cards: Joi.array(),
 });
 
