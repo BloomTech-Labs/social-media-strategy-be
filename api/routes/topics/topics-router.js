@@ -58,23 +58,6 @@ router.get("/:id/user", (req, res) => {
     });
 });
 
-// router.get("/:id/test", (req, res) => {
-//   const { id } = req.params;
-
-//   Topics.getTopicCards(id)
-//     .then((topics) => {
-//       !topics.length
-//         ? res.status(404).json("topics for this user not found")
-//         : res.status(200).json(topics);
-//     })
-//     .catch((err) => {
-//       res.status(404).json({
-//         message: "User with specified ID not found",
-//         Error: err.message,
-//       });
-//     });
-// });
-
 // POST START HERE ----------------
 
 router.post("/:id/user", (req, res) => {

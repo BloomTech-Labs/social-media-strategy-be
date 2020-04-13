@@ -92,6 +92,8 @@ router.post("/:id/user", (req, res) => {
   } else {
     platformModels(Platforms.add(platformbody), req, res);
 
+    // *** These are the same ------
+
     // Platforms.add(platformbody) //May need to change depending on payload
     //   .then((value) => {
     //     res.status(200).json({ "Added platform: ": value });
