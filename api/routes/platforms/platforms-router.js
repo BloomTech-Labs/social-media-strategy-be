@@ -17,7 +17,7 @@ async function lengthcheck(model) {
 function platformModels(modal, req, res) {
   modal
     .then((platforms) => {
-      console.log(platforms);
+      // console.log(platforms);
       platforms
         ? res.status(200).json(platforms)
         : res.status(404).json("Nothing found");

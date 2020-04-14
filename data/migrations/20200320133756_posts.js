@@ -23,3 +23,4 @@ exports.up = function(knex) {
 exports.down = function(knex) {
   return knex.schema.dropTableIfExists('posts');
 };
+ //https://social-media-strategy.herokuapp.com/api/
