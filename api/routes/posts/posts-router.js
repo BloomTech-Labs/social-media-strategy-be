@@ -16,7 +16,7 @@ const schema = Joi.object({
 router.get('/', (req, res) => {
   Posts.find()
     .then(posts => {
-      res.status(200).json({ 'All posts': posts });
+      res.status(200).json({ 'Posts': posts });
     })
     .catch(err => {
       res.status(500).json({
