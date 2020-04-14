@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 router.use('/auth', AuthRouter);
 router.use('/users', restricted, UserRouter);
 router.use('/posts', restricted, PostsRouter);
-router.use('/topics', TopicsRouter);
+router.use('/topics', restricted, TopicsRouter);
 router.use('/platforms', restricted, PlatformsRouter);
 
 module.exports = router;
