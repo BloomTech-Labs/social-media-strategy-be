@@ -73,7 +73,7 @@ router.post("/:id/user", (req, res) => {
       res.status(200).json(value);
     })
     .catch((err) => {
-      console.log("HELLO TOPICS");
+      console.log({ Error: err.message, stack: err.stack, code: err.code });
       res.status(500).json({
         message: "topic cannot be added",
         Error: err.message,
