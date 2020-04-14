@@ -2,13 +2,15 @@ const express = require('express');
 const Posts = require('./posts-model.js');
 const Joi = require('@hapi/joi');
 const router = express.Router();
+const axios = require('axios');
+const validate = require('../auth/middleware');
 
 const schema = Joi.object({
   user_id: Joi.number(),
   platform_id: Joi.number(),
   post_text: Joi.string().required(),
-  datestamp: Joi.any(),
-  topic_id: Joi.number().allow('')
+  datestamp: Joi.any()
+  // topic_id: Joi.number().allow('')
 });
 
 router.get('/', (req, res) => {
@@ -54,24 +56,34 @@ router.get('/:id/user', (req, res) => {
     });
 });
 
-router.post('/:id/user', (req, res) => {
+router.post('/:id/user', validate.validateuserid, async (req, res) => {
+
   const { id } = req.params;
   const postbody = { ...req.body, user_id: id };
   if (Object.keys(postbody).length === 0 || schema.validate(postbody).error) {
     res.status(500).json(schema.validate(postbody).error);
   } else {
-    Posts.add(postbody) //May need to change depending on payload
-      .then(value => {
-        res.status(200).json({ 'Added post: ': value });
-      })
-      .catch(err => {
-        console.log('HELLO');
-        res
-          .status(500)
-          .json({ message: 'Post cannot be added', Error: err.message });
+    try {
+      let post = await Posts.add(postbody);
+      let ax = await axios.post(
+        ' https://social-media-strategy-ds.herokuapp.com/recommend',
+        post
+      );
+
+      console.log(post, ax, postbody, 'TESTING');
+      return res.status(201).json(post);
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
+        error: error.stack,
+        name: error.name,
+        code: error.code
       });
+    }
   }
 });
+
+
 
 router.put('/:id', (req, res) => {
   const { id } = req.params;

@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken'); // <<< install this npm package
-
 const { jwtSecret } = require('../../config/secrets');
 
 module.exports = (req, res, next) => {
