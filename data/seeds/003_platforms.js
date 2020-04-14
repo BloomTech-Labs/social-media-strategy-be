@@ -6,7 +6,6 @@ exports.seed = function(knex) {
       // Inserts seed entries
       return knex('platforms').insert([
         { id: 1, platform: 'Twitter' }
-
       ]);
     });
 };
