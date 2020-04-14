@@ -2,6 +2,7 @@ const express = require("express");
 const Topics = require("./topics-model.js");
 const Joi = require("@hapi/joi");
 const router = express.Router();
+const Query = require("../../query");
 
 const schema = Joi.object({
   user_id: Joi.number(),
@@ -43,8 +44,11 @@ router.get("/:id", (req, res) => {
 
 router.get("/:id/user", (req, res) => {
   const { id } = req.params;
+  const { sortby } = req.query;
+  console.log(req.query);
 
-  Topics.getTopicCards(id)
+  // Topics.getTopicCards(id)
+  Query.getTopics({ sortby }, id)
     .then((topics) => {
       !topics.length
         ? res.status(404).json("topics for this user not found")
