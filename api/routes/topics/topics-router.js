@@ -47,8 +47,8 @@ router.get("/:id/user", (req, res) => {
   const { sortby } = req.query;
   console.log(req.query);
 
-  Topics.getTopicCards(id)
-    // Query.getTopics({ sortby }, id)
+  // Topics.getTopicCards(id)
+  Query.getTopics({ sortby }, id)
     .then((topics) => {
       !topics.length
         ? res.status(404).json("topics for this user not found")
