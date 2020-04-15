@@ -50,6 +50,24 @@ router.delete("/:id", checkRole("admin"), async (req, res) => {
   }
 });
 
+router.delete("/:id/local", async (req, res) => {
+  const { id } = req.params;
+  console.log(okta_userid);
+  console.log(process.env.OKTA_DOMAIN, "ENV");
+
+  try {
+    let userResponse = await User.remove(id);
+    res.status(200).json({ message: "User deleted", userResponse });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+      error: error.stack,
+      name: error.name,
+      code: error.code,
+    });
+  }
+});
+
 function checkRole(...roles) {
   return (req, res, next) => {
     console.log(req.decodedToken);
