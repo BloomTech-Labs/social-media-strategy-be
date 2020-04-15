@@ -63,7 +63,7 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
   console.log('HELLO TESTING IF I MAKE IT', id, okta_userid);
 
   try {
-    let axx = await axios.get(
+    let ax = await axios.get(
       `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
       {
         headers: {
