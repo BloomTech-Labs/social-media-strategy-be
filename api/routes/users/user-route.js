@@ -52,8 +52,6 @@ router.delete("/:id", checkRole("admin"), async (req, res) => {
 
 router.delete("/:id/local", async (req, res) => {
   const { id } = req.params;
-  console.log(okta_userid);
-  console.log(process.env.OKTA_DOMAIN, "ENV");
 
   try {
     let userResponse = await User.remove(id);
