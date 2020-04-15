@@ -107,18 +107,41 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
   }
 });
 
-router.post('/:id/twitter', validate.twitterInfo, (req, res) => {
-  console.log('hello', req.twit);
-  console.log('3', req.twit.config);
-  console.log('2', req.twit.config.consumer_key);
-  req.twit.post('statuses/update', { status: 'Web > DS!!!!!!' }, function (
-    err,
-    data,
-    response
-  ) {
-    console.log(data);
-  });
-  res.status(200).json('success');
+router.post('/:id/twitter', validate.twitterInfo, async (req, res) => {
+  const { id } = req.params;
+  try {
+    let axx = await axios.get(
+      `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
+      {
+        headers: {
+          Authorization: process.env.OKTA_AUTH,
+        },
+      }
+    );
+
+    console.log(axx.data.profile.twitter_screenName, 'SCREENNAME FROM OKTA');
+
+    const postbody = {
+      ...req.body,
+      screenname: axx.data.profile.twitter_screenName,
+      user_id: id,
+    };
+
+    if (Object.keys(postbody).length === 0 || schema.validate(postbody).error) {
+      res.status(500).json(schema.validate(postbody).error);
+    } else {
+      req.twit.post(
+        'statuses/update',
+        { status: req.body.post_text },
+        function (err, data, response) {
+          console.log(data, response, err);
+        }
+      );
+      res.status(200).json('posted successfully');
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
 });
 
 router.put('/:id', (req, res) => {
