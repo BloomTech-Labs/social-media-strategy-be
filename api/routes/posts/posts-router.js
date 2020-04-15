@@ -62,7 +62,7 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
   const { id } = req.params;
   console.log('HELLO TESTING IF I MAKE IT', id, okta_userid);
 
-  try {
+
     let axx = await axios.get(
       `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
       {
@@ -71,15 +71,17 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
         },
       }
     );
-  } catch (error) {
-    console.log(error);
-  }
+
+  console.log(error);
+
   console.log(axx.data.twitter_screenName, 'SCREENNAME FROM OKTA');
+
   const postbody = {
     ...req.body,
     screenname: axx.data.twitter_screenName,
     user_id: id,
   };
+  
   if (Object.keys(postbody).length === 0 || schema.validate(postbody).error) {
     res.status(500).json(schema.validate(postbody).error);
   } else {
