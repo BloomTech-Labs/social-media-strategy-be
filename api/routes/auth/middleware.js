@@ -36,6 +36,7 @@ async function twitterInfo(req, res, next) {
       access_token: ax.data.profile.Oauth_token,
       access_token_secret: ax.data.profile.Oauth_secret,
     });
+    req.twit = T;
     next();
   } catch (error) {
     console.log(error);

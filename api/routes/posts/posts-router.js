@@ -108,7 +108,7 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
 });
 
 router.post('/:id/twitter', validate.twitterInfo, (req, res) => {
-  console.log('hello', T);
+  console.log('hello', req.twit);
 });
 
 router.put('/:id', (req, res) => {
