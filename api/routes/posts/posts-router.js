@@ -71,7 +71,7 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
     }
   );
 
-  console.log(axx.data.twitter_screenName, 'SCREENNAME FROM OKTA');
+  console.log(axx, 'SCREENNAME FROM OKTA');
 
   const postbody = {
     ...req.body,
