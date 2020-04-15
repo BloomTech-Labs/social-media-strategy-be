@@ -109,6 +109,8 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
 
 router.post('/:id/twitter', validate.twitterInfo, async (req, res) => {
   const { id } = req.params;
+  const { okta_userid } = req.decodedToken;
+
   try {
     let axx = await axios.get(
       `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
@@ -140,14 +142,12 @@ router.post('/:id/twitter', validate.twitterInfo, async (req, res) => {
       res.status(200).json('posted successfully');
     }
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: error.message,
-        stack: error.stack,
-        title: error.title,
-        code: error.code,
-      });
+    res.status(500).json({
+      error: error.message,
+      stack: error.stack,
+      title: error.title,
+      code: error.code,
+    });
   }
 });
 
