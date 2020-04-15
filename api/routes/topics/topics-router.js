@@ -8,6 +8,7 @@ const schema = Joi.object({
   user_id: Joi.number(),
   title: Joi.string().required(),
   cards: Joi.array(),
+  index: Joi.number(),
 });
 
 router.get("/", (req, res) => {
