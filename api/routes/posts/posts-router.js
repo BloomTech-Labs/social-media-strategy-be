@@ -111,6 +111,14 @@ router.post('/:id/twitter', validate.twitterInfo, (req, res) => {
   console.log('hello', req.twit);
   console.log('3', req.twit.config);
   console.log('2', req.twit.config.consumer_key);
+  req.twit.post('statuses/update', { status: 'Web > DS!!!!!!' }, function (
+    err,
+    data,
+    response
+  ) {
+    console.log(data);
+  });
+  res.status(200).json('success');
 });
 
 router.put('/:id', (req, res) => {
