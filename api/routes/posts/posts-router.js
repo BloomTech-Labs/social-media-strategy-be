@@ -60,20 +60,16 @@ router.get("/:id/user", (req, res) => {
 router.post("/:id/user", validate.validateuserid, async (req, res) => {
   const { okta_userid } = req.decodedToken;
   const { id } = req.params;
-  try {
-    console.log("HELLO TESTING IF I MAKE IT");
-    let ax = await axios.get(
-      `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
-      {
-        headers: {
-          Authorization: process.env.OKTA_AUTH,
-        },
-      }
-    );
-    console.log(ax.data.twitter_screenName, "SCREENNAME FROM OKTA");
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  console.log("HELLO TESTING IF I MAKE IT");
+  let ax = await axios.get(
+    `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
+    {
+      headers: {
+        Authorization: process.env.OKTA_AUTH,
+      },
+    }
+  );
+  console.log(ax.data.twitter_screenName, "SCREENNAME FROM OKTA");
   const postbody = {
     ...req.body,
     screenname: ax.data.twitter_screenName,
