@@ -140,7 +140,14 @@ router.post('/:id/twitter', validate.twitterInfo, async (req, res) => {
       res.status(200).json('posted successfully');
     }
   } catch (error) {
-    res.status(500).json(error);
+    res
+      .status(500)
+      .json({
+        error: error.message,
+        stack: error.stack,
+        title: error.title,
+        code: error.code,
+      });
   }
 });
 
