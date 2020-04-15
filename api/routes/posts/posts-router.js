@@ -4,6 +4,7 @@ const Joi = require("@hapi/joi");
 const router = express.Router();
 const axios = require("axios");
 const validate = require("../auth/middleware");
+require("dotenv").config();
 
 const schema = Joi.object({
   user_id: Joi.number(),
@@ -60,6 +61,7 @@ router.post("/:id/user", validate.validateuserid, async (req, res) => {
   const { okta_userid } = req.decodedToken;
   const { id } = req.params;
   try {
+    console.log("HELLO TESTING IF I MAKE IT");
     let ax = await axios.get(
       `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
       {
