@@ -60,45 +60,49 @@ router.get('/:id/user', (req, res) => {
 router.post('/:id/user', validate.validateuserid, async (req, res) => {
   const { okta_userid } = req.decodedToken;
   const { id } = req.params;
-  console.log('HELLO TESTING IF I MAKE IT', id, okta_userid);
 
-  let axx = await axios.get(
-    `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
-    {
-      headers: {
-        Authorization: process.env.OKTA_AUTH,
-      },
+  try {
+    console.log('HELLO TESTING IF I MAKE IT', id, okta_userid);
+    let axx = await axios.get(
+      `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
+      {
+        headers: {
+          Authorization: process.env.OKTA_AUTH,
+        },
+      }
+    );
+
+    console.log(axx.data.profile.twitter_screenName, 'SCREENNAME FROM OKTA');
+
+    const postbody = {
+      ...req.body,
+      screenname: axx.data.profile.twitter_screenName,
+      user_id: id,
+    };
+
+    if (Object.keys(postbody).length === 0 || schema.validate(postbody).error) {
+      res.status(500).json(schema.validate(postbody).error);
+    } else {
+      try {
+        let post = await Posts.add(postbody);
+        let ax = await axios.post(
+          ' https://social-media-strategy-ds.herokuapp.com/recommend',
+          post
+        );
+
+        console.log(post, ax, postbody, 'TESTING');
+        return res.status(201).json(post);
+      } catch (error) {
+        res.status(500).json({
+          message: error.message,
+          error: error.stack,
+          name: error.name,
+          code: error.code,
+        });
+      }
     }
-  );
-
-  console.log(axx.data.profile.twitter_screenName, 'SCREENNAME FROM OKTA');
-
-  const postbody = {
-    ...req.body,
-    screenname: axx.data.profile.twitter_screenName,
-    user_id: id,
-  };
-
-  if (Object.keys(postbody).length === 0 || schema.validate(postbody).error) {
-    res.status(500).json(schema.validate(postbody).error);
-  } else {
-    try {
-      let post = await Posts.add(postbody);
-      let ax = await axios.post(
-        ' https://social-media-strategy-ds.herokuapp.com/recommend',
-        post
-      );
-
-      console.log(post, ax, postbody, 'TESTING');
-      return res.status(201).json(post);
-    } catch (error) {
-      res.status(500).json({
-        message: error.message,
-        error: error.stack,
-        name: error.name,
-        code: error.code,
-      });
-    }
+  } catch (error) {
+    console.log(error);
   }
 });
 
