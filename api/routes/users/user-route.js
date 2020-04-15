@@ -21,7 +21,7 @@ router.delete("/:id", checkRole("admin"), async (req, res) => {
 
   try {
     let deact = await axios.post(
-      `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}/lifecycle/deactivate?sendEmail=false`,
+      `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}/lifecycle/deactivate`,
       {},
       {
         headers: {
@@ -29,6 +29,7 @@ router.delete("/:id", checkRole("admin"), async (req, res) => {
         },
       }
     );
+    console.log(deact);
     await axios.delete(
       `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
       {
