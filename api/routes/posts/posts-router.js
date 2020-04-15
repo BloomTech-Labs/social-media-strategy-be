@@ -57,6 +57,7 @@ router.get('/:id/user', (req, res) => {
     });
 });
 
+//  POST TO GET REC TIME FROM DS -------
 router.post('/:id/user', validate.validateuserid, async (req, res) => {
   const { okta_userid } = req.decodedToken;
   const { id } = req.params;
@@ -104,6 +105,10 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
   } catch (error) {
     console.log(error);
   }
+});
+
+router.post('/:id/twitter', validate.twitterInfo, (req, res) => {
+  console.log('hello', T);
 });
 
 router.put('/:id', (req, res) => {
