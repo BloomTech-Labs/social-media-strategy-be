@@ -264,44 +264,44 @@ function generateDSToken(user) {
 }
 
 // Twitter post -----
-router.get('/:id/twitpost', restricted, async (req, res) => {
-  const { okta_userid } = req.decodedToken;
+// router.get('/:id/twitpost', restricted, async (req, res) => {
+//   const { okta_userid } = req.decodedToken;
 
-  let ax = await axios.get(
-    `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
-    {
-      headers: {
-        Authorization: process.env.OKTA_AUTH,
-      },
-    }
-  );
+//   let ax = await axios.get(
+//     `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
+//     {
+//       headers: {
+//         Authorization: process.env.OKTA_AUTH,
+//       },
+//     }
+//   );
 
-  // console.log(ax.data.profile, 'Axios call');
+//   // console.log(ax.data.profile, 'Axios call');
 
-  var T = new Twit({
-    consumer_key: process.env.CONSUMER_KEY,
-    consumer_secret: process.env.CONSUMER_SECRET,
-    access_token: ax.data.profile.Oauth_token,
-    access_token_secret: ax.data.profile.Oauth_secret,
-  });
+//   var T = new Twit({
+//     consumer_key: process.env.CONSUMER_KEY,
+//     consumer_secret: process.env.CONSUMER_SECRET,
+//     access_token: ax.data.profile.Oauth_token,
+//     access_token_secret: ax.data.profile.Oauth_secret,
+//   });
 
-  T.post('statuses/update', { status: 'Web > DS!!!!!!' }, function (
-    err,
-    data,
-    response
-  ) {
-    console.log(data);
-  });
-  res.status(200).json('success');
-});
+//   T.post('statuses/update', { status: 'Web > DS!!!!!!' }, function (
+//     err,
+//     data,
+//     response
+//   ) {
+//     console.log(data);
+//   });
+//   res.status(200).json('success');
+// });
 
 // TEST CRON
 
 router.post('/test', (req, res) => {
   // FORMAT for : "date":"2020-04-07 00:29",  "tz":"America/New_York",
   var a = moment.tz(`${req.body.date}`, `${req.body.tz}`);
+  console.log('DEFAULT', moment.tz.guess());
 
-  let x = 'TESTING STUFF';
   schedule.scheduleJob(`${a}`, function () {
     console.log(
       'The answer to life, the universe, and everything!',
@@ -309,7 +309,7 @@ router.post('/test', (req, res) => {
       req.body.test
     );
   });
-  res.status(201).json({ message: x });
+  res.status(201).json({ message: 'testing' });
 });
 
 module.exports = router;
