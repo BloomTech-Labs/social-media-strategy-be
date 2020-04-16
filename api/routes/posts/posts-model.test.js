@@ -43,5 +43,10 @@ describe('insert post model function', () => {
         postsLength = await db('posts');
         expect(postsLength).toHaveLength(2);
 
+        await Posts.remove(4)
+
+        postsLength = await db('posts');
+        expect(postsLength).toHaveLength(1);
+
     });
 });

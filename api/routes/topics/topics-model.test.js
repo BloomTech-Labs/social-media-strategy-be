@@ -31,5 +31,10 @@ describe('insert function', () => {
         topicsLength = await db('topics');
         expect(topicsLength).toHaveLength(2);
 
+        await Topics.remove(2)
+
+        topicsLength = await db('topics');
+        expect(topicsLength).toHaveLength(1);
+
     });
 });
