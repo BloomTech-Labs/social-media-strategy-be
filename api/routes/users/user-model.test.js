@@ -1,5 +1,5 @@
-const db = require("../../../data/db.config");
-const users = require('./users-model');
+// const db = require("../../../data/db.config");
+// const users = require('./users-model');
 
 
 //users model testing for add() 
