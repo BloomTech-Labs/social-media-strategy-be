@@ -5,11 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "cross-env NODE_ENV=testing jest --watch",
-    "prestart": "npx knex migrate:rollback",
+    "prestart": "npx knex migrate:latest",
     "start": "node index.js",
     "server": "nodemon",
-    "coverage": "jest --coverage --detectOpenHandles --forceExit || true",
-    "poststart": "npx knex migrate:latest"
+    "coverage": "jest --coverage --detectOpenHandles --forceExit || true"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
