@@ -109,6 +109,22 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
   }
 });
 
+router.post("/quick/:id/user", (req, res) => {
+  Posts.add(req.body) 
+    .then((value) => {
+      res.status(200).json(value);
+    })
+    .catch((err) => {
+      console.log({ Error: err.message, stack: err.stack, code: err.code });
+      res.status(500).json({
+        message: "Post cannot be added",
+        Error: err.message,
+        stack: err.stack,
+        code: err.code,
+      });
+    });
+});
+
 // TWITTER POST --------
 
 router.post('/:id/twitter', validate.twitterInfo, async (req, res) => {
