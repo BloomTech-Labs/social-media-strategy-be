@@ -1,8 +1,8 @@
-const db = require("../data/db.config");
+const db = require('../data/db.config');
 
 module.exports = {
   getTopics(query, id) {
-    const data = db("topics").where("user_id", id);
+    const data = db('topics').where('user_id', id);
 
     if (query.sortby) {
       return data.orderBy(query.sortby, query.sortdir).then((topic) =>

@@ -7,10 +7,11 @@ const validate = require('../auth/middleware');
 require('dotenv').config();
 
 const schema = Joi.object({
+  id: Joi.string().required(),
   user_id: Joi.number(),
   platform_id: Joi.number(),
   post_text: Joi.string().required(),
-  datestamp: Joi.any(),
+  date: Joi.string().allow(''),
   screenname: Joi.string().allow(''),
 });
 
@@ -41,7 +42,7 @@ router.get('/:id', (req, res) => {
       });
     });
 });
-
+// GET
 router.get('/:id/user', (req, res) => {
   const { id } = req.params;
 
@@ -94,6 +95,7 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
         console.log(post, ax, postbody, 'TESTING');
         return res.status(201).json(post);
       } catch (error) {
+        console.log(error);
         res.status(500).json({
           message: error.message,
           error: error.stack,
@@ -106,6 +108,8 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
     console.log(error);
   }
 });
+
+// TWITTER POST --------
 
 router.post('/:id/twitter', validate.twitterInfo, async (req, res) => {
   const { id } = req.params;
@@ -121,8 +125,6 @@ router.post('/:id/twitter', validate.twitterInfo, async (req, res) => {
       }
     );
 
-    console.log(axx.data.profile.twitter_screenName, 'SCREENNAME FROM OKTA');
-
     const postbody = {
       ...req.body,
       screenname: axx.data.profile.twitter_screenName,
@@ -132,14 +134,18 @@ router.post('/:id/twitter', validate.twitterInfo, async (req, res) => {
     if (Object.keys(postbody).length === 0 || schema.validate(postbody).error) {
       res.status(500).json(schema.validate(postbody).error);
     } else {
-      req.twit.post(
-        'statuses/update',
-        { status: req.body.post_text },
-        function (err, data, response) {
-          console.log(data, response, err);
-        }
-      );
-      res.status(200).json('posted successfully');
+      if (date.length) {
+        // Schedule post here
+      } else {
+        req.twit.post(
+          'statuses/update',
+          { status: req.body.post_text },
+          function (err, data, response) {
+            console.log(data, response, err);
+          }
+        );
+        res.status(200).json('posted successfully');
+      }
     }
   } catch (error) {
     res.status(500).json({
