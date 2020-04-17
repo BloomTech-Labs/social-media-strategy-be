@@ -37,6 +37,7 @@ const schema = Joi.object({
 router.get('/:id/oauth', validateuserid, async (req, res, next) => {
   try {
     let twit = await client.getRequestToken('https://so-me.net/callback ');
+    // https://master.duosa5dkjv93b.amplifyapp.com/callback     <-- if so-me in not fixed
 
     const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${twit.oauth_token}`;
 
