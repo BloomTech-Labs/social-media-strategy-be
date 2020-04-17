@@ -109,15 +109,22 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
   }
 });
 
-router.post("/quick/:id/user", (req, res) => {
-  Posts.add(req.body) 
+router.post('/quick/:id/user', (req, res) => {
+  const { id } = req.params;
+
+  const postbody = {
+    ...req.body,
+    screenname: 'HELLO',
+    user_id: id,
+  };
+  Posts.add(postbody)
     .then((value) => {
       res.status(200).json(value);
     })
     .catch((err) => {
       console.log({ Error: err.message, stack: err.stack, code: err.code });
       res.status(500).json({
-        message: "Post cannot be added",
+        message: 'Post cannot be added',
         Error: err.message,
         stack: err.stack,
         code: err.code,
