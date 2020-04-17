@@ -1,6 +1,8 @@
 const request = require('supertest');
 require('dotenv').config();
 const server = require('../../server');
+// const db = require("../../../data/db.config");
+// const Users = require('./users-model');
 
 let token;
 
@@ -61,4 +63,36 @@ describe('testing user router', () => {
         });
     });
   });
+
+
+      //Users model testing for add() 
+    //   describe('insert users model function', () => {
+    //     it('inserts a new user into the db', async () => {
+    //         await db('users').truncate();
+    //         let usersLength;
+    //         usersLength = await db('users');
+    //         expect(usersLength).toHaveLength(0);
+
+    //         await Users.add({
+    //             id: 3,
+    //             email: "new@newnew.com",
+    //             password: "password"
+    //         })
+
+    //         usersLength = await db('users');
+           
+    //         expect(usersLength).toHaveLength(1);
+
+
+    //         await Users.add({
+    //           id: 4,
+    //           email: "newnew@newnew.com",
+    //           password: "password"
+    //         })
+
+    //         usersLength = await db('users');
+    //         expect(usersLength).toHaveLength(2);
+
+    //     });
+    // });
 });
