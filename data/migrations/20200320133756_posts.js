@@ -1,6 +1,6 @@
 exports.up = function(knex) {
   return knex.schema.createTable('posts', tbl => {
-    tbl.increments('id');
+    tbl.text('id').primary()
 
     tbl.integer('user_id').unsigned().notNullable().references('id').inTable('users').onUpdate('CASCADE').onDelete('CASCADE');
 
