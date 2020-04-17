@@ -1,20 +1,20 @@
-require("dotenv").config();
-const express = require("express");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const { jwtSecret } = require("../../config/secrets");
+require('dotenv').config();
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { jwtSecret } = require('../../config/secrets');
 const router = express.Router();
-const Users = require("../users/user-model");
-const Joi = require("@hapi/joi");
-const axios = require("axios");
-const Twitterlite = require("twitter-lite");
-const { validateuserid } = require("../auth/middleware");
-const restricted = require("../auth/restricted-middleware");
-const queryString = require("query-string");
-var moment = require("moment-timezone");
-var schedule = require("node-schedule");
-var Twit = require("twit");
-var moment = require("moment-timezone");
+const Users = require('../users/user-model');
+const Joi = require('@hapi/joi');
+const axios = require('axios');
+const Twitterlite = require('twitter-lite');
+const { validateuserid } = require('../auth/middleware');
+const restricted = require('../auth/restricted-middleware');
+const queryString = require('query-string');
+var moment = require('moment-timezone');
+var schedule = require('node-schedule');
+var Twit = require('twit');
+var moment = require('moment-timezone');
 
 const client = new Twitterlite({
   consumer_key: process.env.CONSUMER_KEY,
@@ -35,7 +35,7 @@ const schema = Joi.object({
   role: Joi.string().empty('').default('user'),
 });
 
-router.get("/:id/oauth", validateuserid, async (req, res, next) => {
+router.get('/:id/oauth', validateuserid, async (req, res, next) => {
   try {
     let twit = await client.getRequestToken('https://so-me.net/callback ');
     // https://master.duosa5dkjv93b.amplifyapp.com/callback     <-- if so-me in not fixed
@@ -48,7 +48,7 @@ router.get("/:id/oauth", validateuserid, async (req, res, next) => {
   }
 });
 
-router.post("/:id/callback", restricted, async (req, res, next) => {
+router.post('/:id/callback', restricted, async (req, res, next) => {
   const { okta_userid } = req.decodedToken;
 
   try {
@@ -84,7 +84,7 @@ router.post("/:id/callback", restricted, async (req, res, next) => {
       access_token: parsed_data.oauth_token,
       access_token_secret: parsed_data.oauth_token_secret,
     });
-    let a = await T.get("followers/ids", {
+    let a = await T.get('followers/ids', {
       screen_name: `${parsed_data.screen_name}`,
     });
     let totalfollowers = await a.data.ids.length;
@@ -103,7 +103,7 @@ router.post("/:id/callback", restricted, async (req, res, next) => {
   }
 });
 
-router.post("/register", async (req, res) => {
+router.post('/register', async (req, res) => {
   let user = req.body;
 
   let newuser = schema.validate(user).value;
@@ -150,7 +150,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/login", (req, res) => {
+router.post('/login', (req, res) => {
   let { email, password } = req.body;
 
   Users.findBy({ email })
@@ -160,7 +160,7 @@ router.post("/login", (req, res) => {
         try {
           const token = generateToken(user);
           res.status(200).json({
-            message: "Login successful",
+            message: 'Login successful',
             token,
           });
         } catch (error) {
@@ -172,14 +172,14 @@ router.post("/login", (req, res) => {
           });
         }
       } else {
-        res.status(500).json({ error: "login error" });
+        res.status(500).json({ error: 'login error' });
       }
     })
     .catch((err) => res.status(500).json(err.message));
 });
 
 // DS LOGIN
-router.post("/dsteam", async (req, res) => {
+router.post('/dsteam', async (req, res) => {
   let { email, password } = req.body;
 
   let user = await Users.findBy({ email }).first();
@@ -197,28 +197,28 @@ router.post("/dsteam", async (req, res) => {
 
       const token = generateDSToken(newuser);
       res.status(200).json({
-        message: "Register & Login successful",
+        message: 'Register & Login successful',
         token,
       });
     } catch (error) {
       res
         .status(500)
-        .json("Wrong credentials or is req.body is in wrong format");
+        .json('Wrong credentials or is req.body is in wrong format');
     }
   } else if (!dsSchema.validate(req.body).error) {
     try {
       const token = generateDSToken(user);
       res.status(200).json({
-        message: "Login successful",
+        message: 'Login successful',
         token,
       });
     } catch (error) {
       res
         .status(500)
-        .json("Wrong credentials or is req.body is in wrong format");
+        .json('Wrong credentials or is req.body is in wrong format');
     }
   } else {
-    res.status(401).json("Wrong Ds_Team credentials provided");
+    res.status(401).json('Wrong Ds_Team credentials provided');
   }
 });
 
@@ -257,7 +257,7 @@ function generateDSToken(user) {
     role: user.role,
   };
   const options = {
-    expiresIn: "30d", // probably change for shorter time, esp if doing refresh tokens
+    expiresIn: '30d', // probably change for shorter time, esp if doing refresh tokens
   };
 
   return jwt.sign(payload, jwtSecret, options);
