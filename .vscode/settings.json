@@ -10,7 +10,11 @@
     ],
     "cSpell.words": [
         "krahs",
+        "lengthcheck",
         "screenname",
         "twitaccess"
+    ],
+    "cSpell.ignoreWords": [
+        "oktainfo"
     ]
 }

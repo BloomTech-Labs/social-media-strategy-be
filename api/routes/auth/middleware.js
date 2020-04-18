@@ -3,7 +3,7 @@ var Twit = require('twit');
 const Twitterlite = require('twitter-lite');
 const axios = require('axios');
 
-module.exports = { validateuserid, twitterInfo };
+module.exports = { validateuserid, twitterInfo, oktaInfo };
 
 function validateuserid(req, res, next) {
   const { id } = req.params;
@@ -18,7 +18,6 @@ function validateuserid(req, res, next) {
 
 async function twitterInfo(req, res, next) {
   const { okta_userid } = req.decodedToken;
-  console.log(okta_userid);
 
   try {
     let ax = await axios.get(
@@ -36,7 +35,29 @@ async function twitterInfo(req, res, next) {
       access_token: ax.data.profile.Oauth_token,
       access_token_secret: ax.data.profile.Oauth_secret,
     });
+    req.okta = ax;
     req.twit = T;
+    next();
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+}
+async function oktaInfo(req, res, next) {
+  const { okta_userid } = req.decodedToken;
+  console.log(okta_userid);
+
+  try {
+    let ax = await axios.get(
+      `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
+      {
+        headers: {
+          Authorization: process.env.OKTA_AUTH,
+        },
+      }
+    );
+
+    req.okta = ax;
     next();
   } catch (error) {
     console.log(error);

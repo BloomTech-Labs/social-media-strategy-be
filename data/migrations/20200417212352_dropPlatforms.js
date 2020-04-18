@@ -7,18 +7,21 @@ exports.up = function (knex) {
 };
 
 exports.down = function (knex) {
-  return knex.schema.createTable('platforms', (tbl) => {
-    tbl.increments('id');
+  return knex.schema
+    .createTable('platforms', (tbl) => {
+      tbl.increments('id');
 
-    tbl.text('platform', 64);
-    tbl
-      .integer('user_id')
-      .unsigned()
-      .references('id')
-      .inTable('users')
-      .onUpdate('CASCADE')
-      .onDelete('CASCADE');
-
-    // tbl.text('okta_userid').notNullable();
-  });
+      tbl.text('platform', 64);
+      tbl
+        .integer('user_id')
+        .unsigned()
+        .references('id')
+        .inTable('users')
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
+    })
+    .alterTable('posts', (tbl) => {
+      tbl
+        .integer('platform_id').unsigned().references('id').inTable('platforms').defaultsTo(1).onUpdate('CASCADE') .onDelete('CASCADE');
+    });
 };
