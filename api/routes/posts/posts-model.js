@@ -5,7 +5,7 @@ module.exports = { find, add, remove, update };
 function find(filter) {
   let posts = db('posts');
   if (filter) {
-    return posts.where({ filter });
+    return posts.where(filter);
   } else {
     return posts;
   }

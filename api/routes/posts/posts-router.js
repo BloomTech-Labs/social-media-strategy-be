@@ -78,7 +78,10 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
 
     const postbody = {
       ...req.body,
-      screenname: axx.data.profile.twitter_screenName,
+      screenname: !axx
+        ? axx.data.profile.twitter_screenName
+        : `testing-${Date.now()}`,
+
       user_id: id,
     };
 
@@ -87,12 +90,13 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
     } else {
       try {
         let post = await Posts.add(postbody);
-        let ax = await axios.post(
-          ' https://social-media-strategy-ds.herokuapp.com/recommend',
-          post
-        );
+        // let ax = await axios.post(
+        //   ' https://social-media-strategy-ds.herokuapp.com/recommend',
+        //   post
+        // );
+        // console.log(ax, 'ARE YOU WORKING?');
 
-        console.log(post, ax, postbody, 'TESTING');
+        console.log(post, postbody, 'TESTING');
         return res.status(201).json(post);
       } catch (error) {
         console.log(error.message);
