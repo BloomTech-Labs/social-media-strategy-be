@@ -9,7 +9,6 @@ require('dotenv').config();
 const schema = Joi.object({
   id: Joi.string().required(),
   user_id: Joi.number(),
-  platform_id: Joi.number(),
   post_text: Joi.string().required(),
   date: Joi.string().allow(''),
   screenname: Joi.string().allow(''),
