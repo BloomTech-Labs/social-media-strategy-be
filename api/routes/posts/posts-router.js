@@ -80,7 +80,7 @@ router.post('/:id/user', validate.validateuserid, async (req, res) => {
       ...req.body,
       screenname: !axx
         ? axx.data.profile.twitter_screenName
-        : `testing-${Date.now()}`,
+        : `testing-${Date.now()}`, //testing purposes
 
       user_id: id,
     };
