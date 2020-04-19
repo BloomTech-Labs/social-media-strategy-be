@@ -4,7 +4,7 @@ exports.up = function(knex) {
 
     tbl.integer('user_id').unsigned().notNullable().references('id').inTable('users').onUpdate('CASCADE').onDelete('CASCADE');
 
-    tbl.integer('platform_id').unsigned().references('id').inTable('platforms').defaultsTo(1).onUpdate('CASCADE').onDelete('CASCADE');
+    tbl.integer('platform_id').unsigned().references('id').inTable('platforms').onUpdate('CASCADE').onDelete('CASCADE');
 
     tbl.text('post_text', 280) //280 for Twitter, will change for future platforms
       .notNullable();
