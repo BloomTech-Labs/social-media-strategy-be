@@ -19,6 +19,7 @@ function routerModels(modal, req, res) {
         : res.status(404).json('Nothing found');
     })
     .catch((error) => {
+      console.log(error.message, 'ERROR');
       res.status(500).json({
         message: error.message,
         error: error.stack,
