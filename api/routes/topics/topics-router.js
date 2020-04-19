@@ -12,10 +12,11 @@ const [
 ] = require('../../helper');
 
 const schema = Joi.object({
+  id: Joi.string(),
   user_id: Joi.number(),
   title: Joi.string().required(),
   cards: Joi.array(),
-  index: Joi.number(),
+  index: Joi.any(),
 });
 
 router.get('/', (req, res) => {
@@ -62,7 +63,7 @@ router.get('/:id/user', async (req, res) => {
   const { sortby } = req.query;
   console.log(req.query);
   if ((await lengthcheck(Topics.find({ user_id: id }))) === 0) {
-    return res.status(404).json('no post found');
+    return res.status(404).json('no Topics found');
   } else {
     topicsModels(Query.getTopics({ sortby }, id), req, res);
   }
@@ -88,23 +89,25 @@ router.post('/:id/user', (req, res) => {
   const { id } = req.params;
   const topicbody = { ...req.body, user_id: id };
   console.log(req.body);
-  // if (Object.keys(topicbody).length === 0 || schema.validate(topicbody).error) {
-  //   res.status(500).json(schema.validate(topicbody).error);
-  // } else {
-  // }
-  Topics.add(req.body) //May need to change depending on payload
-    .then((value) => {
-      res.status(200).json(value);
-    })
-    .catch((err) => {
-      console.log({ Error: err.message, stack: err.stack, code: err.code });
-      res.status(500).json({
-        message: 'topic cannot be added',
-        Error: err.message,
-        stack: err.stack,
-        code: err.code,
-      });
-    });
+
+  if (joivalidation(topicbody, schema)) {
+    res.status(500).json(joivalidationError(topicbody, schema));
+  } else {
+    topicsModels(Topics.add(topicbody), req, res);
+  }
+  // Topics.add(req.body) //May need to change depending on payload
+  //   .then((value) => {
+  //     res.status(200).json(value);
+  //   })
+  //   .catch((err) => {
+  //     console.log({ Error: err.message, stack: err.stack, code: err.code });
+  //     res.status(500).json({
+  //       message: 'topic cannot be added',
+  //       Error: err.message,
+  //       stack: err.stack,
+  //       code: err.code,
+  //     });
+  // });
 });
 
 // PUT START HERE --------------
@@ -112,7 +115,7 @@ router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const update = req.body;
   if ((await lengthcheck(Topics.find({ id: id }))) === 0) {
-    return res.status(404).json('no post found');
+    return res.status(404).json('no Topics found');
   } else {
     topicsModels(Topics.update(update, id), req, res);
   }
@@ -132,18 +135,23 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE START HERE ------------
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   const { id } = req.params;
+  if ((await lengthcheck(Topics.find({ id: id }))) === 0) {
+    return res.status(404).json('no Topics found');
+  } else {
+    topicsModels(Topics.remove(id), req, res);
+  }
 
-  Topics.remove(id)
-    .then((response) => {
-      res.status(200).json({ message: 'Topic deleted', response });
-    })
-    .catch((err) => {
-      res
-        .status(500)
-        .json({ message: 'Topic cannot be removed', Error: err.message });
-    });
+  // Topics.remove(id)
+  //   .then((response) => {
+  //     res.status(200).json({ message: 'Topic deleted', response });
+  //   })
+  //   .catch((err) => {
+  //     res
+  //       .status(500)
+  //       .json({ message: 'Topic cannot be removed', Error: err.message });
+  //   });
 });
 
 module.exports = router;
