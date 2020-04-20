@@ -22,11 +22,6 @@ exports.down = function (knex) {
     })
     .alterTable('posts', (tbl) => {
       tbl
-        .integer('platform_id')
-        .unsigned()
-        .references('id')
-        .inTable('platforms')
-        .onUpdate('CASCADE')
-        .onDelete('CASCADE');
+        .integer('platform_id').unsigned().references('id').inTable('platforms').onUpdate('CASCADE') .onDelete('CASCADE');
     });
 };

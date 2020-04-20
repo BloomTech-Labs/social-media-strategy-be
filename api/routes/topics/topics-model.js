@@ -34,7 +34,8 @@ function update(topic, id) {
       updated > 0
         ? find({ id })
             .first()
-            .then((check) => getTopicCards(check.user_id))
+            .then((check) => getTopicCards(check.user_id)) &
+          console.log(updated)
         : null
     );
 }
