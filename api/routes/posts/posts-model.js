@@ -21,12 +21,12 @@ function remove(id) {
   return db('posts')
     .where({ id })
     .del()
-    .then(res => find());
+    .then((res) => find());
 }
 
 function update(post, id) {
   return db('posts')
     .where('id', id)
     .update(post)
-    .then(updated => (updated > 0 ? find({ id }) : null));
+    .then((updated) => (updated > 0 ? find({ id }) : null));
 }

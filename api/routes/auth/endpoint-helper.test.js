@@ -72,5 +72,5 @@ const endpointAuthTesting = (endpoint) => {
 
 endpointAuthTesting('topics');
 endpointAuthTesting('posts');
-endpointAuthTesting('platforms');
+// endpointAuthTesting('platforms');
 endpointAuthTesting('users');
