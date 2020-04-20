@@ -3,6 +3,7 @@ const Posts = require('./posts-model.js');
 const Joi = require('@hapi/joi');
 const router = express.Router();
 const { oktaInfo, twitterInfo, validateuserid } = require('../auth/middleware');
+const axios = require('axios');
 const [
   joivalidation,
   joivalidationError,
