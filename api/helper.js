@@ -14,7 +14,7 @@ async function lengthcheck(model) {
 function routerModels(modal, req, res) {
   modal
     .then((data) => {
-      data ? res.status(200).json(data) : res.status(404).json('Nothing found');
+      res.status(200).json(data);
     })
     .catch((error) => {
       console.log(error.message, 'ERROR');

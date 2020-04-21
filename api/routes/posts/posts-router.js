@@ -3,6 +3,7 @@ const Posts = require('./posts-model.js');
 const Joi = require('@hapi/joi');
 const router = express.Router();
 const { oktaInfo, twitterInfo, validateuserid } = require('../auth/middleware');
+const axios = require('axios');
 const [
   joivalidation,
   joivalidationError,
@@ -107,11 +108,11 @@ router.post('/:id/user', validateuserid, oktaInfo, async (req, res) => {
   } else {
     try {
       let post = await Posts.add(postbody);
-      // let ax = await axios.post(
-      //   ' https://social-media-strategy-ds.herokuapp.com/recommend',
-      //   post
-      // );
-      // console.log(ax, 'ARE YOU WORKING?');
+      let ax = await axios.post(
+        ' https://production-environment-flask.herokuapp.com/recommend',
+        post
+      );
+      console.log(ax, 'ARE YOU WORKING?');
       return res.status(201).json(post);
     } catch (error) {
       console.log(error.message);
