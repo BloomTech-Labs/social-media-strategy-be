@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">35.09% </span>
+                <span class="strong">32.08% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>20/57</span>
+                <span class='fraction'>17/53</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">5.56% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/18</span>
+                <span class='fraction'>0/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">27.27% </span>
+                <span class="strong">12.5% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/11</span>
+                <span class='fraction'>1/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">35.09% </span>
+                <span class="strong">32.08% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>20/57</span>
+                <span class='fraction'>17/53</span>
             </div>
         
             
@@ -262,7 +262,8 @@
 <a name='L203'></a><a href='#L203'>203</a>
 <a name='L204'></a><a href='#L204'>204</a>
 <a name='L205'></a><a href='#L205'>205</a>
-<a name='L206'></a><a href='#L206'>206</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
@@ -271,26 +272,27 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -472,11 +474,12 @@ const Posts = require('./posts-model.js');
 const Joi = require('@hapi/joi');
 const router = express.Router();
 const { oktaInfo, twitterInfo, validateuserid } = require('../auth/middleware');
-const {
+const [
   joivalidation,
   joivalidationError,
   lengthcheck,
-} = require('../../helper');
+  postModels,
+] = require('../../helper');
 require('dotenv').config();
 &nbsp;
 const schema = Joi.object({
@@ -486,23 +489,23 @@ const schema = Joi.object({
   date: Joi.string().allow(''),
   screenname: Joi.string().allow(''),
 });
-function postModels(modal, req, res) {
-  modal
-    .then((posts) =&gt; {
-      console.log(posts);
-      posts
-        ? res.status(200).json(posts)
-        : <span class="branch-1 cbranch-no" title="branch not covered" >res.status(404).json('Nothing found');</span>
-    })
-    .catch(<span class="fstat-no" title="function not covered" >(e</span>rror) =&gt; {
-<span class="cstat-no" title="statement not covered" >      res.status(500).json({</span>
-        message: error.message,
-        error: error.stack,
-        name: error.name,
-        code: error.code,
-      });
-    });
-}
+// export function postModels(modal, req, res) {
+//   modal
+//     .then((posts) =&gt; {
+//       console.log(posts);
+//       posts
+//         ? res.status(200).json(posts)
+//         : res.status(404).json('Nothing found');
+//     })
+//     .catch((error) =&gt; {
+//       res.status(500).json({
+//         message: error.message,
+//         error: error.stack,
+//         name: error.name,
+//         code: error.code,
+//       });
+//     });
+// }
 // GET --------------
 router.get('/', (req, res) =&gt; {
   postModels(Posts.find(), req, res);
@@ -679,7 +682,7 @@ module.exports = router;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Fri Apr 17 2020 23:20:04 GMT-0400 (Eastern Daylight Time)
+                at Sat Apr 18 2020 21:30:44 GMT-0400 (Eastern Daylight Time)
             </div>
         </div>
         <script src="../../../../prettify.js"></script>

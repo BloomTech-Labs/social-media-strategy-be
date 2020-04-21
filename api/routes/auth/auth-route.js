@@ -8,7 +8,7 @@ const Users = require('../users/user-model');
 const Joi = require('@hapi/joi');
 const axios = require('axios');
 const Twitterlite = require('twitter-lite');
-const { validateuserid } = require('../auth/middleware');
+const { validateuserid, twitterInfo, oktaInfo } = require('../auth/middleware');
 const restricted = require('../auth/restricted-middleware');
 const queryString = require('query-string');
 var moment = require('moment-timezone');
@@ -37,7 +37,7 @@ const schema = Joi.object({
 
 router.get('/:id/oauth', validateuserid, async (req, res, next) => {
   try {
-    let twit = await client.getRequestToken('https://so-me.net/callback ');
+    let twit = await client.getRequestToken('https://www.so-me.net/callback ');
     // https://master.duosa5dkjv93b.amplifyapp.com/callback     <-- if so-me in not fixed
 
     const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${twit.oauth_token}`;
@@ -262,6 +262,27 @@ function generateDSToken(user) {
 
   return jwt.sign(payload, jwtSecret, options);
 }
+
+router.get('/userInfo', restricted, twitterInfo, async (req, res) => {
+  try {
+    let twitInfo = await req.twit.get('users/show', {
+      screen_name: `${req.okta.data.profile.twitter_screenName}`,
+    });
+
+    console.log('USERRS/SHOW', twitInfo.data);
+
+    res.status(200).json({
+      screen_name: req.okta.data.profile.twitter_screenName,
+      total_followers: twitInfo.data.followers_count,
+      total_following: twitInfo.data.friends_count,
+      total_post: twitInfo.data.statuses_count,
+      profile_img: twitInfo.data.profile_image_url_https,
+      location: twitInfo.data.location,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 // Twitter post -----
 // router.get('/:id/twitpost', restricted, async (req, res) => {
