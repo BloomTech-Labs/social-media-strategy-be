@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { jwtSecret } = require('../../config/secrets');
 const router = express.Router();
-const Users = require('../users/user-model');
+// const Users = require('../users/user-model');
 const Joi = require('@hapi/joi');
 const axios = require('axios');
 const Twitterlite = require('twitter-lite');
@@ -15,6 +15,17 @@ var moment = require('moment-timezone');
 var schedule = require('node-schedule');
 var Twit = require('twit');
 var moment = require('moment-timezone');
+const [
+  joivalidation,
+  joivalidationError,
+  lengthcheck,
+  postModels,
+  find,
+  add,
+  UserRemove,
+  UserUpdate,
+  findByID,
+] = require('../../helper');
 
 const client = new Twitterlite({
   consumer_key: process.env.CONSUMER_KEY,
@@ -131,9 +142,9 @@ router.post('/register', async (req, res) => {
       );
 
       newuser.okta_userid = ax.data.id;
-      let saved = await Users.add(newuser);
+      let saved = await add('users', newuser);
 
-      let tokenuser = await Users.findBy({ email: req.body.email }).first();
+      let tokenuser = await find('users', { email: req.body.email }).first();
       const token = generateToken(tokenuser);
 
       res.status(201).json({ user: tokenuser, token });
@@ -153,7 +164,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', (req, res) => {
   let { email, password } = req.body;
 
-  Users.findBy({ email })
+  find('users', { email })
     .first()
     .then((user) => {
       if (user && bcrypt.compareSync(password, user.password)) {
@@ -182,7 +193,7 @@ router.post('/login', (req, res) => {
 router.post('/dsteam', async (req, res) => {
   let { email, password } = req.body;
 
-  let user = await Users.findBy({ email }).first();
+  let user = await find('users', { email }).first();
 
   if (!user && !dsSchema.validate(req.body).error) {
     try {
@@ -192,8 +203,8 @@ router.post('/dsteam', async (req, res) => {
 
       usr.password = hash;
 
-      let saved = await Users.add(usr);
-      let newuser = await Users.findBy({ email }).first();
+      let saved = await add('users', usr);
+      let newuser = await find('users', { email }).first();
 
       const token = generateDSToken(newuser);
       res.status(200).json({

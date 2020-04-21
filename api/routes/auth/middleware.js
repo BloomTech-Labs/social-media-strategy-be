@@ -1,13 +1,24 @@
-const Users = require('../../routes/users/user-model');
+// const Users = require('../../routes/users/user-model');
 var Twit = require('twit');
 const Twitterlite = require('twitter-lite');
 const axios = require('axios');
+const [
+  joivalidation,
+  joivalidationError,
+  lengthcheck,
+  postModels,
+  find,
+  add,
+  UserRemove,
+  UserUpdate,
+  findByID,
+] = require('../../helper');
 
 module.exports = { validateuserid, twitterInfo, oktaInfo };
 
 function validateuserid(req, res, next) {
   const { id } = req.params;
-  Users.find(id)
+  findByID('users', id)
     .then((user) =>
       user
         ? (req.oktaid = user.okta_userid) & next()

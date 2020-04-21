@@ -85,10 +85,9 @@ router.get('/:id/user', async (req, res) => {
 
 // POST START HERE ----------------
 
-router.post('/:id/user', (req, res) => {
+router.post('/:id/user', validateuserid, (req, res) => {
   const { id } = req.params;
   const topicbody = { ...req.body, user_id: id };
-  console.log(req.body);
 
   if (joivalidation(topicbody, schema)) {
     res.status(500).json(joivalidationError(topicbody, schema));

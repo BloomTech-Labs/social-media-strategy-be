@@ -1,23 +1,34 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const User = require("../users/user-model");
-const axios = require("axios");
-require("dotenv").config();
+const User = require('../users/user-model');
+const axios = require('axios');
+require('dotenv').config();
+const [
+  joivalidation,
+  joivalidationError,
+  lengthcheck,
+  postModels,
+  find,
+  add,
+  UserRemove,
+  UserUpdate,
+  findByID,
+] = require('../../helper'); //ARRAY IMPORTS NEED TO STAY IN ORDER
 
-router.get("/", (req, res) => {
-  User.find()
+router.get('/', (req, res) => {
+  find('users')
     .then((users) => res.status(200).json(users))
     .catch((err) => res.status(500).json(err.message));
 });
-router.get("/user", (req, res) => {
+router.get('/user', (req, res) => {
   res.status(200).json(req.decodedToken);
 });
 
-router.delete("/:id", checkRole("admin"), async (req, res) => {
+router.delete('/:id', checkRole('admin'), async (req, res) => {
   const { okta_userid } = req.decodedToken;
   const { id } = req.params;
   console.log(okta_userid);
-  console.log(process.env.OKTA_DOMAIN, "ENV");
+  console.log(process.env.OKTA_DOMAIN, 'ENV');
 
   try {
     let deact = await axios.post(
@@ -38,8 +49,8 @@ router.delete("/:id", checkRole("admin"), async (req, res) => {
         },
       }
     );
-    let userResponse = await User.remove(id);
-    res.status(200).json({ message: "User deleted", userResponse });
+    let userResponse = await UserRemove('users', id);
+    res.status(200).json({ message: 'User deleted', userResponse });
   } catch (error) {
     res.status(500).json({
       message: error.message,
@@ -50,12 +61,12 @@ router.delete("/:id", checkRole("admin"), async (req, res) => {
   }
 });
 
-router.delete("/:id/local", async (req, res) => {
+router.delete('/:id/local', async (req, res) => {
   const { id } = req.params;
 
   try {
-    let userResponse = await User.remove(id);
-    res.status(200).json({ message: "User deleted", userResponse });
+    let userResponse = await UserRemove('users', id);
+    res.status(200).json({ message: 'User deleted', userResponse });
   } catch (error) {
     res.status(500).json({
       message: error.message,

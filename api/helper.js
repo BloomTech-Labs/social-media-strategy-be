@@ -1,4 +1,16 @@
-module.exports = [joivalidation, joivalidationError, lengthcheck, routerModels];
+const db = require('../data/db.config.js');
+
+module.exports = [
+  joivalidation,
+  joivalidationError,
+  lengthcheck,
+  routerModels,
+  find,
+  add,
+  remove,
+  update,
+  findByID
+];
 
 function joivalidation(reqbody, schema) {
   return Object.keys(reqbody).length === 0 || schema.validate(reqbody).error;
@@ -25,4 +37,44 @@ function routerModels(modal, req, res) {
         code: error.code,
       });
     });
+}
+
+function find(table, filter) {
+  let posts = db(`${table}`);
+  console.log('POSTS', posts);
+  if (filter) {
+    return posts.where(filter);
+  } else {
+    return posts;
+  }
+}
+
+async function add(table, payload) {
+  await db(`${table}`).insert(payload);
+
+  return find(table, payload).first();
+}
+
+function remove(table, id) {
+  return db(`${table}`)
+    .where({ id })
+    .del()
+    .then((res) => find(table));
+}
+
+function update(table, payload, id) {
+  return db(`${table}`)
+    .where('id', id)
+    .update(payload)
+    .then((updated) => (updated > 0 ? find(table, { id }) : null));
+}
+
+function findByID(table, id) {
+  let data = db(`${table}`);
+
+  if (id) {
+    return data.where({ id: id }).first();
+  } else {
+    return data;
+  }
 }
