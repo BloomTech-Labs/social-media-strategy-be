@@ -1,7 +1,8 @@
 const db = require('../../../data/db.config');
 const Posts = require('../posts/posts-model.js');
 const Topics = require('../topics/topics-model.js')
-// const Users = require('../topics/user-model.js')
+// const Users = require('../users/user-model.js');
+
 const postExample = {
     id: 4,
     user_id: 1,
@@ -18,6 +19,13 @@ const postExample = {
     title: "New Topic1",
     user_id: 1,
     cards: []
+}
+
+const userExample = {
+    id: 50,
+    email: 'hal@hal.com',
+    password: 'test',
+    okta_userid: '12323'
 }
 
 function modelTester(table, model, formattedSubmission){
@@ -44,5 +52,6 @@ function modelTester(table, model, formattedSubmission){
 
 modelTester('posts', Posts, postExample);
 modelTester('topics', Topics, topicExample);
+// modelTester('users', Users, userExample);
 
 

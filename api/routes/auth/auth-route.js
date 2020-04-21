@@ -312,4 +312,8 @@ router.post('/test', (req, res) => {
   res.status(201).json({ message: 'testing' });
 });
 
+router.get('/userInfo', (req, res) => {
+
+})
+
 module.exports = router;
