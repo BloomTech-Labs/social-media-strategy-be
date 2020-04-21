@@ -1,4 +1,3 @@
-// const Users = require('../../routes/users/user-model');
 var Twit = require('twit');
 const Twitterlite = require('twitter-lite');
 const axios = require('axios');
