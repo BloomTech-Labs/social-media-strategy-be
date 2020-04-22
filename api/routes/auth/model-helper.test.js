@@ -1,7 +1,16 @@
 const db = require('../../../data/db.config');
 const Posts = require('../posts/posts-model.js');
 const Topics = require('../topics/topics-model.js')
-// const Users = require('../users/user-model.js');
+const [
+  joivalidation,
+  joivalidationError,
+  lengthcheck,
+  postModels,
+  find,
+  add,
+  ModelRemove,
+  UserUpdate,
+] = require('../../helper');
 
 const postExample = {
     id: 4,
@@ -36,13 +45,13 @@ function modelTester(table, model, formattedSubmission){
           tableLength = await db(`${table}`);
           expect(tableLength).toHaveLength(0);
       
-          await model.add(formattedSubmission);
+          await add(table, formattedSubmission);
       
           tableLength = await db(`${table}`);
       
           expect(tableLength).toHaveLength(1);
       
-          await model.remove(formattedSubmission.id);
+          await ModelRemove(table, formattedSubmission.id);
       
           tableLength = await db(`${table}`);
           expect(tableLength).toHaveLength(0);
