@@ -15,6 +15,8 @@ const [
   findByID,
 ] = require('../../helper');
 require('dotenv').config();
+var moment = require('moment-timezone');
+var schedule = require('node-schedule');
 
 const schema = Joi.object({
   id: Joi.string().required(),
@@ -170,7 +172,15 @@ router.put('/:id/twitter', twitterInfo, async (req, res) => {
       if (req.body.date) {
         console.log(req.body.date);
         // Schedule post here
+        // var a = moment.tz(`${req.body.date}`, `${req.body.tz}`);
+        console.log('DEFAULT', moment.tz.guess());
 
+        schedule.scheduleJob(`${req.body.date}`, async function () {
+          console.log('I WENT OUT AT', new Date());
+          req.twit.post('statuses/update', {
+            status: req.body.post_text,
+          });
+        });
         postModels(PostUpdate('posts', update, id), req, res);
       } else {
         await req.twit.post('statuses/update', { status: req.body.post_text });

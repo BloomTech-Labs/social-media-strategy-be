@@ -13,7 +13,6 @@ const queryString = require('query-string');
 var moment = require('moment-timezone');
 var schedule = require('node-schedule');
 var Twit = require('twit');
-var moment = require('moment-timezone');
 const [
   joivalidation,
   joivalidationError,
@@ -279,7 +278,7 @@ router.get('/userInfo', restricted, twitterInfo, async (req, res) => {
       screen_name: `${req.okta.data.profile.twitter_screenName}`,
     });
 
-    console.log('USERRS/SHOW', twitInfo);
+    // console.log('USERRS/SHOW', twitInfo);
 
     res.status(200).json({
       screen_name: req.okta.data.profile.twitter_screenName,
