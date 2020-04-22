@@ -279,7 +279,7 @@ router.get('/userInfo', restricted, twitterInfo, async (req, res) => {
       screen_name: `${req.okta.data.profile.twitter_screenName}`,
     });
 
-    console.log('USERRS/SHOW', twitInfo.data);
+    console.log('USERRS/SHOW', twitInfo);
 
     res.status(200).json({
       screen_name: req.okta.data.profile.twitter_screenName,
@@ -288,6 +288,7 @@ router.get('/userInfo', restricted, twitterInfo, async (req, res) => {
       total_post: twitInfo.data.statuses_count,
       profile_img: twitInfo.data.profile_image_url_https,
       location: twitInfo.data.location,
+      name: twitInfo.data.name,
     });
   } catch (error) {
     console.log(error);
