@@ -21,17 +21,6 @@ const schema = Joi.object({
 
 router.get('/', (req, res) => {
   topicsModels(Topics.find(), req, res);
-
-  // Topics.find()
-  //   .then((topics) => {
-  //     res.status(200).json({ topics });
-  //   })
-  //   .catch((err) => {
-  //     res.status(500).json({
-  //       message: 'Error retrieving Topics',
-  //       Error: err,
-  //     });
-  //   });
 });
 
 router.get('/:id', async (req, res) => {
@@ -41,21 +30,6 @@ router.get('/:id', async (req, res) => {
   } else {
     topicsModels(Topics.find({ id: req.params.id }), req, res);
   }
-
-  // Topics.find({ id })
-  //   .first()
-  //   .then((topics) => {
-  //     console.log(!topics.cards.length);
-  //     !topics.length
-  //       ? res.status(200).json(topics)
-  //       : res.json(404).json('no topic found');
-  //   })
-  //   .catch((err) => {
-  //     res.status(404).json({
-  //       message: 'topic with specified ID not found',
-  //       Error: err,
-  //     });
-  //   });
 });
 
 router.get('/:id/user', async (req, res) => {
@@ -67,20 +41,6 @@ router.get('/:id/user', async (req, res) => {
   } else {
     topicsModels(Query.getTopics({ sortby }, id), req, res);
   }
-
-  // Topics.getTopicCards(id)
-  // Query.getTopics({ sortby }, id)
-  //   .then((topics) => {
-  //     !topics.length
-  //       ? res.status(404).json('topics for this user not found')
-  //       : res.status(200).json(topics);
-  //   })
-  //   .catch((err) => {
-  //     res.status(404).json({
-  //       message: 'User with specified ID not found',
-  //       Error: err.message,
-  //     });
-  //   });
 });
 
 // POST START HERE ----------------
@@ -94,19 +54,6 @@ router.post('/:id/user', validateuserid, (req, res) => {
   } else {
     topicsModels(Topics.add(topicbody), req, res);
   }
-  // Topics.add(req.body) //May need to change depending on payload
-  //   .then((value) => {
-  //     res.status(200).json(value);
-  //   })
-  //   .catch((err) => {
-  //     console.log({ Error: err.message, stack: err.stack, code: err.code });
-  //     res.status(500).json({
-  //       message: 'topic cannot be added',
-  //       Error: err.message,
-  //       stack: err.stack,
-  //       code: err.code,
-  //     });
-  // });
 });
 
 // PUT START HERE --------------
@@ -118,19 +65,6 @@ router.put('/:id', async (req, res) => {
   } else {
     topicsModels(Topics.update(update, id), req, res);
   }
-  // Topics.update(update, id)
-  //   .then((value) => {
-  //     res.status(201).json({ value });
-  //   })
-  //   .catch((err) => {
-  //     console.log(err.message);
-  //     res.status(500).json({
-  //       message: 'Topic cannot be updated',
-  //       Error: err.message,
-  //       code: err.code,
-  //       stack: err.stack,
-  //     });
-  //   });
 });
 
 // DELETE START HERE ------------
@@ -141,16 +75,6 @@ router.delete('/:id', async (req, res) => {
   } else {
     topicsModels(Topics.remove(id), req, res);
   }
-
-  // Topics.remove(id)
-  //   .then((response) => {
-  //     res.status(200).json({ message: 'Topic deleted', response });
-  //   })
-  //   .catch((err) => {
-  //     res
-  //       .status(500)
-  //       .json({ message: 'Topic cannot be removed', Error: err.message });
-  //   });
 });
 
 module.exports = router;
