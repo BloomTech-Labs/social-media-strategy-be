@@ -104,7 +104,7 @@ router.post('/:id/user', validateuserid, oktaInfo, async (req, res) => {
   //  req.okta.data  === oktainfo from middleware
   const postbody = {
     ...req.body,
-    screenname: req.okta.data.profile.twitter_screenName ?? '',
+    screenname: req.okta.data.profile.twitter_screenName || '',
     user_id: id,
   };
   if (joivalidation(postbody, schema)) {
