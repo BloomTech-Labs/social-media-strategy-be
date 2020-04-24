@@ -166,14 +166,16 @@ router.put('/:id/twitter', twitterInfo, async (req, res) => {
       return res.status(404).json('no post found');
     } else {
       const update = { ...req.body, completed: true };
-
+      let date_check = await find('posts', { id: id });
+      console.log(!date_check[0].date, 'CHECK');
       if (req.body.date) {
-        console.log(req.body.date);
+        console.log(req.body.date, id);
+
         // Schedule post here
         // var a = moment.tz(`${req.body.date}`, `${req.body.tz}`);
-        console.log('DEFAULT', moment.tz.guess());
+        // console.log('DEFAULT', moment.tz.guess());
 
-        schedule.scheduleJob(`${req.body.date}`, async function () {
+        schedule.scheduleJob(id, `${req.body.date}`, async function () {
           console.log('I WENT OUT AT', new Date());
           req.twit.post('statuses/update', {
             status: req.body.post_text,
@@ -198,22 +200,12 @@ router.put('/:id/twitter', twitterInfo, async (req, res) => {
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const update = req.body;
+
   if ((await lengthcheck(find('posts', { id: id }))) === 0) {
     return res.status(404).json('no post found');
   } else {
     postModels(PostUpdate('posts', update, id), req, res);
   }
-
-  // Posts.update(update, id) //May need to change depending on payload
-  //   .then((value) => {
-  //     res.status(201).json({ 'Updated post: ': value });
-  //   })
-  //   .catch((err) => {
-  //     // console.log(err.message)
-  //     res
-  //       .status(500)
-  //       .json({ message: 'Post cannot be updated', Error: err.message });
-  //   });
 });
 
 router.delete('/:id', async (req, res) => {
@@ -221,18 +213,27 @@ router.delete('/:id', async (req, res) => {
   if ((await lengthcheck(find('posts', { id: id }))) === 0) {
     return res.status(404).json('no post found');
   } else {
-    postModels(PostRemove('posts', id), req, res);
-  }
+    let date_check = await find('posts', { id: id });
+    console.log(
+      date_check[0].date,
+      new Date(date_check[0].date) < new Date(),
+      'TEST'
+    );
 
-  // Posts.remove(id)
-  //   .then((response) => {
-  //     res.status(200).json({ message: 'Post deleted', response });
-  //   })
-  //   .catch((err) => {
-  //     res
-  //       .status(500)
-  //       .json({ message: 'Post cannot be removed', Error: err.message });
-  //   });
+    if (!date_check[0].date) {
+      postModels(PostRemove('posts', id), req, res);
+    } else if (
+      date_check[0].completed === true &&
+      new Date(date_check[0].date) < new Date()
+    ) {
+      postModels(PostRemove('posts', id), req, res);
+    } else {
+      var cancel_job = schedule.scheduledJobs[id];
+      cancel_job.cancel();
+
+      postModels(PostRemove('posts', id), req, res);
+    }
+  }
 });
 
 module.exports = router;

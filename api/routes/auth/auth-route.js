@@ -295,18 +295,17 @@ router.get('/userInfo', restricted, twitterInfo, async (req, res) => {
 });
 
 router.get('/userStream', restricted, twitterInfo, async (req, res) => {
-  console.log('SCREENY', req.okta.data.profile.twitter_screenName)
+  console.log('SCREENY', req.okta.data.profile.twitter_screenName);
   try {
-    let twitInfo = await req.twit.get('statuses/home_timeline/:count', 
-    {
+    let twitInfo = await req.twit.get('statuses/home_timeline/:count', {
       screen_name: `${req.okta.data.profile.twitter_screenName}`,
-      count: 1 
+      count: 1,
     });
 
     // console.log('STREAMMY', twitInfo.data);
-  
+
     // res.end();
-    res.status(200).json({stream_data: twitInfo.data});
+    res.status(200).json({ stream_data: twitInfo.data });
   } catch (error) {
     console.log(error);
   }
@@ -348,21 +347,38 @@ router.get('/userStream', restricted, twitterInfo, async (req, res) => {
 
 router.post('/test', (req, res) => {
   // FORMAT for : "date":"2020-04-07 00:29",  "tz":"America/New_York",
-  var a = moment.tz(`${req.body.date}`, `${req.body.tz}`);
+  // var a = moment.tz(`${req.body.date}`, `${req.body.tz}`);
   console.log('DEFAULT', moment.tz.guess());
+  // schedule.scheduleJob(req.body.id, a, function () {
+  //   console.log(
+  //     'The answer to life, the universe, and everything!',
+  //     new Date(),
+  //     req.body.test
+  //   );
+  // });
 
-  schedule.scheduleJob(`${a}`, function () {
+  schedule.scheduleJob(`${req.body.id}`, `${req.body.date}`, function () {
     console.log(
       'The answer to life, the universe, and everything!',
       new Date(),
-      req.body.test
+      req.body.post_text
     );
   });
-  res.status(201).json({ message: 'testing' });
+  // var j = schedule.scheduleJob(unique_name, date, function () {});
+  // // later on
+  // var my_job = schedule.scheduledJobs[unique_name];
+  // my_job.cancel();
+
+  res.status(201).json({ message: req.body.id });
 });
 
-router.get('/userInfo', (req, res) => {
+router.post('/test/:id', async (req, res) => {
+  const { id } = req.params;
+  var cancel_job = schedule.scheduledJobs[id];
+  cancel_job.cancel();
 
-})
+  // let del = await postModels(UserRemove('posts', id), req, res);
+  res.status(200).json({ message: `Delete for ${id}` });
+});
 
 module.exports = router;
