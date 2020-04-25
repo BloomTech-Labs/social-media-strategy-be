@@ -30,6 +30,13 @@ const postExample = {
     cards: []
 }
 
+const userExample = {
+    id: 50,
+    email: 'hal@hal.com',
+    password: 'test',
+    okta_userid: '12323'
+}
+
 function modelTester(table, model, formattedSubmission){
     describe('insert function inserts', () => {
         it('inserts a new item into the db', async () => {
@@ -54,5 +61,6 @@ function modelTester(table, model, formattedSubmission){
 
 modelTester('posts', Posts, postExample);
 modelTester('topics', Topics, topicExample);
+// modelTester('users', Users, userExample);
 
 

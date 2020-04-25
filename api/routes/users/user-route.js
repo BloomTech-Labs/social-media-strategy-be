@@ -76,21 +76,32 @@ router.delete('/:id/local', async (req, res) => {
   }
 });
 
-function checkRole(...roles) {
-  return (req, res, next) => {
-    console.log(req.decodedToken);
-    if (
-      req.decodedToken &&
-      req.decodedToken.role &&
-      roles.includes(req.decodedToken.role.toLowerCase())
-    ) {
-      next();
-    } else {
-      res.status(401).json({
-        message: `Don't have Authorization for this command, contact an Admin`,
-      });
-    }
-  };
-}
 
-module.exports = router;
+router.put('/:id', async (req, res) => {
+  const { id } = req.params;
+  const update = req.body;
+  if ((await lengthcheck(find('users', { id: id }))) === 0) {
+    return res.status(404).json('no user found');
+  } else {
+    postModels(UserUpdate('users', update, id), req, res);
+  }
+});
+
+  function checkRole(...roles) {
+    return (req, res, next) => {
+      console.log(req.decodedToken);
+      if (
+        req.decodedToken &&
+        req.decodedToken.role &&
+        roles.includes(req.decodedToken.role.toLowerCase())
+      ) {
+        next();
+      } else {
+        res.status(401).json({
+          message: `Don't have Authorization for this command, contact an Admin`,
+        });
+      }
+    };
+  }
+
+  module.exports = router;

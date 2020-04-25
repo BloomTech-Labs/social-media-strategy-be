@@ -104,9 +104,7 @@ router.post('/:id/user', validateuserid, oktaInfo, async (req, res) => {
   //  req.okta.data  === oktainfo from middleware
   const postbody = {
     ...req.body,
-    screenname: req.okta
-      ? req.okta.data.profile.twitter_screenName
-      : `testing-${Date.now()}`, //testing purposes
+    screenname: req.okta.data.profile.twitter_screenName || '',
     user_id: id,
   };
   if (joivalidation(postbody, schema)) {
@@ -168,14 +166,16 @@ router.put('/:id/twitter', twitterInfo, async (req, res) => {
       return res.status(404).json('no post found');
     } else {
       const update = { ...req.body, completed: true };
-
+      let date_check = await find('posts', { id: id });
+      console.log(!date_check[0].date, 'CHECK');
       if (req.body.date) {
-        console.log(req.body.date);
+        console.log(req.body.date, id);
+
         // Schedule post here
         // var a = moment.tz(`${req.body.date}`, `${req.body.tz}`);
-        console.log('DEFAULT', moment.tz.guess());
+        // console.log('DEFAULT', moment.tz.guess());
 
-        schedule.scheduleJob(`${req.body.date}`, async function () {
+        schedule.scheduleJob(id, `${req.body.date}`, async function () {
           console.log('I WENT OUT AT', new Date());
           req.twit.post('statuses/update', {
             status: req.body.post_text,
@@ -200,6 +200,7 @@ router.put('/:id/twitter', twitterInfo, async (req, res) => {
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const update = req.body;
+
   if ((await lengthcheck(find('posts', { id: id }))) === 0) {
     return res.status(404).json('no post found');
   } else {
@@ -212,7 +213,30 @@ router.delete('/:id', async (req, res) => {
   if ((await lengthcheck(find('posts', { id: id }))) === 0) {
     return res.status(404).json('no post found');
   } else {
+<<<<<<< HEAD
     postModels(PostRemove('posts', id), req, res);
+=======
+    let date_check = await find('posts', { id: id });
+    console.log(
+      date_check[0].date,
+      new Date(date_check[0].date) < new Date(),
+      'TEST'
+    );
+
+    if (!date_check[0].date) {
+      postModels(PostRemove('posts', id), req, res);
+    } else if (
+      date_check[0].completed === true &&
+      new Date(date_check[0].date) < new Date()
+    ) {
+      postModels(PostRemove('posts', id), req, res);
+    } else {
+      var cancel_job = schedule.scheduledJobs[id];
+      cancel_job.cancel();
+
+      postModels(PostRemove('posts', id), req, res);
+    }
+>>>>>>> scheduled-post-feature
   }
 });
 

@@ -39,12 +39,16 @@ async function twitterInfo(req, res, next) {
       }
     );
 
+    // console.log("AX IN TWITINFO", ax);
+
     var T = new Twit({
       consumer_key: process.env.CONSUMER_KEY,
       consumer_secret: process.env.CONSUMER_SECRET,
       access_token: ax.data.profile.Oauth_token,
       access_token_secret: ax.data.profile.Oauth_secret,
     });
+
+    console.log('TWITTER STUFF', T)
     req.okta = ax;
     req.twit = T;
     next();

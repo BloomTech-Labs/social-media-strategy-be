@@ -9,7 +9,7 @@ module.exports = [
   add,
   remove,
   update,
-  findByID
+  findByID,
 ];
 
 function joivalidation(reqbody, schema) {
@@ -41,7 +41,6 @@ function routerModels(modal, req, res) {
 
 function find(table, filter) {
   let posts = db(`${table}`);
-  console.log('POSTS', posts);
   if (filter) {
     return posts.where(filter);
   } else {
