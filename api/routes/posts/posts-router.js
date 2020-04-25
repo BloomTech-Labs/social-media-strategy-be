@@ -25,37 +25,10 @@ const schema = Joi.object({
   date: Joi.string().allow(''),
   screenname: Joi.string().allow(''),
 });
-// export function postModels(modal, req, res) {
-//   modal
-//     .then((posts) => {
-//       console.log(posts);
-//       posts
-//         ? res.status(200).json(posts)
-//         : res.status(404).json('Nothing found');
-//     })
-//     .catch((error) => {
-//       res.status(500).json({
-//         message: error.message,
-//         error: error.stack,
-//         name: error.name,
-//         code: error.code,
-//       });
-//     });
-// }
+
 // GET --------------
 router.get('/', (req, res) => {
   postModels(find('posts'), req, res);
-
-  // Posts.find()
-  //   .then((posts) => {
-  //     res.status(200).json({ Posts: posts });
-  //   })
-  //   .catch((err) => {
-  //     res.status(500).json({
-  //       message: 'Error retrieving posts',
-  //       Error: err,
-  //     });
-  //   });
 });
 
 router.get('/:id', async (req, res) => {
@@ -66,17 +39,6 @@ router.get('/:id', async (req, res) => {
   } else {
     postModels(find('posts', { id: req.params.id }), req, res);
   }
-
-  // Posts.find({ id })
-  //   .then((posts) => {
-  //     res.status(200).json({ 'Post with specified ID': posts });
-  //   })
-  //   .catch((err) => {
-  //     res.status(404).json({
-  //       message: 'Post with specified ID not found',
-  //       Error: err,
-  //     });
-  //   });
 });
 router.get('/:id/user', async (req, res) => {
   const { id } = req.params;
@@ -85,26 +47,14 @@ router.get('/:id/user', async (req, res) => {
   } else {
     postModels(find('posts', { user_id: id }), req, res);
   }
-
-  // Posts.find({ user_id: id })
-  //   .then((posts) => {
-  //     res.status(200).json({ 'Post by specified user': posts });
-  //   })
-  //   .catch((err) => {
-  //     res.status(404).json({
-  //       message: 'Post with specified ID not found',
-  //       Error: err,
-  //     });
-  //   });
 });
 
 //  POST TO GET REC TIME FROM DS -------
-router.post('/:id/user', validateuserid, oktaInfo, async (req, res) => {
+router.post('/:id/user', validateuserid, async (req, res) => {
   const { id } = req.params;
   //  req.okta.data  === oktainfo from middleware
   const postbody = {
     ...req.body,
-    screenname: req.okta.data.profile.twitter_screenName || '',
     user_id: id,
   };
   if (joivalidation(postbody, schema)) {
@@ -112,11 +62,10 @@ router.post('/:id/user', validateuserid, oktaInfo, async (req, res) => {
   } else {
     try {
       let post = await add('posts', postbody);
-      let ax = await axios.post(
+      await axios.post(
         ' https://production-environment-flask.herokuapp.com/recommend',
         post
       );
-      console.log(ax, 'ARE YOU WORKING?');
       return res.status(201).json(post);
     } catch (error) {
       console.log(error.message);
