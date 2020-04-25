@@ -213,9 +213,6 @@ router.delete('/:id', async (req, res) => {
   if ((await lengthcheck(find('posts', { id: id }))) === 0) {
     return res.status(404).json('no post found');
   } else {
-<<<<<<< HEAD
-    postModels(PostRemove('posts', id), req, res);
-=======
     let date_check = await find('posts', { id: id });
     console.log(
       date_check[0].date,
@@ -236,7 +233,6 @@ router.delete('/:id', async (req, res) => {
 
       postModels(PostRemove('posts', id), req, res);
     }
->>>>>>> scheduled-post-feature
   }
 });
 
