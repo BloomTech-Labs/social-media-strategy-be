@@ -205,17 +205,6 @@ router.put('/:id', async (req, res) => {
   } else {
     postModels(PostUpdate('posts', update, id), req, res);
   }
-
-  // Posts.update(update, id) //May need to change depending on payload
-  //   .then((value) => {
-  //     res.status(201).json({ 'Updated post: ': value });
-  //   })
-  //   .catch((err) => {
-  //     // console.log(err.message)
-  //     res
-  //       .status(500)
-  //       .json({ message: 'Post cannot be updated', Error: err.message });
-  //   });
 });
 
 router.delete('/:id', async (req, res) => {
@@ -225,16 +214,6 @@ router.delete('/:id', async (req, res) => {
   } else {
     postModels(PostRemove('posts', id), req, res);
   }
-
-  // Posts.remove(id)
-  //   .then((response) => {
-  //     res.status(200).json({ message: 'Post deleted', response });
-  //   })
-  //   .catch((err) => {
-  //     res
-  //       .status(500)
-  //       .json({ message: 'Post cannot be removed', Error: err.message });
-  //   });
 });
 
 module.exports = router;
