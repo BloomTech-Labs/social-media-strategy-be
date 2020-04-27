@@ -7,7 +7,12 @@ const router = express.Router();
 const Joi = require('@hapi/joi');
 const axios = require('axios');
 const Twitterlite = require('twitter-lite');
-const { validateuserid, twitterInfo, oktaInfo } = require('../auth/middleware');
+const {
+  validateuserid,
+  twitterInfo,
+  oktaInfo,
+  validateRegister,
+} = require('../auth/middleware');
 const restricted = require('../auth/restricted-middleware');
 const queryString = require('query-string');
 var moment = require('moment-timezone');
@@ -112,7 +117,7 @@ router.post('/:id/callback', restricted, async (req, res, next) => {
   }
 });
 
-router.post('/register', async (req, res) => {
+router.post('/register', validateRegister, async (req, res) => {
   let user = req.body;
 
   let newuser = schema.validate(user).value;

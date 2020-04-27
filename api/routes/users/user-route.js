@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const { validateuserid } = require('../auth/middleware');
+
 require('dotenv').config();
 const [
   joivalidation,
@@ -11,7 +13,6 @@ const [
   add,
   UserRemove,
   UserUpdate,
-  findByID,
 ] = require('../../helper'); //ARRAY IMPORTS NEED TO STAY IN ORDER
 
 router.get('/', (req, res) => {
@@ -22,16 +23,20 @@ router.get('/', (req, res) => {
 router.get('/user', (req, res) => {
   res.status(200).json(req.decodedToken);
 });
-
-router.delete('/:id', checkRole('admin'), async (req, res) => {
-  const { okta_userid } = req.decodedToken;
+router.get('/:id', (req, res) => {
   const { id } = req.params;
-  console.log(okta_userid);
-  console.log(process.env.OKTA_DOMAIN, 'ENV');
+  find('users', { id: id })
+    .then((users) => res.status(200).json(users))
+    .catch((err) => res.status(500).json(err.message));
+});
+
+router.delete('/:id', checkRole('admin'), validateuserid, async (req, res) => {
+  const { id } = req.params;
+  console.log(req.oktaid);
 
   try {
     let deact = await axios.post(
-      `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}/lifecycle/deactivate`,
+      `https://${process.env.OKTA_DOMAIN}/users/${req.oktaid}/lifecycle/deactivate`,
       {},
       {
         headers: {
@@ -39,9 +44,8 @@ router.delete('/:id', checkRole('admin'), async (req, res) => {
         },
       }
     );
-    console.log(deact);
     await axios.delete(
-      `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
+      `https://${process.env.OKTA_DOMAIN}/users/${req.oktaid}`,
       {
         headers: {
           Authorization: process.env.OKTA_AUTH,
@@ -76,7 +80,6 @@ router.delete('/:id/local', async (req, res) => {
   }
 });
 
-
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const update = req.body;
@@ -87,21 +90,21 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-  function checkRole(...roles) {
-    return (req, res, next) => {
-      console.log(req.decodedToken);
-      if (
-        req.decodedToken &&
-        req.decodedToken.role &&
-        roles.includes(req.decodedToken.role.toLowerCase())
-      ) {
-        next();
-      } else {
-        res.status(401).json({
-          message: `Don't have Authorization for this command, contact an Admin`,
-        });
-      }
-    };
-  }
+function checkRole(...roles) {
+  return (req, res, next) => {
+    console.log(req.decodedToken);
+    if (
+      req.decodedToken &&
+      req.decodedToken.role &&
+      roles.includes(req.decodedToken.role.toLowerCase())
+    ) {
+      next();
+    } else {
+      res.status(401).json({
+        message: `Don't have Authorization for this command, contact an Admin`,
+      });
+    }
+  };
+}
 
-  module.exports = router;
+module.exports = router;

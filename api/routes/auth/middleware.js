@@ -13,7 +13,7 @@ const [
   findByID,
 ] = require('../../helper');
 
-module.exports = { validateuserid, twitterInfo, oktaInfo };
+module.exports = { validateuserid, twitterInfo, oktaInfo, validateRegister };
 
 function validateuserid(req, res, next) {
   const { id } = req.params;
@@ -24,6 +24,21 @@ function validateuserid(req, res, next) {
         : res.status(400).json({ error: 'Not a Valid ID' })
     )
     .catch((err) => res.status(500).json(err.message));
+}
+async function validateRegister(req, res, next) {
+  let user = await find('users');
+  let namecheck = [];
+  await user.forEach((e) => namecheck.push(e.email) & console.log(e.email));
+
+  if (namecheck.includes(req.body.email)) {
+    res
+      .status(500)
+      .json(
+        'Email already registered, please choose a different email or proceed to login'
+      );
+  } else {
+    next();
+  }
 }
 
 async function twitterInfo(req, res, next) {
@@ -48,7 +63,7 @@ async function twitterInfo(req, res, next) {
       access_token_secret: ax.data.profile.Oauth_secret,
     });
 
-    console.log('TWITTER STUFF', T)
+    console.log('TWITTER STUFF', T);
     req.okta = ax;
     req.twit = T;
     next();
