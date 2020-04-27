@@ -189,7 +189,7 @@ router.post('/login', (req, res) => {
         res.status(500).json({ error: 'login error' });
       }
     })
-    .catch((err) => res.status(500).json(err.message));
+    .catch((err) => res.status(500).json({ error: err.message }));
 });
 
 // DS LOGIN
