@@ -31,11 +31,10 @@ async function validateRegister(req, res, next) {
   await user.forEach((e) => namecheck.push(e.email));
 
   if (namecheck.includes(req.body.email)) {
-    res
-      .status(500)
-      .json(
-        'Email already registered, please choose a different email or proceed to login'
-      );
+    res.status(500).json({
+      error:
+        'Email already registered, please choose a different email or proceed to login',
+    });
   } else {
     next();
   }
