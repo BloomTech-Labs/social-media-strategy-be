@@ -28,7 +28,7 @@ function validateuserid(req, res, next) {
 async function validateRegister(req, res, next) {
   let user = await find('users');
   let namecheck = [];
-  await user.forEach((e) => namecheck.push(e.email) & console.log(e.email));
+  await user.forEach((e) => namecheck.push(e.email));
 
   if (namecheck.includes(req.body.email)) {
     res
