@@ -185,4 +185,13 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+router.delete('/:id/local', async (req, res) => {
+  const { id } = req.params;
+  if ((await lengthcheck(find('posts', { id: id }))) === 0) {
+    return res.status(404).json('no post found');
+  } else {
+    postModels(PostRemove('posts', id), req, res);
+  }
+});
+
 module.exports = router;
