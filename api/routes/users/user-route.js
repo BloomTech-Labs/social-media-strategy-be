@@ -80,7 +80,7 @@ router.delete('/:id/local', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', checkRole('admin'), async (req, res) => {
   const { id } = req.params;
   const update = req.body;
   if ((await lengthcheck(find('users', { id: id }))) === 0) {

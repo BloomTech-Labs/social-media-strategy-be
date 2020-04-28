@@ -49,7 +49,7 @@ const schema = Joi.object({
   role: Joi.string().empty('').default('user'),
 });
 
-router.get('/:id/oauth', validateuserid, async (req, res, next) => {
+router.get('/:id/oauth', validateuserid, restricted, async (req, res, next) => {
   try {
     let twit = await client.getRequestToken('https://www.so-me.net/callback ');
     // https://master.duosa5dkjv93b.amplifyapp.com/callback     <-- if so-me in not fixed
@@ -62,7 +62,7 @@ router.get('/:id/oauth', validateuserid, async (req, res, next) => {
   }
 });
 
-router.post('/:id/callback', restricted, async (req, res, next) => {
+router.post('/:id/callback', restricted, async (req, res, next) => { //Remember we restricted this
   const { okta_userid } = req.decodedToken;
 
   try {
@@ -90,7 +90,7 @@ router.post('/:id/callback', restricted, async (req, res, next) => {
         },
       }
     );
-    // let followers = '';
+  
 
     var T = new Twit({
       consumer_key: process.env.CONSUMER_KEY,
@@ -283,7 +283,6 @@ router.get('/userInfo', restricted, twitterInfo, async (req, res) => {
       screen_name: `${req.okta.data.profile.twitter_screenName}`,
     });
 
-    // console.log('USERRS/SHOW', twitInfo);
 
     res.status(200).json({
       screen_name: req.okta.data.profile.twitter_screenName,
@@ -307,83 +306,10 @@ router.get('/userStream', restricted, twitterInfo, async (req, res) => {
       count: 1,
     });
 
-    // console.log('STREAMMY', twitInfo.data);
-
-    // res.end();
     res.status(200).json({ stream_data: twitInfo.data });
   } catch (error) {
     console.log(error);
   }
-});
-
-// Twitter post -----
-// router.get('/:id/twitpost', restricted, async (req, res) => {
-//   const { okta_userid } = req.decodedToken;
-
-//   let ax = await axios.get(
-//     `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
-//     {
-//       headers: {
-//         Authorization: process.env.OKTA_AUTH,
-//       },
-//     }
-//   );
-
-//   // console.log(ax.data.profile, 'Axios call');
-
-//   var T = new Twit({
-//     consumer_key: process.env.CONSUMER_KEY,
-//     consumer_secret: process.env.CONSUMER_SECRET,
-//     access_token: ax.data.profile.Oauth_token,
-//     access_token_secret: ax.data.profile.Oauth_secret,
-//   });
-
-//   T.post('statuses/update', { status: 'Web > DS!!!!!!' }, function (
-//     err,
-//     data,
-//     response
-//   ) {
-//     console.log(data);
-//   });
-//   res.status(200).json('success');
-// });
-
-// TEST CRON
-
-router.post('/test', (req, res) => {
-  // FORMAT for : "date":"2020-04-07 00:29",  "tz":"America/New_York",
-  // var a = moment.tz(`${req.body.date}`, `${req.body.tz}`);
-  console.log('DEFAULT', moment.tz.guess());
-  // schedule.scheduleJob(req.body.id, a, function () {
-  //   console.log(
-  //     'The answer to life, the universe, and everything!',
-  //     new Date(),
-  //     req.body.test
-  //   );
-  // });
-
-  schedule.scheduleJob(`${req.body.id}`, `${req.body.date}`, function () {
-    console.log(
-      'The answer to life, the universe, and everything!',
-      new Date(),
-      req.body.post_text
-    );
-  });
-  // var j = schedule.scheduleJob(unique_name, date, function () {});
-  // // later on
-  // var my_job = schedule.scheduledJobs[unique_name];
-  // my_job.cancel();
-
-  res.status(201).json({ message: req.body.id });
-});
-
-router.post('/test/:id', async (req, res) => {
-  const { id } = req.params;
-  var cancel_job = schedule.scheduledJobs[id];
-  cancel_job.cancel();
-
-  // let del = await postModels(UserRemove('posts', id), req, res);
-  res.status(200).json({ message: `Delete for ${id}` });
 });
 
 module.exports = router;
