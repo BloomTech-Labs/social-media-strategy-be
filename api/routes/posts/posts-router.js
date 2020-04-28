@@ -61,12 +61,12 @@ router.post('/:id/user', validateuserid, async (req, res) => {
     res.status(500).json(joivalidationError(postbody, schema));
   } else {
     try {
-      let post = await add('posts', postbody);
+      let addedPost = await add('posts', postbody);
       await axios.post(
         ' https://production-environment-flask.herokuapp.com/recommend',
-        post
+        addedPost
       );
-      return res.status(201).json(post);
+      return res.status(201).json(addedPost);
     } catch (error) {
       console.log(error.message);
       res.status(500).json({
