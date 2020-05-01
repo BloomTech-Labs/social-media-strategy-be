@@ -25,7 +25,7 @@ To get the server running locally:
 
 **Endpoints**
 
-https://api.so-me.net/api
+https://api.so-me.net
 
 | Method | URL                    | Description                                                                                                     |
 | ------ | ---------------------- | --------------------------------------------------------------------------------------------------------------- |
