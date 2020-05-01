@@ -64,7 +64,7 @@ https://api.so-me.net/api
 
 <https://api.so-me.net/api/auth/register>
 
-#### ### --- register account
+#### ### --- register account in Both OKTA and in the Database
 
 ## Email: _Required/Unique_ | Password: _Required_ | role: \_Not Required_defaults to user
 
