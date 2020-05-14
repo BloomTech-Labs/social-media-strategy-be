@@ -1,23 +1,23 @@
-require('dotenv').config();
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { jwtSecret } = require('../../config/secrets');
+require("dotenv").config();
+const express = require("express");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { jwtSecret } = require("../../config/secrets");
 const router = express.Router();
-const Joi = require('@hapi/joi');
-const axios = require('axios');
-const Twitterlite = require('twitter-lite');
+const Joi = require("@hapi/joi");
+const axios = require("axios");
+const Twitterlite = require("twitter-lite");
 const {
   validateuserid,
   twitterInfo,
   oktaInfo,
   validateRegister,
-} = require('../auth/middleware');
-const restricted = require('../auth/restricted-middleware');
-const queryString = require('query-string');
-var moment = require('moment-timezone');
-var schedule = require('node-schedule');
-var Twit = require('twit');
+} = require("../auth/middleware");
+const restricted = require("../auth/restricted-middleware");
+const queryString = require("query-string");
+var moment = require("moment-timezone");
+var schedule = require("node-schedule");
+var Twit = require("twit");
 const [
   joivalidation,
   joivalidationError,
@@ -28,7 +28,7 @@ const [
   UserRemove,
   UserUpdate,
   findByID,
-] = require('../../helper');
+] = require("../../helper");
 
 const client = new Twitterlite({
   consumer_key: process.env.CONSUMER_KEY,
@@ -36,22 +36,22 @@ const client = new Twitterlite({
 });
 
 const dsSchema = Joi.object({
-  email: Joi.string().email().required().valid('ds10@lasersharks.com'),
-  password: Joi.string().required().min(4).max(30).valid('krahs'),
-  okta_userid: Joi.string().default('DS have no Okta'),
-  role: Joi.string().empty('').default('admin'),
+  email: Joi.string().email().required().valid("ds10@lasersharks.com"),
+  password: Joi.string().required().min(4).max(30).valid("krahs"),
+  okta_userid: Joi.string().default("DS have no Okta"),
+  role: Joi.string().empty("").default("admin"),
 });
 
 const schema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required().min(4).max(30),
   okta_userid: Joi.string(),
-  role: Joi.string().empty('').default('user'),
+  role: Joi.string().empty("").default("user"),
 });
 
-router.get('/:id/oauth', validateuserid, restricted, async (req, res, next) => {
+router.get("/:id/oauth", validateuserid, restricted, async (req, res, next) => {
   try {
-    let twit = await client.getRequestToken('https://www.so-me.net/callback ');
+    let twit = await client.getRequestToken("https://www.so-me.net/callback ");
     // https://master.duosa5dkjv93b.amplifyapp.com/callback     <-- if so-me in not fixed
 
     const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${twit.oauth_token}`;
@@ -62,7 +62,8 @@ router.get('/:id/oauth', validateuserid, restricted, async (req, res, next) => {
   }
 });
 
-router.post('/:id/callback', restricted, async (req, res, next) => { //Remember we restricted this
+router.post("/:id/callback", restricted, async (req, res, next) => {
+  //Remember we restricted this
   const { okta_userid } = req.decodedToken;
 
   try {
@@ -90,7 +91,6 @@ router.post('/:id/callback', restricted, async (req, res, next) => { //Remember 
         },
       }
     );
-  
 
     var T = new Twit({
       consumer_key: process.env.CONSUMER_KEY,
@@ -98,7 +98,7 @@ router.post('/:id/callback', restricted, async (req, res, next) => { //Remember 
       access_token: parsed_data.oauth_token,
       access_token_secret: parsed_data.oauth_token_secret,
     });
-    let a = await T.get('followers/ids', {
+    let a = await T.get("followers/ids", {
       screen_name: `${parsed_data.screen_name}`,
     });
     let totalfollowers = await a.data.ids.length;
@@ -117,7 +117,7 @@ router.post('/:id/callback', restricted, async (req, res, next) => { //Remember 
   }
 });
 
-router.post('/register', validateRegister, async (req, res) => {
+router.post("/register", validateRegister, async (req, res) => {
   let user = req.body;
 
   let newuser = schema.validate(user).value;
@@ -145,9 +145,9 @@ router.post('/register', validateRegister, async (req, res) => {
       );
 
       newuser.okta_userid = ax.data.id;
-      let saved = await add('users', newuser);
+      let saved = await add("users", newuser);
 
-      let tokenuser = await find('users', { email: req.body.email }).first();
+      let tokenuser = await find("users", { email: req.body.email }).first();
       const token = generateToken(tokenuser);
 
       res.status(201).json({ user: tokenuser, token });
@@ -164,17 +164,17 @@ router.post('/register', validateRegister, async (req, res) => {
   }
 });
 
-router.post('/login', (req, res) => {
+router.post("/login", (req, res) => {
   let { email, password } = req.body;
 
-  find('users', { email })
+  find("users", { email })
     .first()
     .then((user) => {
       if (user && bcrypt.compareSync(password, user.password)) {
         try {
           const token = generateToken(user);
           res.status(200).json({
-            message: 'Login successful',
+            message: "Login successful",
             token,
           });
         } catch (error) {
@@ -186,17 +186,17 @@ router.post('/login', (req, res) => {
           });
         }
       } else {
-        res.status(500).json({ error: 'login error' });
+        res.status(500).json({ error: "login error" });
       }
     })
     .catch((err) => res.status(500).json({ error: err.message }));
 });
 
 // DS LOGIN
-router.post('/dsteam', async (req, res) => {
+router.post("/dsteam", async (req, res) => {
   let { email, password } = req.body;
 
-  let user = await find('users', { email }).first();
+  let user = await find("users", { email }).first();
 
   if (!user && !dsSchema.validate(req.body).error) {
     try {
@@ -206,33 +206,33 @@ router.post('/dsteam', async (req, res) => {
 
       usr.password = hash;
 
-      let saved = await add('users', usr);
-      let newuser = await find('users', { email }).first();
+      let saved = await add("users", usr);
+      let newuser = await find("users", { email }).first();
 
       const token = generateDSToken(newuser);
       res.status(200).json({
-        message: 'Register & Login successful',
+        message: "Register & Login successful",
         token,
       });
     } catch (error) {
       res
         .status(500)
-        .json('Wrong credentials or is req.body is in wrong format');
+        .json("Wrong credentials or is req.body is in wrong format");
     }
   } else if (!dsSchema.validate(req.body).error) {
     try {
       const token = generateDSToken(user);
       res.status(200).json({
-        message: 'Login successful',
+        message: "Login successful",
         token,
       });
     } catch (error) {
       res
         .status(500)
-        .json('Wrong credentials or is req.body is in wrong format');
+        .json("Wrong credentials or is req.body is in wrong format");
     }
   } else {
-    res.status(401).json('Wrong Ds_Team credentials provided');
+    res.status(401).json("Wrong Ds_Team credentials provided");
   }
 });
 
@@ -246,15 +246,15 @@ function generateToken(user) {
     role: user.role,
   };
 
-  if (user.role === 'admin') {
+  if (user.role === "admin") {
     console.log(user.role);
     const options = {
-      expiresIn: '30d',
+      expiresIn: "30d",
     };
     return jwt.sign(payload, jwtSecret, options);
   } else {
     const options = {
-      expiresIn: '1d', // probably change for shorter time, esp if doing refresh tokens
+      expiresIn: "1d", // probably change for shorter time, esp if doing refresh tokens
     };
     return jwt.sign(payload, jwtSecret, options);
   }
@@ -271,18 +271,17 @@ function generateDSToken(user) {
     role: user.role,
   };
   const options = {
-    expiresIn: '30d', // probably change for shorter time, esp if doing refresh tokens
+    expiresIn: "30d", // probably change for shorter time, esp if doing refresh tokens
   };
 
   return jwt.sign(payload, jwtSecret, options);
 }
 
-router.get('/userInfo', restricted, twitterInfo, async (req, res) => {
+router.get("/userInfo", restricted, twitterInfo, async (req, res) => {
   try {
-    let twitInfo = await req.twit.get('users/show', {
+    let twitInfo = await req.twit.get("users/show", {
       screen_name: `${req.okta.data.profile.twitter_screenName}`,
     });
-
 
     res.status(200).json({
       screen_name: req.okta.data.profile.twitter_screenName,
@@ -298,10 +297,10 @@ router.get('/userInfo', restricted, twitterInfo, async (req, res) => {
   }
 });
 
-router.get('/userStream', restricted, twitterInfo, async (req, res) => {
-  console.log('SCREENY', req.okta.data.profile.twitter_screenName);
+router.get("/userStream", restricted, twitterInfo, async (req, res) => {
+  console.log("SCREENY", req.okta.data.profile.twitter_screenName);
   try {
-    let twitInfo = await req.twit.get('statuses/home_timeline/:count', {
+    let twitInfo = await req.twit.get("statuses/home_timeline/:count", {
       screen_name: `${req.okta.data.profile.twitter_screenName}`,
       count: 1,
     });
