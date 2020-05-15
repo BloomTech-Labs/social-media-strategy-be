@@ -934,7 +934,7 @@ NODE_ENV='development'
 <br>
 EMAIL_TEST='test@test.com'
 <br>
-PASSWORD_TEST='test'
+PASSWORD_TEST=''
 <br>
 CONSUMER_KEY=""
 <br>
