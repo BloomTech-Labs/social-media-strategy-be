@@ -19,10 +19,10 @@ router.get("/twitter/authorize", async (req, res, next) => {
       ? "http://localhost:3000/connect/twitter/callback"
       : "https://www.so-me.net/connect/twitter/callback";
   try {
-    const tl = await client.getRequestToken(callbackURL);
+    const oauthResponse = await client.getRequestToken(callbackURL);
     console.log("callbackURL", callbackURL);
-    console.log(tl);
-    const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${tl.oauth_token}`;
+    console.log(oauthResponse);
+    const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${oauthResponse.oauth_token}`;
 
     res.status(200).json(redirecturl);
   } catch (error) {
