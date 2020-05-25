@@ -5,6 +5,7 @@ const axios = require("axios");
 const Twitterlite = require("twitter-lite");
 const { twitterInfo } = require("../auth/middleware");
 const restricted = require("../auth/restricted-middleware");
+const verifyJWT = require("./okta-jwt-verifier");
 const queryString = require("query-string");
 var Twit = require("twit");
 
@@ -13,7 +14,7 @@ const client = new Twitterlite({
   consumer_secret: process.env.CONSUMER_SECRET,
 });
 
-router.get("/twitter/authorize", async (req, res, next) => {
+router.get("/twitter/authorize", verifyJWT, async (req, res, next) => {
   const callbackURL =
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000/connect/twitter/callback"
