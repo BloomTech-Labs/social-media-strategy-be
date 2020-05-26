@@ -2,14 +2,14 @@ require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
-const Twitterlite = require("twitter-lite");
+const Twitter = require("twitter-lite");
 const { twitterInfo } = require("../auth/middleware");
 const restricted = require("../auth/restricted-middleware");
 const verifyJWT = require("./okta-jwt-verifier");
 const queryString = require("query-string");
 var Twit = require("twit");
 
-const client = new Twitterlite({
+const client = new Twitter({
   consumer_key: process.env.CONSUMER_KEY,
   consumer_secret: process.env.CONSUMER_SECRET,
 });
@@ -31,27 +31,30 @@ router.get("/twitter/authorize", verifyJWT, async (req, res, next) => {
   }
 });
 
-router.post("/:id/callback", restricted, async (req, res, next) => {
-  //Remember we restricted this
-  const { okta_userid } = req.decodedToken;
+router.post("/twitter/callback", verifyJWT, async (req, res, next) => {
+  const okta_uid = req.jwt.claims.uid;
+  const { oauth_token, oauth_verifier } = req.body;
+  console.log(req.body);
 
-  try {
-    let twitaccess = await axios.post(
-      `https://api.twitter.com/oauth/access_token${req.body.location.search}`
-    );
-    // PARSE DATA OF TWITTER AXIOS CALL
-    const parsed_data = queryString.parse(twitaccess.data);
+  const parsed = await axios
+    .post(
+      `https://api.twitter.com/oauth/access_token?oauth_token=${oauth_token}&oauth_verifier=${oauth_verifier}`
+    )
+    .then(({ data }) => queryString.parse(data))
+    .catch((err) => console.error(err));
 
-    // Sends Okta user profile Oauth information
-    let ax = await axios.post(
-      `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
+  console.log("parsed", parsed);
+
+  // Sends Okta user profile Oauth information
+  await axios
+    .post(
+      `https://${process.env.OKTA_DOMAIN}/users/${okta_uid}`,
       {
         profile: {
-          Oauth_token: parsed_data.oauth_token,
-          Oauth_secret: parsed_data.oauth_token_secret,
-          twitter_userId: parsed_data.user_id,
-          twitter_screenName: parsed_data.screen_name,
-          oauth_verifier: req.body.parse.oauth_verifier,
+          Oauth_token: parsed.oauth_token,
+          Oauth_secret: parsed.oauth_token_secret,
+          twitter_userId: parsed.user_id,
+          twitter_screenName: parsed.screen_name,
         },
       },
       {
@@ -59,31 +62,33 @@ router.post("/:id/callback", restricted, async (req, res, next) => {
           Authorization: process.env.OKTA_AUTH,
         },
       }
-    );
+    )
+    .then(({ data }) => console.log(data))
+    .catch((err) => console.error(err));
 
-    var T = new Twit({
-      consumer_key: process.env.CONSUMER_KEY,
-      consumer_secret: process.env.CONSUMER_SECRET,
-      access_token: parsed_data.oauth_token,
-      access_token_secret: parsed_data.oauth_token_secret,
-    });
-    let a = await T.get("followers/ids", {
-      screen_name: `${parsed_data.screen_name}`,
-    });
-    let totalfollowers = await a.data.ids.length;
+  //   var T = new Twit({
+  //     consumer_key: process.env.CONSUMER_KEY,
+  //     consumer_secret: process.env.CONSUMER_SECRET,
+  //     access_token: parsed_data.oauth_token,
+  //     access_token_secret: parsed_data.oauth_token_secret,
+  //   });
+  //   let a = await T.get("followers/ids", {
+  //     screen_name: `${parsed_data.screen_name}`,
+  //   });
+  //   let totalfollowers = await a.data.ids.length;
 
-    res.status(200).json({
-      twitter_screenName: parsed_data.screen_name,
-      total_followers: totalfollowers,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-      error: error.stack,
-      name: error.name,
-      code: error.code,
-    });
-  }
+  //   res.status(200).json({
+  //     twitter_screenName: parsed_data.screen_name,
+  //     total_followers: totalfollowers,
+  //   });
+  // } catch (error) {
+  //   res.status(500).json({
+  //     message: error.message,
+  //     error: error.stack,
+  //     name: error.name,
+  //     code: error.code,
+  //   });
+  // }
 });
 
 router.get("/userInfo", restricted, twitterInfo, async (req, res) => {
