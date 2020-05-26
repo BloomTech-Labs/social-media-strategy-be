@@ -1,8 +1,6 @@
 const db = require('../data/db.config.js');
 
-module.exports = [
-  joivalidation,
-  joivalidationError,
+module.exports = {
   lengthcheck,
   routerModels,
   find,
@@ -10,14 +8,8 @@ module.exports = [
   remove,
   update,
   findByID,
-];
+};
 
-function joivalidation(reqbody, schema) {
-  return Object.keys(reqbody).length === 0 || schema.validate(reqbody).error;
-}
-function joivalidationError(reqbody, schema) {
-  return schema.validate(reqbody).error;
-}
 async function lengthcheck(model) {
   let lengthcheck = await model;
   return lengthcheck.length;

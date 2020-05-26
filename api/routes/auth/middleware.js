@@ -1,17 +1,10 @@
 var Twit = require('twit');
 const Twitterlite = require('twitter-lite');
 const axios = require('axios');
-const [
-  joivalidation,
-  joivalidationError,
-  lengthcheck,
-  postModels,
+const {
   find,
-  add,
-  UserRemove,
-  UserUpdate,
   findByID,
-] = require('../../helper');
+ } = require('../../helper');
 
 module.exports = { validateuserid, twitterInfo, oktaInfo, validateRegister };
 
