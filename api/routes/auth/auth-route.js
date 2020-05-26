@@ -1,60 +1,27 @@
 require("dotenv").config();
 const express = require("express");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const { jwtSecret } = require("../../config/secrets");
 const router = express.Router();
-const Joi = require("@hapi/joi");
 const axios = require("axios");
-const Twitterlite = require("twitter-lite");
-const {
-  validateuserid,
-  twitterInfo,
-  oktaInfo,
-  validateRegister,
-} = require("../auth/middleware");
+const Twitter = require("twitter-lite");
+const { twitterInfo } = require("../auth/middleware");
 const restricted = require("../auth/restricted-middleware");
+const verifyJWT = require("./okta-jwt-verifier");
 const queryString = require("query-string");
-var moment = require("moment-timezone");
-var schedule = require("node-schedule");
 var Twit = require("twit");
-const [
-  joivalidation,
-  joivalidationError,
-  lengthcheck,
-  postModels,
-  find,
-  add,
-  UserRemove,
-  UserUpdate,
-  findByID,
-] = require("../../helper");
 
-const client = new Twitterlite({
+const client = new Twitter({
   consumer_key: process.env.CONSUMER_KEY,
   consumer_secret: process.env.CONSUMER_SECRET,
 });
 
-const dsSchema = Joi.object({
-  email: Joi.string().email().required().valid("ds10@lasersharks.com"),
-  password: Joi.string().required().min(4).max(30).valid("krahs"),
-  okta_userid: Joi.string().default("DS have no Okta"),
-  role: Joi.string().empty("").default("admin"),
-});
-
-const schema = Joi.object({
-  email: Joi.string().email().required(),
-  password: Joi.string().required().min(4).max(30),
-  okta_userid: Joi.string(),
-  role: Joi.string().empty("").default("user"),
-});
-
-router.get("/:id/oauth", validateuserid, restricted, async (req, res, next) => {
+router.get("/twitter/authorize", verifyJWT, async (req, res, next) => {
+  const callbackURL =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:3000/connect/twitter/callback"
+      : "https://www.so-me.net/connect/twitter/callback";
   try {
-    let twit = await client.getRequestToken("https://www.so-me.net/callback ");
-    // https://master.duosa5dkjv93b.amplifyapp.com/callback     <-- if so-me in not fixed
-
-    const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${twit.oauth_token}`;
+    const oauthResponse = await client.getRequestToken(callbackURL);
+    const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${oauthResponse.oauth_token}`;
 
     res.status(200).json(redirecturl);
   } catch (error) {
@@ -62,27 +29,33 @@ router.get("/:id/oauth", validateuserid, restricted, async (req, res, next) => {
   }
 });
 
-router.post("/:id/callback", restricted, async (req, res, next) => {
-  //Remember we restricted this
-  const { okta_userid } = req.decodedToken;
+router.post("/twitter/callback", verifyJWT, async (req, res, next) => {
+  const okta_uid = req.jwt.claims.uid;
+  const { oauth_token, oauth_verifier } = req.body;
 
-  try {
-    let twitaccess = await axios.post(
-      `https://api.twitter.com/oauth/access_token${req.body.location.search}`
-    );
-    // PARSE DATA OF TWITTER AXIOS CALL
-    const parsed_data = queryString.parse(twitaccess.data);
+  const parsed = await axios
+    .post(
+      `https://api.twitter.com/oauth/access_token?oauth_token=${oauth_token}&oauth_verifier=${oauth_verifier}`
+    )
+    .then(({ data }) => queryString.parse(data))
+    .catch((err) => console.error(err));
 
-    // Sends Okta user profile Oauth information
-    let ax = await axios.post(
-      `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
+  if (!parsed)
+    return next({
+      code: 500,
+      message: "There was a problem connecting your Twitter account",
+    });
+
+  // Sends Okta user profile Oauth information
+  await axios
+    .post(
+      `https://${process.env.OKTA_DOMAIN}/users/${okta_uid}`,
       {
         profile: {
-          Oauth_token: parsed_data.oauth_token,
-          Oauth_secret: parsed_data.oauth_token_secret,
-          twitter_userId: parsed_data.user_id,
-          twitter_screenName: parsed_data.screen_name,
-          oauth_verifier: req.body.parse.oauth_verifier,
+          Oauth_token: parsed.oauth_token,
+          Oauth_secret: parsed.oauth_token_secret,
+          twitter_userId: parsed.user_id,
+          twitter_screenName: parsed.screen_name,
         },
       },
       {
@@ -90,192 +63,41 @@ router.post("/:id/callback", restricted, async (req, res, next) => {
           Authorization: process.env.OKTA_AUTH,
         },
       }
-    );
-
-    var T = new Twit({
-      consumer_key: process.env.CONSUMER_KEY,
-      consumer_secret: process.env.CONSUMER_SECRET,
-      access_token: parsed_data.oauth_token,
-      access_token_secret: parsed_data.oauth_token_secret,
-    });
-    let a = await T.get("followers/ids", {
-      screen_name: `${parsed_data.screen_name}`,
-    });
-    let totalfollowers = await a.data.ids.length;
-
-    res.status(200).json({
-      twitter_screenName: parsed_data.screen_name,
-      total_followers: totalfollowers,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-      error: error.stack,
-      name: error.name,
-      code: error.code,
-    });
-  }
-});
-
-router.post("/register", validateRegister, async (req, res) => {
-  let user = req.body;
-
-  let newuser = schema.validate(user).value;
-  if (!schema.validate(user).error) {
-    try {
-      const hash = bcrypt.hashSync(newuser.password, 10);
-      newuser.password = hash;
-
-      let ax = await axios.post(
-        `https://${process.env.OKTA_DOMAIN}/users?activate=true`,
-        {
-          profile: {
-            email: req.body.email,
-            login: req.body.email,
-          },
-          credentials: {
-            password: { value: req.body.password },
-          },
-        },
-        {
-          headers: {
-            Authorization: process.env.OKTA_AUTH,
-          },
-        }
-      );
-
-      newuser.okta_userid = ax.data.id;
-      let saved = await add("users", newuser);
-
-      let tokenuser = await find("users", { email: req.body.email }).first();
-      const token = generateToken(tokenuser);
-
-      res.status(201).json({ user: tokenuser, token });
-    } catch (error) {
-      res.status(500).json({
-        message: error.message,
-        error: error.stack,
-        name: error.name,
-        code: error.code,
+    )
+    .then(({ data }) => {
+      res.json({
+        message: `Twitter account @${parsed.screen_name} connected!`,
       });
-    }
-  } else {
-    res.status(500).json(schema.validate(user).error);
-  }
-});
-
-router.post("/login", (req, res) => {
-  let { email, password } = req.body;
-
-  find("users", { email })
-    .first()
-    .then((user) => {
-      if (user && bcrypt.compareSync(password, user.password)) {
-        try {
-          const token = generateToken(user);
-          res.status(200).json({
-            message: "Login successful",
-            token,
-          });
-        } catch (error) {
-          res.status(500).json({
-            message: error.message,
-            error: error.stack,
-            name: error.name,
-            code: error.code,
-          });
-        }
-      } else {
-        res.status(500).json({ error: "login error" });
-      }
     })
-    .catch((err) => res.status(500).json({ error: err.message }));
+    .catch((err) => {
+      console.error(err);
+      next({ code: 500, message: "There was a problem saving your data" });
+    });
+
+  //   var T = new Twit({
+  //     consumer_key: process.env.CONSUMER_KEY,
+  //     consumer_secret: process.env.CONSUMER_SECRET,
+  //     access_token: parsed_data.oauth_token,
+  //     access_token_secret: parsed_data.oauth_token_secret,
+  //   });
+  //   let a = await T.get("followers/ids", {
+  //     screen_name: `${parsed_data.screen_name}`,
+  //   });
+  //   let totalfollowers = await a.data.ids.length;
+
+  //   res.status(200).json({
+  //     twitter_screenName: parsed_data.screen_name,
+  //     total_followers: totalfollowers,
+  //   });
+  // } catch (error) {
+  //   res.status(500).json({
+  //     message: error.message,
+  //     error: error.stack,
+  //     name: error.name,
+  //     code: error.code,
+  //   });
+  // }
 });
-
-// DS LOGIN
-router.post("/dsteam", async (req, res) => {
-  let { email, password } = req.body;
-
-  let user = await find("users", { email }).first();
-
-  if (!user && !dsSchema.validate(req.body).error) {
-    try {
-      let usr = dsSchema.validate({ email, password }).value;
-
-      const hash = bcrypt.hashSync(usr.password, 10);
-
-      usr.password = hash;
-
-      let saved = await add("users", usr);
-      let newuser = await find("users", { email }).first();
-
-      const token = generateDSToken(newuser);
-      res.status(200).json({
-        message: "Register & Login successful",
-        token,
-      });
-    } catch (error) {
-      res
-        .status(500)
-        .json("Wrong credentials or is req.body is in wrong format");
-    }
-  } else if (!dsSchema.validate(req.body).error) {
-    try {
-      const token = generateDSToken(user);
-      res.status(200).json({
-        message: "Login successful",
-        token,
-      });
-    } catch (error) {
-      res
-        .status(500)
-        .json("Wrong credentials or is req.body is in wrong format");
-    }
-  } else {
-    res.status(401).json("Wrong Ds_Team credentials provided");
-  }
-});
-
-// TOKEN FUNCTIONS
-
-function generateToken(user) {
-  const payload = {
-    subject: user.id,
-    email: user.email,
-    okta_userid: user.okta_userid,
-    role: user.role,
-  };
-
-  if (user.role === "admin") {
-    console.log(user.role);
-    const options = {
-      expiresIn: "30d",
-    };
-    return jwt.sign(payload, jwtSecret, options);
-  } else {
-    const options = {
-      expiresIn: "1d", // probably change for shorter time, esp if doing refresh tokens
-    };
-    return jwt.sign(payload, jwtSecret, options);
-  }
-
-  // const options = {
-  //   expiresIn: "1d", // probably change for shorter time, esp if doing refresh tokens
-  // };
-}
-function generateDSToken(user) {
-  const payload = {
-    subject: user.id,
-    email: user.email,
-    okta_userid: user.okta_userid,
-    role: user.role,
-  };
-  const options = {
-    expiresIn: "30d", // probably change for shorter time, esp if doing refresh tokens
-  };
-
-  return jwt.sign(payload, jwtSecret, options);
-}
 
 router.get("/userInfo", restricted, twitterInfo, async (req, res) => {
   try {
