@@ -4,16 +4,13 @@ const axios = require('axios');
 const { validateuserid } = require('../auth/middleware');
 
 require('dotenv').config();
-const [
-  joivalidation,
-  joivalidationError,
+const {
   lengthcheck,
-  postModels,
+  routerModels,
   find,
-  add,
-  UserRemove,
-  UserUpdate,
-] = require('../../helper'); //ARRAY IMPORTS NEED TO STAY IN ORDER
+  remove,
+  update,
+} = require('../../helper'); //ARRAY IMPORTS NEED TO STAY IN ORDER
 
 router.get('/', (req, res) => {
   find('users')
@@ -52,7 +49,7 @@ router.delete('/:id', checkRole('admin'), async (req, res) => {
         },
       }
     );
-    let userResponse = await UserRemove('users', id);
+    let userResponse = await remove('users', id);
     res.status(200).json({ message: 'User deleted', userResponse });
   } catch (error) {
     res.status(500).json({
@@ -68,7 +65,7 @@ router.delete('/:id/local', async (req, res) => {
   const { id } = req.params;
 
   try {
-    let userResponse = await UserRemove('users', id);
+    let userResponse = await remove('users', id);
     res.status(200).json({ message: 'User deleted', userResponse });
   } catch (error) {
     res.status(500).json({
@@ -82,11 +79,11 @@ router.delete('/:id/local', async (req, res) => {
 
 router.put('/:id', checkRole('admin'), async (req, res) => {
   const { id } = req.params;
-  const update = req.body;
+  const userUpdate = req.body;
   if ((await lengthcheck(find('users', { id: id }))) === 0) {
     return res.status(404).json('no user found');
   } else {
-    postModels(UserUpdate('users', update, id), req, res);
+    routerModels(update('users', userUpdate, id), req, res);
   }
 });
 
