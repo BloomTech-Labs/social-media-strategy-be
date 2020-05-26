@@ -13,7 +13,7 @@ server.use(morgan("combined"));
 server.use(helmet());
 
 server.get("/", (req, res) => {
-  res.status(200).json({ message: "ITS WORKING!!!" });
+  res.status(200).json({ message: "IT'S WORKING!!!" });
 });
 
 server.use("/api", ApiRouter);
