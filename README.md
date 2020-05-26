@@ -71,7 +71,7 @@ https://api.so-me.net
 ```
 {
 "email": "test@test.com"
-"password": "test",
+"password": "",
 "role": user
 }
 ```
@@ -92,7 +92,7 @@ Store as: localStorage.setItem('token', res.data.token)
 ```
 {
 "email": "test@test.com"
-"password": "test"
+"password": ""
 }
 ```
 
@@ -130,7 +130,7 @@ Store as: localStorage.setItem('token', res.data.token)
 ```
 {
   "email":"ds10@lasersharks.com"
-  "password": "krahs"
+  "password": ""
 }
 ```
 
@@ -163,7 +163,7 @@ Store as: localStorage.setItem('token', res.data.token)
 
 ```
 {
-"id": "topic-5d8c67ef-52cf-48d5-a4fd-64d2076904d5 topic-0",
+"id": "",
 "title": "Drafts",
 }
 ```
@@ -192,7 +192,7 @@ Store as: localStorage.setItem('token', res.data.token)
 #### ### -- Retrieves Twitter URL needed to activate Oauth process, front-end will redirect user to this url
 
 ```
-"https://api.twitter.com/oauth/authorize?oauth_token=hZffUQAAAAABDNzLAAABccJumCg"
+"https://api.twitter.com/oauth/authorize?oauth_token="
 ```
 
 # GET # /api/posts/:id/userInfo
@@ -354,15 +354,15 @@ Store as: localStorage.setItem('token', res.data.token)
     {
         "id": 30,
         "email": "test@test.com",
-        "password": "$2a$10$/1IXp2y42Bv0zfjXgdxwAeorSme74nE8/ZH2HN1vem0zBJSyrkMAG",
-        "okta_userid": "00uak92wnasdaES80CopL4x6",
+        "password": "",
+        "okta_userid": "",
         "role": "user"
     },
     {
         "id": 31,
         "email": "jrivetest@test.com",
-        "password": "$2a$10$oKlKOpxl7mDiiGB2JsNDE.D/5xKdrOtwUe2t5T3jlSlNt9X2oKB4a",
-        "okta_userid": "00uak7adsfaf3o78b7eJpJ94x6",
+        "password": "",
+        "okta_userid": "",
         "role": "user"
     },
 ]
@@ -380,7 +380,7 @@ Store as: localStorage.setItem('token', res.data.token)
 {
     "subject": 30,
     "email": "test@test.com",
-    "okta_userid": "00uafk92wnzzdES80CopL4x6",
+    "okta_userid": "",
     "role": "user",
     "iat": 1588079945,
     "exp": 1588166345
@@ -399,8 +399,8 @@ Store as: localStorage.setItem('token', res.data.token)
     {
         "id": 12,
         "email": "test@test.com",
-        "password": "$2a$10$/1IXp2y42Bv0zfjXgdxwAeorSme74nE8/ZH2HN1vem0zBJSyrkMAG",
-        "okta_userid": "00uak92wnasdaES80CopL4x6",
+        "password": "",
+        "okta_userid": "",
         "role": "user"
     }
 ```
@@ -737,15 +737,15 @@ Returns all users in DB, verifying that specified one was deleted.
     {
         "id": 30,
         "email": "test@test.com",
-        "password": "$2a$10$/1IXp2y42Bv0zfjXgdxwAeorSme74nE8/ZH2HN1vem0zBJSyrkMAG",
-        "okta_userid": "00uak92wnasdaES80CopL4x6",
+        "password": "",
+        "okta_userid": "",
         "role": "user"
     },
     {
         "id": 31,
         "email": "jrivetest@test.com",
-        "password": "$2a$10$oKlKOpxl7mDiiGB2JsNDE.D/5xKdrOtwUe2t5T3jlSlNt9X2oKB4a",
-        "okta_userid": "00uak7adsfaf3o78b7eJpJ94x6",
+        "password": "",
+        "okta_userid": "",
         "role": "user"
     },
 ]
@@ -766,15 +766,15 @@ Returns all users in DB, verifying that specified one was deleted.
     {
         "id": 30,
         "email": "test@test.com",
-        "password": "$2a$10$/1IXp2y42Bv0zfjXgdxwAeorSme74nE8/ZH2HN1vem0zBJSyrkMAG",
-        "okta_userid": "00uak92wnasdaES80CopL4x6",
+        "password": "",
+        "okta_userid": "",
         "role": "user"
     },
     {
         "id": 31,
         "email": "jrivetest@test.com",
-        "password": "$2a$10$oKlKOpxl7mDiiGB2JsNDE.D/5xKdrOtwUe2t5T3jlSlNt9X2oKB4a",
-        "okta_userid": "00uak7adsfaf3o78b7eJpJ94x6",
+        "password": "",
+        "okta_userid": "",
         "role": "user"
     },
 ]
@@ -928,29 +928,29 @@ Located in `topics-model.js`
 
 ## Environment Variables
 
-JWT_SECRETS="zcasfdaffzxcvvrtydkldssadjfoiwuernpoiamfassdfasio"
+JWT_SECRETS=""
 <br>
 NODE_ENV='development'
 <br>
 EMAIL_TEST='test@test.com'
 <br>
-PASSWORD_TEST='test'
+PASSWORD_TEST=''
 <br>
-CONSUMER_KEY="qwxfZ7keDWO6vTlqxr7ZFCxzC"
+CONSUMER_KEY=""
 <br>
-CONSUMER_SECRET="jtMjwQu2UPztxIbjnEdBVglgJK47cAhJ9bmLpXFD86fhjC3fqa"
+CONSUMER_SECRET=""
 <br>
-OKTA_AUTH="SSWS007i8tncM4Z-bN6fiP6fvu0AbKS-tvql3lFtxy-6vd"
+OKTA_AUTH=""
 <br>
-OKTA_DOMAIN=dev-966011.okta.com/api/v1
+OKTA_DOMAIN=
 <br>
-DB_USER="jrivera6869"
+DB_USER=""
 <br>
-DB_PW="postgres"
+DB_PW=""
 <br>
-DB_DB="ebdb"
+DB_DB=""
 <br>
-DB_HOST="aa1xxezbq1ezyd0.cst1ktu0kueb.us-east-1.rds.amazonaws.com"
+DB_HOST=""
 <br>
 
 ## Contributing
