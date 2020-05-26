@@ -43,6 +43,11 @@ router.post("/twitter/callback", verifyJWT, async (req, res, next) => {
     .then(({ data }) => queryString.parse(data))
     .catch((err) => console.error(err));
 
+  if (!parsed)
+    return next({
+      code: 500,
+      message: "There was a problem connecting your Twitter account",
+    });
   console.log("parsed", parsed);
 
   // Sends Okta user profile Oauth information
@@ -63,8 +68,16 @@ router.post("/twitter/callback", verifyJWT, async (req, res, next) => {
         },
       }
     )
-    .then(({ data }) => console.log(data))
-    .catch((err) => console.error(err));
+    .then(({ data }) => {
+      console.log(data);
+      res.json({
+        message: `Twitter account @${parsed.screen_name} connected!`,
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+      next({ code: 500, message: "There was a problem saving your data" });
+    });
 
   //   var T = new Twit({
   //     consumer_key: process.env.CONSUMER_KEY,
