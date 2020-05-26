@@ -30,13 +30,13 @@ router.get('/:id', (req, res) => {
     .catch((err) => res.status(500).json(err.message));
 });
 
-router.delete('/:id', checkRole('admin'), validateuserid, async (req, res) => {
+router.delete('/:id', checkRole('admin'), async (req, res) => {
   const { id } = req.params;
-  console.log(req.oktaid);
+  const oktaId = req.decodedToken.okta_userid
 
   try {
     let deact = await axios.post(
-      `https://${process.env.OKTA_DOMAIN}/users/${req.oktaid}/lifecycle/deactivate`,
+      `https://${process.env.OKTA_DOMAIN}/users/${oktaId}/lifecycle/deactivate`,
       {},
       {
         headers: {
@@ -45,7 +45,7 @@ router.delete('/:id', checkRole('admin'), validateuserid, async (req, res) => {
       }
     );
     await axios.delete(
-      `https://${process.env.OKTA_DOMAIN}/users/${req.oktaid}`,
+      `https://${process.env.OKTA_DOMAIN}/users/${oktaId}`,
       {
         headers: {
           Authorization: process.env.OKTA_AUTH,

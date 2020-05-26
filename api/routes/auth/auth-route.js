@@ -44,12 +44,11 @@ const dsSchema = Joi.object({
 
 const schema = Joi.object({
   email: Joi.string().email().required(),
-  password: Joi.string().required().min(4).max(30),
   okta_userid: Joi.string(),
   role: Joi.string().empty('').default('user'),
 });
 
-router.get('/:id/oauth', validateuserid, restricted, async (req, res, next) => {
+router.get('/:id/oauth', /*validateuserid,*/ restricted, async (req, res, next) => {
   try {
     let twit = await client.getRequestToken('https://www.so-me.net/callback ');
     // https://master.duosa5dkjv93b.amplifyapp.com/callback     <-- if so-me in not fixed
@@ -117,14 +116,13 @@ router.post('/:id/callback', restricted, async (req, res, next) => { //Remember 
   }
 });
 
-router.post('/register', validateRegister, async (req, res) => {
+router.post('/register', async (req, res) => {
+  console.log("Post endpoint reached with req: ", req);
   let user = req.body;
 
   let newuser = schema.validate(user).value;
   if (!schema.validate(user).error) {
     try {
-      const hash = bcrypt.hashSync(newuser.password, 10);
-      newuser.password = hash;
 
       let ax = await axios.post(
         `https://${process.env.OKTA_DOMAIN}/users?activate=true`,
@@ -133,9 +131,9 @@ router.post('/register', validateRegister, async (req, res) => {
             email: req.body.email,
             login: req.body.email,
           },
-          credentials: {
-            password: { value: req.body.password },
-          },
+          // credentials: {
+          //   password: { value: req.body.password },
+          // },
         },
         {
           headers: {
@@ -148,9 +146,8 @@ router.post('/register', validateRegister, async (req, res) => {
       let saved = await add('users', newuser);
 
       let tokenuser = await find('users', { email: req.body.email }).first();
-      const token = generateToken(tokenuser);
 
-      res.status(201).json({ user: tokenuser, token });
+      res.status(201).json({ user: tokenuser });
     } catch (error) {
       res.status(500).json({
         message: error.message,
@@ -164,18 +161,16 @@ router.post('/register', validateRegister, async (req, res) => {
   }
 });
 
-router.post('/login', (req, res) => {
-  let { email, password } = req.body;
+router.post('/login', restricted, (req, res) => {
+  let { email } = req.body;
 
   find('users', { email })
     .first()
     .then((user) => {
-      if (user && bcrypt.compareSync(password, user.password)) {
+      if (req.decodedToken) {
         try {
-          const token = generateToken(user);
           res.status(200).json({
             message: 'Login successful',
-            token,
           });
         } catch (error) {
           res.status(500).json({
@@ -238,31 +233,31 @@ router.post('/dsteam', async (req, res) => {
 
 // TOKEN FUNCTIONS
 
-function generateToken(user) {
-  const payload = {
-    subject: user.id,
-    email: user.email,
-    okta_userid: user.okta_userid,
-    role: user.role,
-  };
+// function generateToken(user) {
+//   const payload = {
+//     subject: user.id,
+//     email: user.email,
+//     okta_userid: user.okta_userid,
+//     role: user.role,
+//   };
 
-  if (user.role === 'admin') {
-    console.log(user.role);
-    const options = {
-      expiresIn: '30d',
-    };
-    return jwt.sign(payload, jwtSecret, options);
-  } else {
-    const options = {
-      expiresIn: '1d', // probably change for shorter time, esp if doing refresh tokens
-    };
-    return jwt.sign(payload, jwtSecret, options);
-  }
+//   if (user.role === 'admin') {
+//     console.log(user.role);
+//     const options = {
+//       expiresIn: '30d',
+//     };
+//     return jwt.sign(payload, jwtSecret, options);
+//   } else {
+//     const options = {
+//       expiresIn: '1d', // probably change for shorter time, esp if doing refresh tokens
+//     };
+//     return jwt.sign(payload, jwtSecret, options);
+//   }
 
-  // const options = {
-  //   expiresIn: "1d", // probably change for shorter time, esp if doing refresh tokens
-  // };
-}
+//   // const options = {
+//   //   expiresIn: "1d", // probably change for shorter time, esp if doing refresh tokens
+//   // };
+// }
 function generateDSToken(user) {
   const payload = {
     subject: user.id,

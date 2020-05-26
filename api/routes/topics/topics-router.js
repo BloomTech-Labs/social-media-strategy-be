@@ -13,7 +13,7 @@ const [
 
 const schema = Joi.object({
   id: Joi.string(),
-  user_id: Joi.number(),
+  user_id: Joi.string(),
   title: Joi.string().required(),
   cards: Joi.array(),
   index: Joi.any(),
@@ -45,8 +45,8 @@ router.get('/:id/user', async (req, res) => {
 
 // POST START HERE ----------------
 
-router.post('/:id/user', validateuserid, (req, res) => {
-  const { id } = req.params;
+router.post('/:id/user', (req, res) => {
+  const id = req.decodedToken.okta_userid;
   const topicbody = { ...req.body, user_id: id };
 
   if (joivalidation(topicbody, schema)) {

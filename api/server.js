@@ -13,6 +13,7 @@ server.use(morgan('combined'));
 server.use(helmet());
 
 server.get('/', (req, res) => {
+  console.log("Root endpoint reached.");
   res.status(200).json({ message: 'ITS WORKING!!!' });
 });
 
