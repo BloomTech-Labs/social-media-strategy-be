@@ -21,8 +21,6 @@ router.get("/twitter/authorize", verifyJWT, async (req, res, next) => {
       : "https://www.so-me.net/connect/twitter/callback";
   try {
     const oauthResponse = await client.getRequestToken(callbackURL);
-    console.log("callbackURL", callbackURL);
-    console.log(oauthResponse);
     const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${oauthResponse.oauth_token}`;
 
     res.status(200).json(redirecturl);
@@ -34,7 +32,6 @@ router.get("/twitter/authorize", verifyJWT, async (req, res, next) => {
 router.post("/twitter/callback", verifyJWT, async (req, res, next) => {
   const okta_uid = req.jwt.claims.uid;
   const { oauth_token, oauth_verifier } = req.body;
-  console.log(req.body);
 
   const parsed = await axios
     .post(
@@ -48,7 +45,6 @@ router.post("/twitter/callback", verifyJWT, async (req, res, next) => {
       code: 500,
       message: "There was a problem connecting your Twitter account",
     });
-  console.log("parsed", parsed);
 
   // Sends Okta user profile Oauth information
   await axios
@@ -69,7 +65,6 @@ router.post("/twitter/callback", verifyJWT, async (req, res, next) => {
       }
     )
     .then(({ data }) => {
-      console.log(data);
       res.json({
         message: `Twitter account @${parsed.screen_name} connected!`,
       });
