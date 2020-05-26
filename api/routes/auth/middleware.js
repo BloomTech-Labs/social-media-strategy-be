@@ -21,7 +21,7 @@ function validateuserid(req, res, next) {
     .then((user) =>
       user
         ? (req.oktaid = user.okta_userid) & next()
-        : res.status(400).json({ error: 'Not a Valid ID' })
+        : res.status(400).json({ error: 'Invalid Okta ID.' })
     )
     .catch((err) => res.status(500).json(err.message));
 }
@@ -29,8 +29,8 @@ async function validateRegister(req, res, next) {
   let user = await find('users');
   let namecheck = [];
   await user.forEach((e) => namecheck.push(e.email));
-
   if (namecheck.includes(req.body.email)) {
+    console.log("Email found: ", req.body.email);
     res.status(500).json({
       error:
         'Email already registered, please choose a different email or proceed to login',

@@ -14,6 +14,7 @@ const client = new Twitter({
   consumer_secret: process.env.CONSUMER_SECRET,
 });
 
+
 router.get("/twitter/authorize", verifyJWT, async (req, res, next) => {
   const callbackURL =
     process.env.NODE_ENV === "development"
@@ -63,6 +64,7 @@ router.post("/twitter/callback", verifyJWT, async (req, res, next) => {
           Authorization: process.env.OKTA_AUTH,
         },
       }
+
     )
     .then(({ data }) => {
       res.json({
@@ -98,6 +100,7 @@ router.post("/twitter/callback", verifyJWT, async (req, res, next) => {
   //   });
   // }
 });
+
 
 router.get("/userInfo", restricted, twitterInfo, async (req, res) => {
   try {

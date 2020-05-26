@@ -14,6 +14,7 @@ const [
   PostUpdate,
   findByID,
 ] = require('../../helper');
+const restricted = require('../auth/restricted-middleware');
 require('dotenv').config();
 var moment = require('moment-timezone');
 var schedule = require('node-schedule');
@@ -50,8 +51,8 @@ router.get('/:id/user', async (req, res) => {
 });
 
 //  POST TO GET REC TIME FROM DS -------
-router.post('/:id/user', validateuserid, async (req, res) => {
-  const { id } = req.params;
+router.post('/:id/user', async (req, res) => {
+  const id = req.decodedToken.okta_userid;
   //  req.okta.data  === oktainfo from middleware
   const postbody = {
     ...req.body,
@@ -82,7 +83,7 @@ router.post('/:id/user', validateuserid, async (req, res) => {
 // TWITTER POST --------
 
 router.post('/:id/postnow', twitterInfo, async (req, res) => {
-  const { id } = req.params;
+  const id = req.decodedToken.okta_userid;
 
   const postbody = {
     ...req.body,
