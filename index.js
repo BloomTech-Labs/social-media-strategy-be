@@ -8,8 +8,8 @@ if (process.env.NODE_ENV === "development") {
   https
     .createServer(
       {
-        key: fs.readFileSync("server.key"),
-        cert: fs.readFileSync("server.cert"),
+        key: fs.readFileSync("dev-server.key"),
+        cert: fs.readFileSync("dev-server.cert"),
       },
       server
     )
