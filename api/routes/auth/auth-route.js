@@ -21,7 +21,7 @@ router.get("/twitter/authorize", verifyJWT, async (req, res, next) => {
           process.env.C9_HOSTNAME || "localhost"
         }:3000/connect/twitter/callback`
       : "https://www.so-me.net/connect/twitter/callback";
-  console.log(callbackURL);
+
   try {
     const oauthResponse = await client.getRequestToken(callbackURL);
     const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${oauthResponse.oauth_token}`;
