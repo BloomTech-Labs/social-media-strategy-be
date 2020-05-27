@@ -15,12 +15,7 @@ const client = new Twitter({
 });
 
 router.get("/twitter/authorize", verifyJWT, async (req, res, next) => {
-  const callbackURL =
-    process.env.NODE_ENV === "development"
-      ? `https://${
-          process.env.C9_HOSTNAME || "localhost"
-        }:3000/connect/twitter/callback`
-      : "https://www.so-me.net/connect/twitter/callback";
+  const callbackURL = `${process.env.APP_URL}/connect/twitter/callback`;
 
   try {
     const oauthResponse = await client.getRequestToken(callbackURL);
@@ -100,6 +95,41 @@ router.post("/twitter/callback", verifyJWT, async (req, res, next) => {
   //     code: error.code,
   //   });
   // }
+});
+
+router.get("/twitter/disconnect", verifyJWT, async (req, res, next) => {
+  const okta_uid = req.jwt.claims.uid;
+
+  // Removes Oauth information from Okta user profile
+  await axios
+    .post(
+      `https://${process.env.OKTA_DOMAIN}/users/${okta_uid}`,
+      {
+        profile: {
+          Oauth_token: null,
+          Oauth_secret: null,
+          twitter_userId: null,
+          twitter_screenName: null,
+        },
+      },
+      {
+        headers: {
+          Authorization: process.env.OKTA_AUTH,
+        },
+      }
+    )
+    .then(({ data }) => {
+      res.json({
+        message: `Twitter account disconnected!`,
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+      next({
+        code: 500,
+        message: "There was a problem disconnecting your account",
+      });
+    });
 });
 
 router.get("/userInfo", restricted, twitterInfo, async (req, res) => {
