@@ -4,7 +4,7 @@ const fs = require("fs");
 const server = require("./api/server");
 
 const port = process.env.PORT || 5000;
-if (process.env.NODE_ENV === "development") {
+if (process.env.C9_HOSTNAME) {
   https
     .createServer(
       {

@@ -15,12 +15,7 @@ const client = new Twitter({
 });
 
 router.get("/twitter/authorize", verifyJWT, async (req, res, next) => {
-  const callbackURL =
-    process.env.NODE_ENV === "development"
-      ? `https://${
-          process.env.C9_HOSTNAME || "localhost"
-        }:3000/connect/twitter/callback`
-      : "https://www.so-me.net/connect/twitter/callback";
+  const callbackURL = `${process.env.APP_URL}/connect/twitter/callback`;
 
   try {
     const oauthResponse = await client.getRequestToken(callbackURL);
@@ -130,7 +125,10 @@ router.get("/twitter/disconnect", verifyJWT, async (req, res, next) => {
     })
     .catch((err) => {
       console.error(err);
-      next({ code: 500, message: "There was a problem disconnecting your account" });
+      next({
+        code: 500,
+        message: "There was a problem disconnecting your account",
+      });
     });
 });
 
