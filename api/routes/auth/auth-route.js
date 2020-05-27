@@ -14,12 +14,14 @@ const client = new Twitter({
   consumer_secret: process.env.CONSUMER_SECRET,
 });
 
-
 router.get("/twitter/authorize", verifyJWT, async (req, res, next) => {
   const callbackURL =
     process.env.NODE_ENV === "development"
-      ? "http://localhost:3000/connect/twitter/callback"
+      ? `https://${
+          process.env.C9_HOSTNAME || "localhost"
+        }:3000/connect/twitter/callback`
       : "https://www.so-me.net/connect/twitter/callback";
+  console.log(callbackURL);
   try {
     const oauthResponse = await client.getRequestToken(callbackURL);
     const redirecturl = `https://api.twitter.com/oauth/authorize?oauth_token=${oauthResponse.oauth_token}`;
@@ -64,7 +66,6 @@ router.post("/twitter/callback", verifyJWT, async (req, res, next) => {
           Authorization: process.env.OKTA_AUTH,
         },
       }
-
     )
     .then(({ data }) => {
       res.json({
@@ -100,7 +101,6 @@ router.post("/twitter/callback", verifyJWT, async (req, res, next) => {
   //   });
   // }
 });
-
 
 router.get("/userInfo", restricted, twitterInfo, async (req, res) => {
   try {
