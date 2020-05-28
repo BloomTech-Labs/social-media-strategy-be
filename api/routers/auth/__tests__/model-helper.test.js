@@ -1,6 +1,6 @@
-const db = require('../../../data/db.config');
+const db = require("../../../data/dbConfig");
 // const Posts = require('../posts/posts-model.js');
-const lists = require('../lists/lists-model.js')
+const lists = require("../lists/lists-model.js");
 const [
   joivalidation,
   joivalidationError,
@@ -10,41 +10,40 @@ const [
   add,
   ModelRemove,
   ModelUpdate,
-  findByID
-] = require('../../helper');
+  findByID,
+] = require("../../helper");
 
 const postExample = {
   id: 4,
   user_id: 1,
-  post_text: 'Hello Saturn!',
+  post_text: "Hello Saturn!",
   completed: false,
   date: null,
   tz: null,
   optimal_time: null,
   post_score: null,
-}
+};
 
 const listExample = {
   id: 1,
   title: "New list1",
   user_id: 1,
-  cards: []
-}
+  cards: [],
+};
 
 const userExample = {
   id: 50,
-  email: 'hal@hal.com',
-  password: 'test',
-  okta_userid: '12323'
-}
+  email: "hal@hal.com",
+  password: "test",
+  okta_userid: "12323",
+};
 
 const userUpdate = {
   id: 50,
-  email: 'update@update.com',
-  password: 'test',
-  okta_userid: '12323'
-  
-}
+  email: "update@update.com",
+  password: "test",
+  okta_userid: "12323",
+};
 
 const postUpdate = {
   id: 4,
@@ -55,20 +54,20 @@ const postUpdate = {
   tz: null,
   optimal_time: null,
   post_score: null,
-  screenname:null
-}
+  screenname: null,
+};
 
 const listUpdate = {
   id: "1",
   title: "Updated list",
   user_id: 1,
   cards: [],
-  index: null
-}
+  index: null,
+};
 
 function addRemoveTester(table, formattedSubmission) {
-  describe('insert function inserts', () => {
-    it('inserts a new item into the db', async () => {
+  describe("insert function inserts", () => {
+    it("inserts a new item into the db", async () => {
       await db(`${table}`).truncate();
       let tableLength;
       tableLength = await db(`${table}`);
@@ -89,8 +88,8 @@ function addRemoveTester(table, formattedSubmission) {
 }
 
 function updateTester(table, formattedSubmission, formattedUpdate) {
-  describe('Updates inserted values for users and posts tables', () => {
-    it('inserts a new item into the db', async () => {
+  describe("Updates inserted values for users and posts tables", () => {
+    it("inserts a new item into the db", async () => {
       await db(`${table}`).truncate();
       let tableLength;
       tableLength = await db(`${table}`);
@@ -111,10 +110,8 @@ function updateTester(table, formattedSubmission, formattedUpdate) {
   });
 }
 
-addRemoveTester('posts', postExample);
-addRemoveTester('lists', listExample);
-updateTester('posts', postExample, postUpdate);
-updateTester('lists', listExample, listUpdate);
+addRemoveTester("posts", postExample);
+addRemoveTester("lists", listExample);
+updateTester("posts", postExample, postUpdate);
+updateTester("lists", listExample, listUpdate);
 // modelTester('users', Users, userExample);
-
-
