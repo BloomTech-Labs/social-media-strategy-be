@@ -1,35 +1,25 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const axios = require('axios');
-const { validateuserid } = require('../auth/middleware');
+const axios = require("axios");
 
-require('dotenv').config();
-const {
-  lengthcheck,
-  routerModels,
-  find,
-  remove,
-  update,
-} = require('../../helper'); //ARRAY IMPORTS NEED TO STAY IN ORDER
-
-router.get('/', (req, res) => {
-  find('users')
+router.get("/", (req, res) => {
+  find("users")
     .then((users) => res.status(200).json(users))
     .catch((err) => res.status(500).json(err.message));
 });
-router.get('/user', (req, res) => {
+router.get("/user", (req, res) => {
   res.status(200).json(req.decodedToken);
 });
-router.get('/:id', (req, res) => {
+router.get("/:id", (req, res) => {
   const { id } = req.params;
-  find('users', { id: id })
+  find("users", { id: id })
     .then((users) => res.status(200).json(users))
     .catch((err) => res.status(500).json(err.message));
 });
 
-router.delete('/:id', checkRole('admin'), async (req, res) => {
+router.delete("/:id", checkRole("admin"), async (req, res) => {
   const { id } = req.params;
-  const oktaId = req.decodedToken.okta_userid
+  const oktaId = req.decodedToken.okta_userid;
 
   try {
     let deact = await axios.post(
@@ -41,16 +31,13 @@ router.delete('/:id', checkRole('admin'), async (req, res) => {
         },
       }
     );
-    await axios.delete(
-      `https://${process.env.OKTA_DOMAIN}/users/${oktaId}`,
-      {
-        headers: {
-          Authorization: process.env.OKTA_AUTH,
-        },
-      }
-    );
-    let userResponse = await remove('users', id);
-    res.status(200).json({ message: 'User deleted', userResponse });
+    await axios.delete(`https://${process.env.OKTA_DOMAIN}/users/${oktaId}`, {
+      headers: {
+        Authorization: process.env.OKTA_AUTH,
+      },
+    });
+    let userResponse = await remove("users", id);
+    res.status(200).json({ message: "User deleted", userResponse });
   } catch (error) {
     res.status(500).json({
       message: error.message,
@@ -61,12 +48,12 @@ router.delete('/:id', checkRole('admin'), async (req, res) => {
   }
 });
 
-router.delete('/:id/local', async (req, res) => {
+router.delete("/:id/local", async (req, res) => {
   const { id } = req.params;
 
   try {
-    let userResponse = await remove('users', id);
-    res.status(200).json({ message: 'User deleted', userResponse });
+    let userResponse = await remove("users", id);
+    res.status(200).json({ message: "User deleted", userResponse });
   } catch (error) {
     res.status(500).json({
       message: error.message,
@@ -77,13 +64,13 @@ router.delete('/:id/local', async (req, res) => {
   }
 });
 
-router.put('/:id', checkRole('admin'), async (req, res) => {
+router.put("/:id", checkRole("admin"), async (req, res) => {
   const { id } = req.params;
   const userUpdate = req.body;
-  if ((await lengthcheck(find('users', { id: id }))) === 0) {
-    return res.status(404).json('no user found');
+  if ((await lengthcheck(find("users", { id: id }))) === 0) {
+    return res.status(404).json("no user found");
   } else {
-    routerModels(update('users', userUpdate, id), req, res);
+    routerModels(update("users", userUpdate, id), req, res);
   }
 });
 

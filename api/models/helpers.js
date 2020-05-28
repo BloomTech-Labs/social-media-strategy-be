@@ -1,4 +1,4 @@
-const db = require('../data/db.config.js');
+const db = require("../../data/dbConfig.js");
 
 module.exports = {
   lengthcheck,
@@ -21,7 +21,7 @@ function routerModels(modal, req, res) {
       res.status(200).json(data);
     })
     .catch((error) => {
-      console.log(error.message, 'ERROR');
+      console.log(error.message, "ERROR");
       res.status(500).json({
         message: error.message,
         error: error.stack,
@@ -55,7 +55,7 @@ function remove(table, id) {
 
 function update(table, payload, id) {
   return db(`${table}`)
-    .where('id', id)
+    .where("id", id)
     .update(payload)
     .then((updated) => (updated > 0 ? find(table, { id }) : null));
 }

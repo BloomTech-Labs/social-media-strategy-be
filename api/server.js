@@ -4,7 +4,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
 
-const ApiRouter = require("../api/api-routes");
+const apiRouter = require("./routers/apiRouter");
 
 server.use(cors());
 
@@ -16,7 +16,7 @@ server.get("/", (req, res) => {
   res.status(200).json({ message: "IT'S WORKING!!!" });
 });
 
-server.use("/api", ApiRouter);
+server.use("/api", apiRouter);
 server.use(errorHandler);
 
 module.exports = server;
