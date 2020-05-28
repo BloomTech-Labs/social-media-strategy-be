@@ -2,7 +2,7 @@ const axios = require("axios");
 const Twit = require("twit");
 
 async function verifyTwitter(req, res, next) {
-  const { okta_userid } = req.decodedToken;
+  const { okta_uid } = req.jwt.claims;
 
   try {
     let ax = await axios.get(
