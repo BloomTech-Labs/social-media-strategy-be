@@ -3,8 +3,6 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 const Twitter = require("twitter-lite");
-const { twitterInfo } = require("../auth/middleware");
-const verifyJWT = require("./okta-jwt-verifier");
 const queryString = require("query-string");
 
 const client = new Twitter({
@@ -12,7 +10,7 @@ const client = new Twitter({
   consumer_secret: process.env.CONSUMER_SECRET,
 });
 
-router.get("/twitter/authorize", verifyJWT, async (req, res, next) => {
+router.get("/twitter/authorize", async (req, res, next) => {
   const callbackURL = `${process.env.APP_URL}/connect/twitter/callback`;
 
   try {
@@ -25,7 +23,7 @@ router.get("/twitter/authorize", verifyJWT, async (req, res, next) => {
   }
 });
 
-router.post("/twitter/callback", verifyJWT, async (req, res, next) => {
+router.post("/twitter/callback", async (req, res, next) => {
   const okta_uid = req.jwt.claims.uid;
   const { oauth_token, oauth_verifier } = req.body;
 
@@ -71,7 +69,7 @@ router.post("/twitter/callback", verifyJWT, async (req, res, next) => {
     });
 });
 
-router.get("/twitter/disconnect", verifyJWT, async (req, res, next) => {
+router.get("/twitter/disconnect", async (req, res, next) => {
   const okta_uid = req.jwt.claims.uid;
 
   // Removes Oauth information from Okta user profile

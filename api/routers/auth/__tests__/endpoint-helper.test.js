@@ -70,6 +70,6 @@ const endpointAuthTesting = (endpoint) => {
 };
 
 
-endpointAuthTesting('topics');
+endpointAuthTesting('lists');
 endpointAuthTesting('posts');
 endpointAuthTesting('users');

@@ -1,6 +1,6 @@
 const db = require('../../../data/db.config');
 // const Posts = require('../posts/posts-model.js');
-const Topics = require('../topics/topics-model.js')
+const lists = require('../lists/lists-model.js')
 const [
   joivalidation,
   joivalidationError,
@@ -24,9 +24,9 @@ const postExample = {
   post_score: null,
 }
 
-const topicExample = {
+const listExample = {
   id: 1,
-  title: "New Topic1",
+  title: "New list1",
   user_id: 1,
   cards: []
 }
@@ -58,9 +58,9 @@ const postUpdate = {
   screenname:null
 }
 
-const topicUpdate = {
+const listUpdate = {
   id: "1",
-  title: "Updated Topic",
+  title: "Updated list",
   user_id: 1,
   cards: [],
   index: null
@@ -112,9 +112,9 @@ function updateTester(table, formattedSubmission, formattedUpdate) {
 }
 
 addRemoveTester('posts', postExample);
-addRemoveTester('topics', topicExample);
+addRemoveTester('lists', listExample);
 updateTester('posts', postExample, postUpdate);
-updateTester('topics', topicExample, topicUpdate);
+updateTester('lists', listExample, listUpdate);
 // modelTester('users', Users, userExample);
 
 

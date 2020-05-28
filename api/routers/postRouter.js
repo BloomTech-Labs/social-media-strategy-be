@@ -1,7 +1,5 @@
 const express = require("express");
-const Joi = require("@hapi/joi");
-const router = express.Router();
-const { oktaInfo, twitterInfo, validateuserid } = require("../auth/middleware");
+const verifyTwitter = require("../middleware/verifyTwitter");
 const axios = require("axios");
 const {
   lengthcheck,
@@ -10,11 +8,13 @@ const {
   add,
   remove,
   update,
-} = require("../../helper");
-const restricted = require("../auth/restricted-middleware");
+} = require("../models/helpers");
+
 require("dotenv").config();
 var moment = require("moment-timezone");
 var schedule = require("node-schedule");
+
+const router = express.Router();
 
 // GET --------------
 router.get("/", (req, res) => {
@@ -67,7 +67,7 @@ router.post("/:id/user", async (req, res) => {
 
 // TWITTER POST --------
 
-router.post("/:id/postnow", twitterInfo, async (req, res) => {
+router.post("/:id/postnow", async (req, res) => {
   const id = req.decodedToken.okta_userid;
 
   const postbody = {
@@ -89,7 +89,7 @@ router.post("/:id/postnow", twitterInfo, async (req, res) => {
   }
 });
 
-router.put("/:id/twitter", twitterInfo, async (req, res) => {
+router.put("/:id/twitter", async (req, res) => {
   const { id } = req.params;
   try {
     if ((await lengthcheck(find("posts", { id: id }))) === 0) {
