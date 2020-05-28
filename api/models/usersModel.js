@@ -1,4 +1,4 @@
-const db = require("../../data/db.config");
+const db = require("../../data/dbConfig");
 
 module.exports = {
   add,
@@ -6,6 +6,8 @@ module.exports = {
   findBy,
   findByOktaUID,
   updateByOktaUID,
+  update,
+  remove,
 };
 
 function find() {
@@ -27,4 +29,18 @@ function findByOktaUID(okta_uid) {
 
 function updateByOktaUID(okta_uid, updates) {
   return db("users").where({ okta_uid }).update(updates);
+}
+
+function update(payload, okta_uid) {
+  return db("users")
+    .where("okta_uid", okta_uid)
+    .update(payload)
+    .then((updated) => (updated > 0 ? find("users", { okta_uid }) : null));
+}
+
+function remove(okta_uid) {
+  return db("users")
+    .where({ okta_uid })
+    .del()
+    .then((res) => find("users"));
 }

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const AuthRouter = require("./auth/authRouter");
 const verifyJWT = require("../middleware/verifyJWT");
+const verifyUser = require("../middleware/verifyUser");
 const UserRouter = require("./userRouter");
 const ListRouter = require("./listRouter");
 const PostRouter = require("./postRouter");
