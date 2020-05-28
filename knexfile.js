@@ -5,7 +5,7 @@ module.exports = {
   development: {
     client: "pg",
     connection: {
-      host: "127.0.0.1",
+      host: "localhost",
       database: "some-dev",
       user: process.env.PG_USERNAME,
       password: process.env.PG_PASSWORD,
