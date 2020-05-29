@@ -18,24 +18,14 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.get("/:id/user", async (req, res) => {
+// not sure if this is the right logic
+router.get("/:id/posts", async (req, res) => {
   const { id } = req.params;
-  const { sortby } = req.query;
-  console.log(req.query);
-  if ((await lengthcheck(lists.find({ user_id: id }))) === 0) {
-    return res.status(404).json("no lists found");
+  if ((await lengthcheck(lists.find("posts", { id: id }))) === 0) {
+    return res.status(404).json("no posts were found in this list");
   } else {
-    routerModels(lists.getLists({ sortby }, id), req, res);
+    routerModels(lists.find("posts", id), req, res);
   }
-});
-
-// POST START HERE ----------------
-
-router.post("/:id/user", (req, res) => {
-  const id = req.decodedToken.okta_userid;
-  const listbody = { ...req.body, user_id: id };
-
-  routerModels(lists.add(listbody), req, res);
 });
 
 // PUT START HERE --------------
