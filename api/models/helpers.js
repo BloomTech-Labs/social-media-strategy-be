@@ -4,10 +4,8 @@ module.exports = {
   lengthcheck,
   routerModels,
   find,
-  add,
   remove,
   update,
-  findByID,
 };
 
 async function lengthcheck(model) {
@@ -40,12 +38,6 @@ function find(table, filter) {
   }
 }
 
-async function add(table, payload) {
-  await db(`${table}`).insert(payload);
-
-  return find(table, payload).first();
-}
-
 function remove(table, id) {
   return db(`${table}`)
     .where({ id })
@@ -58,14 +50,4 @@ function update(table, payload, id) {
     .where("id", id)
     .update(payload)
     .then((updated) => (updated > 0 ? find(table, { id }) : null));
-}
-
-function findByID(table, id) {
-  let data = db(`${table}`);
-
-  if (id) {
-    return data.where({ id: id }).first();
-  } else {
-    return data;
-  }
 }
