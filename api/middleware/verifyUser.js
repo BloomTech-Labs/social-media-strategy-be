@@ -2,19 +2,19 @@
 const { add, findByOktaUID, updateByOktaUID } = require("../models/usersModel");
 
 async function verifyUser(req, res, next) {
-  const { uid, sub, twitter_screenName } = req.jwt.claims;
+  const { uid, sub, twitter_handle } = req.jwt.claims;
   const user = await findByOktaUID(uid);
   if (!user) {
     add({
       okta_uid: uid,
       email: sub,
-      twitter_handle: twitter_screenName,
+      twitter_handle,
     });
   } else {
     updateByOktaUID(uid, {
       okta_uid: uid,
       email: sub,
-      twitter_handle: twitter_screenName,
+      twitter_handle,
     });
   }
   next();

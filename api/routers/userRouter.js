@@ -65,11 +65,11 @@ router.delete("/:id", async (req, res) => {
 // });
 
 router.put("/", async (req, res) => {
-  const { uid, email, twitter_screenName } = req.jwt.claims;
+  const { uid, email, twitter_handle } = req.jwt.claims;
   const currentUser = {
     okta_uid: uid,
     email,
-    twitter_handle: twitter_screenName,
+    twitter_handle,
   };
 
   const user = await Users.findByOktaUID(uid);
