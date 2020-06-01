@@ -4,8 +4,8 @@ const Posts = require("../models/postsModel.js");
 const router = express.Router();
 
 //// GET --------------
-router.get("/", async (req, res) => {
-  await Posts.get()
+router.get("/", (req, res) => {
+  Posts.get()
     .then((posts) => {
       res.status(200).json(posts);
     })
@@ -16,7 +16,8 @@ router.get("/", async (req, res) => {
 
 //get posts by id
 router.get("/:id", (req, res) => {
-  Posts.findBy(req.params.id)
+  const { id } = req.params;
+  Posts.findBy({ id })
     .then((post) => {
       res.status(200).json(post);
     })
@@ -33,11 +34,17 @@ router.post("/", async (req, res) => {
   let newPost = {
     ...req.body,
     okta_uid,
-    date: 1, // TODO: change it to a valid date
+    date: 1, // TODO: change it to valid current date
     index: posts.length,
   };
 
-  Posts.add(newPost);
+  Posts.add(newPost)
+    .then(post => {
+      res.status(201).json(post);
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    });
 });
 
 // PATCH START HERE --------------
@@ -45,7 +52,13 @@ router.patch("/:id", async (req, res) => {
   const { id } = req.params;
   const update = req.body;
 
-  Posts.update(id, update);
+  Posts.update(id, update)
+    .then(post => {
+      res.json(post);
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    });
 });
 
 // PUT START HERE --------------
