@@ -65,23 +65,19 @@ router.delete("/:id", async (req, res) => {
 // });
 
 router.put("/", async (req, res) => {
-  //const { id } = req.params;
-  const { sub, email, twitter_screenName } = req.body;
-  const updateData = {
-    okta_uid: sub,
+  const { uid, email, twitter_handle } = req.jwt.claims;
+  const currentUser = {
+    okta_uid: uid,
     email,
-    twitter_handle: twitter_screenName,
+    twitter_handle,
   };
 
-  const user = await Users.findByOktaUID(req.jwt.claims.uid);
+  const user = await Users.findByOktaUID(uid);
   if (!user) {
-    let newUser = await Users.add(updateData);
+    const newUser = await Users.add(currentUser);
     res.status(201).json(newUser);
   } else {
-    let updatedUser = await Users.updateByOktaUID(
-      req.jwt.claims.uid,
-      updateData
-    );
+    const updatedUser = await Users.updateByOktaUID(uid, currentUser);
     res.status(200).json(updatedUser);
   }
 });
