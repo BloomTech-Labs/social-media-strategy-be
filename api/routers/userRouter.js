@@ -2,8 +2,7 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 const Users = require("../models/usersModel");
-const List = require("../models/listModel");
-const { routerModels } = require("../models/helpers");
+const Lists = require("../models/listModel");
 
 router.get("/", (req, res) => {
   Users.find("users")
@@ -101,9 +100,9 @@ router.put("/", async (req, res) => {
 //   };
 // }
 
-router.get('/:id/lists', async (req, res) => {
+router.get("/:id/lists", async (req, res) => {
   const okta_uid = req.params.id;
-  routerModels(List.find({ okta_uid }), req, res);
+  Lists.find({ okta_uid });
 });
 
 module.exports = router;
