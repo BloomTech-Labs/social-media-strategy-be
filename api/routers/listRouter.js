@@ -29,8 +29,7 @@ router.get("/:id", (req, res) => {
 
 //get posts by list id
 router.get("/:id/posts", (req, res) => {
-  const { id } = req.params;
-  Posts.find("posts").where({list_id: id})
+  Posts.find({list_id: req.params.id})
     .then(posts => {
       res.status(200).json(posts)
     })
