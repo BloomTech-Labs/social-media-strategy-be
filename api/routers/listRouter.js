@@ -1,88 +1,108 @@
 const express = require("express");
-const List = require("../models/listModel.js");
-const Post = require("../models/postsModel.js");
+const Lists = require("../models/listModel.js");
+const Posts = require("../models/postsModel.js");
 const router = express.Router();
-const { lengthcheck, routerModels } = require("../models/helpers");
 
 // TODO: Add updated authorization middleware
 
-router.get("/", (req, res) => {
-  routerModels(List.find(), req, res);
+//get lists
+router.get("/", async (req, res) => {
+  await Lists.get()
+    .then((lists) => {
+      res.status(200).json(lists);
+    })
+    .catch((err) => {
+      next({ message: err });
+    });
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
-  if ((await lengthcheck(List.find({ id }))) === 0) {
-    return res.status(404).json("not found");
-  } else {
-    routerModels(List.find({ id: req.params.id }), req, res);
+  try {
+    const list = await Lists.findBy(id);
+    if (!list) {
+      next({
+        code: 404,
+        message: "List not found",
+      });
+    } else {
+      res.status(200).json(list);
+    }
+  } catch (err) {
+    next();
   }
 });
 
-router.get("/:id/posts", async (req, res) => {
-  const { id } = req.params;
-  if ((await lengthcheck(List.find({ id }))) === 0) {
-    return res.status(404).json("not found");
-  } else {
-    // const posts = await Post.find({ list_id: id });
-    // console.log('\n****POSTS****\n', posts);
-    routerModels(Post.find({ list_id: id }), req, res);
-  }
-});
-
-router.get("/:id/user", async (req, res) => {
-  const { id } = req.params;
-  const { sortby } = req.query;
-  console.log(req.query);
-  if ((await lengthcheck(List.find({ user_id: id }))) === 0) {
-    return res.status(404).json("no lists found");
-  } else {
-    routerModels(List.getLists({ sortby }, id), req, res);
-  }
+//get posts by list id
+router.get("/:id/posts", (req, res) => {
+  Posts.findBy({ list_id: req.params.id })
+    .then((posts) => {
+      res.status(200).json(posts);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
 });
 
 // POST START HERE ----------------
-
 router.post("/", async (req, res) => {
   const okta_uid = req.jwt.claims.uid;
-  const lists = await List.find();
-  
-  let newList = { 
+  const lists = await Lists.find();
+
+  let newList = {
     ...req.body,
     okta_uid,
-    index: lists.length
+    index: lists.length,
   };
 
-  routerModels(List.add(newList), req, res);
+  Lists.add(newList);
 });
 
 // PUT START HERE --------------
-router.put("/:id", async (req, res) => {
+router.put("/:id", (req, res) => {
   const { id } = req.params;
-  const update = req.body;
-  if ((await lengthcheck(List.find({ id: id }))) === 0) {
-    return res.status(404).json("no lists found");
-  } else {
-    routerModels(List.update(update, id), req, res);
-  }
+  const changes = req.body;
+
+  Lists.update(changes, id)
+    .then((updated) => {
+      res.status(200).json(updated);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
 });
 
 // PATCH START HERE --------------
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", async (req, res, next) => {
   const { id } = req.params;
   const update = req.body;
-  
-  routerModels(List.update(update, id), req, res);
+
+  try {
+    const list = await Lists.update(update, id);
+    if (!list) {
+      next({
+        code: 404,
+        message: "Error while updating",
+      });
+    } else {
+      res.status(200).json(list);
+    }
+  } catch (err) {
+    next({ message: err });
+  }
 });
 
 // DELETE START HERE ------------
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
-  if ((await lengthcheck(List.find({ id: id }))) === 0) {
-    return res.status(404).json("no lists found");
-  } else {
-    routerModels(List.remove(id), req, res);
-  }
+
+  Lists.remove(id)
+    .then((deleted) => {
+      res.status(200).json({ message: "list deleted", deleted });
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
 });
 
 module.exports = router;
