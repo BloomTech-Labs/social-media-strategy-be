@@ -1,29 +1,25 @@
 const db = require("../../data/dbConfig");
 var knex = require("knex");
 
-module.exports = { find, add, remove, update };
+module.exports = { add, get, findBy, remove, update };
 
-function find(filter) {
-  let lists = db("lists");
-  if (filter) {
-    return lists.where(filter);
-  } else {
-    return lists;
-  }
+function get() {
+  return db("lists");
 }
 
-async function add(newList) {
-  const [list] = await db("lists").insert(newList, "*");
-  return list;
+async function add(list) {
+  let [addlist] = await db("lists").insert(list, "*");
+  return addlist;
+}
+
+function findBy(filter) {
+  return db("lists").where(filter);
 }
 
 function remove(id) {
-  return db("lists")
-    .where({ id })
-    .del()
-    .then((res) => find());
+  return db("lists").where({ id }).del();
 }
 
-function update(id, changes) {
-  return db("lists").where({ id }).update(changes);
+function update(update, id) {
+  return db("lists").where("id", id).update(update, "*");
 }

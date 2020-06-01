@@ -1,19 +1,21 @@
-const db = require("../../data/dbConfig.js");
+const db = require("../../data/dbConfig");
+var knex = require("knex");
 
 module.exports = {
-  find,
   add,
+  get,
+  findBy,
   remove,
   update,
 };
 
-function find(filter) {
+function get() {
+  return db("posts");
+}
+
+function findBy(filter) {
   let posts = db("posts");
-  if (filter) {
-    return posts.where(filter);
-  } else {
-    return posts;
-  }
+  return posts.where(filter);
 }
 
 async function add(newPost) {
@@ -22,10 +24,7 @@ async function add(newPost) {
 }
 
 function remove(id) {
-  return db("posts")
-    .where({ id })
-    .del()
-    .then((res) => find());
+  return db("posts").where({ id }).del();
 }
 
 function update(id, changes) {

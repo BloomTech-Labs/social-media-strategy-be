@@ -22,5 +22,5 @@ server.use(errorHandler);
 module.exports = server;
 
 function errorHandler(err, req, res, next) {
-  res.status(err.code).send(err.message);
+  res.status(err.code || 500).send(err.message || "Server Error");
 }

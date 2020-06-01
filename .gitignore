@@ -111,3 +111,4 @@ coverage/
 
 # Vim 
 *.swp
+*.swo

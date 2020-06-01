@@ -49,7 +49,7 @@ router.post("/twitter/callback", async (req, res, next) => {
           Oauth_token: parsed.oauth_token,
           Oauth_secret: parsed.oauth_token_secret,
           twitter_userId: parsed.user_id,
-          twitter_screenName: parsed.screen_name,
+          twitter_handle: parsed.screen_name,
         },
       },
       {
@@ -81,7 +81,7 @@ router.get("/twitter/disconnect", async (req, res, next) => {
           Oauth_token: null,
           Oauth_secret: null,
           twitter_userId: null,
-          twitter_screenName: null,
+          twitter_handle: null,
         },
       },
       {

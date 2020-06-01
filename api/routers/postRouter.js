@@ -1,66 +1,78 @@
+require("dotenv").config();
 const express = require("express");
-const router = express.Router();
 const Posts = require("../models/postsModel.js");
+const router = express.Router();
 
-//get posts
+//// GET --------------
 router.get("/", async (req, res) => {
-  await Posts.find()
-    .then(posts => {
+  await Posts.get()
+    .then((posts) => {
       res.status(200).json(posts);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).json(err);
-    })
+    });
 });
 
 //get posts by id
 router.get("/:id", (req, res) => {
-  Posts.find(req.params.id)
-    .then(post => {
-      res.status(200).json(post)
+  Posts.findBy(req.params.id)
+    .then((post) => {
+      res.status(200).json(post);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).json(err);
-    })
-})
+    });
+});
 
-//get posts by list id
-router.get("/:id/posts", (req, res) => {
-  Posts.find({list_id: req.params.id})
-    .then(posts => {
-      res.status(200).json(posts)
-    })
-    .catch(err => {
-      res.status(500).json(err);
-    })
+// POST
+router.post("/", async (req, res) => {
+  const okta_uid = req.jwt.claims.uid;
+  const posts = await Posts.find({ list_id: req.body.list_id });
+
+  let newPost = {
+    ...req.body,
+    okta_uid,
+    date: 1, // TODO: change it to a valid date
+    index: posts.length,
+  };
+
+  Posts.add(newPost);
+});
+
+// PATCH START HERE --------------
+router.patch("/:id", async (req, res) => {
+  const { id } = req.params;
+  const update = req.body;
+
+  Posts.update(id, update);
 });
 
 // PUT START HERE --------------
-router.put('/:id', (req, res) => {
+router.put("/:id", (req, res) => {
   const { id } = req.params;
   const changes = req.body;
 
   Posts.update(id, changes)
-    .then(updated => {
-      res.status(200).json(updated)
+    .then((updated) => {
+      res.status(200).json(updated);
     })
-    .catch(err => {
-      res.status(500).json(err)
-    })
-})
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
 
 // DELETE START HERE ------------
-router.delete('/:id', (req, res) => {
+router.delete("/:id", (req, res) => {
   const { id } = req.params;
 
   Posts.remove(id)
-    .then(deleted => {
-      res.status(200).json({message: "post deleted", deleted})
+    .then((deleted) => {
+      res.status(200).json({ message: "post deleted", deleted });
     })
-    .catch(err => {
-      res.status(500).json(err)
-    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
 });
-
 
 module.exports = router;
