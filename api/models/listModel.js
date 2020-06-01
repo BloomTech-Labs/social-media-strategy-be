@@ -1,7 +1,7 @@
 const db = require("../../data/dbConfig");
 var knex = require("knex");
 
-module.exports = { find, remove, update};
+module.exports = { find, add, remove, update };
 
 function find(filter) {
   let lists = db("lists");
@@ -12,6 +12,11 @@ function find(filter) {
   }
 }
 
+async function add(newList) {
+  const [list] = await db("lists").insert(newList, "*");
+  return list;
+}
+
 function remove(id) {
   return db("lists")
     .where({ id })
@@ -20,7 +25,5 @@ function remove(id) {
 }
 
 function update(id, changes) {
-  return db('lists')
-  .where({id})
-  .update(changes);
+  return db("lists").where({ id }).update(changes);
 }
