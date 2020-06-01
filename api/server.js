@@ -6,7 +6,12 @@ const cors = require("cors");
 
 const apiRouter = require("./routers/apiRouter");
 
-server.use(cors());
+const corsConfig = {
+  origin: process.env.APP_URL,
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
+server.use(cors(corsConfig));
 
 server.use(express.json());
 server.use(morgan("combined"));
