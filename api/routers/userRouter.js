@@ -4,6 +4,10 @@ const axios = require("axios");
 const Users = require("../models/usersModel");
 const Lists = require("../models/listModel");
 const Posts = require("../models/postsModel");
+const verifyUserId = require("../middleware/verifyUserId");
+
+// middleware to verify if id param matches to user id
+router.use("/:id", verifyUserId);
 
 router.get("/", (req, res) => {
   Users.find()
