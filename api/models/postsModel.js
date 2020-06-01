@@ -13,13 +13,14 @@ function get() {
   return db("posts");
 }
 
-function add(post) {
-  return db("posts").insert(post, "*");
-}
-
 function findBy(filter) {
   let posts = db("posts");
   return posts.where(filter);
+}
+
+async function add(newPost) {
+  const [post] = await db("posts").insert(newPost, "*");
+  return post;
 }
 
 function remove(id) {
