@@ -50,97 +50,7 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-router.put("/", async (req, res) => {
-  const { uid, email, twitter_handle } = req.jwt.claims;
-  const currentUser = {
-    okta_uid: uid,
-    email,
-    twitter_handle,
-  };
-
-  const user = await Users.findBy({ okta_uid: uid });
-  if (!user) {
-    const newUser = await Users.add(currentUser);
-    res.status(201).json(newUser);
-  } else {
-    const updatedUser = await Users.updateByOktaUID(uid, currentUser);
-    res.status(200).json(updatedUser);
-  }
-});
-
-router.get("/lists", async (req, res) => {
-  Lists.findBy({ okta_uid: req.jwt.claims.uid })
-    .then((lists) => {
-      res.status(200).json(lists);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
-
-router.post("/lists", async (req, res) => {
-  const okta_uid = req.jwt.claims.uid;
-  const lists = await Lists.findBy({ okta_uid });
-
-  let newList = {
-    ...req.body,
-    okta_uid,
-    index: lists.length,
-  };
-
-  Lists.add(newList)
-    .then((list) => {
-      res.status(200).json(list);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
-
-router.get("/posts", async (req, res) => {
-  await Posts.findBy({ okta_uid: req.jwt.claims.uid })
-    .then((posts) => {
-      res.status(200).json(posts);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
-
-router.post("/posts", async (req, res) => {
-  const { uid } = req.jwt.claims;
-
-  const {
-    list_id,
-    date,
-    index,
-    post_score,
-    post_text,
-    posted,
-    optimal_time,
-  } = req.body;
-
-  const newPost = {
-    okta_uid: uid,
-    list_id,
-    date,
-    index,
-    post_score,
-    post_text,
-    posted: posted || false,
-    optimal_time,
-  };
-
-  await Posts.add(newPost)
-    .then((post) => {
-      res.status(200).json(post);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
-
-router.put("/", async (req, res) => {
+router.put("/:id", async (req, res) => {
   const { uid, email, twitter_handle } = req.jwt.claims;
   const currentUser = {
     okta_uid: uid,
@@ -159,8 +69,66 @@ router.put("/", async (req, res) => {
 });
 
 router.get("/:id/lists", async (req, res) => {
-  const okta_uid = req.params.id;
-  Lists.findBy({ okta_uid });
+  Lists.findBy({ okta_uid: req.jwt.claims.uid })
+    .then((lists) => {
+      res.status(200).json(lists);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
+router.post("/:id/lists", async (req, res) => {
+  const okta_uid = req.jwt.claims.uid;
+  const lists = await Lists.findBy({ okta_uid });
+
+  let newList = {
+    ...req.body,
+    okta_uid,
+    index: lists.length,
+  };
+
+  Lists.add(newList)
+    .then((list) => {
+      res.status(200).json(list);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
+router.get("/:id/posts", async (req, res) => {
+  await Posts.findBy({ okta_uid: req.jwt.claims.uid })
+    .then((posts) => {
+      res.status(200).json(posts);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
+router.post("/:id/lists/:list_id/posts", async (req, res) => {
+  const okta_uid = req.jwt.claims.uid;
+  const { list_id } = req.params;
+
+  // Get current posts from the same list to generate the index of the new post
+  const currentPosts = await Posts.findBy({ okta_uid, list_id });
+
+  const newPost = {
+    ...req.body,
+    okta_uid,
+    list_id,
+    index: currentPosts.length,
+    date: 1 // TODO: change to real current date
+  }
+
+  Posts.add(newPost)
+    .then((post) => {
+      res.status(200).json(post);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
 });
 
 module.exports = router;
