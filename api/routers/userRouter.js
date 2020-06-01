@@ -68,34 +68,34 @@ router.put("/", async (req, res) => {
   }
 });
 
-// router.get("/lists", async (req, res) => {
-//   await Lists.find({ okta_uid: req.jwt.claims.uid })
-//     .then((lists) => {
-//       res.status(200).json(lists);
-//     })
-//     .catch((err) => {
-//       res.status(500).json(err);
-//     });
-// });
+router.get("/lists/:id", async (req, res) => {
+  await Lists.find({ okta_uid: req.jwt.claims.uid })
+    .then((lists) => {
+      res.status(200).json(lists);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
 
-// router.post("/lists", async (req, res) => {
-//   const okta_uid = req.jwt.claims.uid;
-//   const lists = await Lists.find();
+router.post("/lists", async (req, res) => {
+  const okta_uid = req.jwt.claims.uid;
+  const lists = await Lists.find();
 
-//   let newList = {
-//     ...req.body,
-//     okta_uid,
-//     index: lists.length,
-//   };
+  let newList = {
+    ...req.body,
+    okta_uid,
+    index: lists.length,
+  };
 
-//   await Lists.add(newList)
-//     .then((list) => {
-//       res.status(200).json(list);
-//     })
-//     .catch((err) => {
-//       res.status(500).json(err);
-//     });
-// });
+  await Lists.add(newList)
+    .then((list) => {
+      res.status(200).json(list);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
 
 router.get("/posts", async (req, res) => {
   await Posts.find({ okta_uid: req.jwt.claims.uid })
@@ -158,9 +158,9 @@ router.put("/", async (req, res) => {
   }
 });
 
-// router.get("/:id/lists", async (req, res) => {
-//   const okta_uid = req.params.id;
-//   Lists.find({ okta_uid });
-// });
+router.get("/:id/lists", async (req, res) => {
+  const okta_uid = req.params.id;
+  Lists.find({ okta_uid });
+});
 
 module.exports = router;
