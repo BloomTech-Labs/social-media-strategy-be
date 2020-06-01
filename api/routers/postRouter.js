@@ -28,7 +28,7 @@ router.get("/:id", (req, res) => {
 // POST
 router.post("/", async (req, res) => {
   const okta_uid = req.jwt.claims.uid;
-  const posts = await Posts.find({ list_id: req.body.list_id });
+  const posts = await Posts.findBy({ list_id: req.body.list_id });
 
   let newPost = {
     ...req.body,

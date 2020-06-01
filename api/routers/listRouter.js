@@ -47,7 +47,7 @@ router.get("/:id/posts", (req, res) => {
 // POST START HERE ----------------
 router.post("/", async (req, res) => {
   const okta_uid = req.jwt.claims.uid;
-  const lists = await Lists.find();
+  const lists = await Lists.get();
 
   let newList = {
     ...req.body,

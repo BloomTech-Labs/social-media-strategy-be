@@ -6,7 +6,7 @@ const Lists = require("../models/listModel");
 const Posts = require("../models/postsModel");
 
 router.get("/", (req, res) => {
-  Users.find("users")
+  Users.find()
     .then((users) => res.status(200).json(users))
     .catch((err) => res.status(500).json(err.message));
 });
@@ -58,7 +58,7 @@ router.put("/", async (req, res) => {
     twitter_handle,
   };
 
-  const user = await Users.findByOktaUID(uid);
+  const user = await Users.findBy({ okta_uid: uid });
   if (!user) {
     const newUser = await Users.add(currentUser);
     res.status(201).json(newUser);
@@ -69,7 +69,7 @@ router.put("/", async (req, res) => {
 });
 
 router.get("/lists", async (req, res) => {
-  await Lists.find({ okta_uid: req.jwt.claims.uid })
+  Lists.findBy({ okta_uid: req.jwt.claims.uid })
     .then((lists) => {
       res.status(200).json(lists);
     })
@@ -80,7 +80,7 @@ router.get("/lists", async (req, res) => {
 
 router.post("/lists", async (req, res) => {
   const okta_uid = req.jwt.claims.uid;
-  const lists = await Lists.find();
+  const lists = await Lists.findBy({ okta_uid });
 
   let newList = {
     ...req.body,
@@ -88,7 +88,7 @@ router.post("/lists", async (req, res) => {
     index: lists.length,
   };
 
-  await Lists.add(newList)
+  Lists.add(newList)
     .then((list) => {
       res.status(200).json(list);
     })
@@ -98,7 +98,7 @@ router.post("/lists", async (req, res) => {
 });
 
 router.get("/posts", async (req, res) => {
-  await Posts.find({ okta_uid: req.jwt.claims.uid })
+  await Posts.findBy({ okta_uid: req.jwt.claims.uid })
     .then((posts) => {
       res.status(200).json(posts);
     })
@@ -148,7 +148,7 @@ router.put("/", async (req, res) => {
     twitter_handle,
   };
 
-  const user = await Users.findByOktaUID(uid);
+  const user = await Users.findBy({ okta_uid: uid });
   if (!user) {
     const newUser = await Users.add(currentUser);
     res.status(201).json(newUser);
@@ -160,7 +160,7 @@ router.put("/", async (req, res) => {
 
 router.get("/:id/lists", async (req, res) => {
   const okta_uid = req.params.id;
-  Lists.find({ okta_uid });
+  Lists.findBy({ okta_uid });
 });
 
 module.exports = router;
