@@ -6,8 +6,8 @@ const router = express.Router();
 // TODO: Add updated authorization middleware
 
 //get lists
-router.get("/", async (req, res) => {
-  await Lists.get()
+router.get("/", (req, res) => {
+  Lists.get()
     .then((lists) => {
       res.status(200).json(lists);
     })
@@ -47,15 +47,43 @@ router.get("/:id/posts", (req, res) => {
 // POST START HERE ----------------
 router.post("/", async (req, res) => {
   const okta_uid = req.jwt.claims.uid;
-  const lists = await Lists.get();
+  const currentLists = await Lists.findBy({ okta_uid });
 
   let newList = {
     ...req.body,
     okta_uid,
-    index: lists.length,
+    index: currentLists.length,
   };
 
-  Lists.add(newList);
+  Lists.add(newList)
+    .then(list => {
+      res.status(201).json(list);
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    });
+});
+
+// CREATE NEW POST TO THE LIST
+router.post("/:id/posts", async (req, res) => {
+  const okta_uid = req.jwt.claims.uid;
+  const list_id = req.params.id;
+  const currentPosts = await Posts.findBy({ okta_uid, list_id });
+
+  let newPost = {
+    ...req.body,
+    okta_uid,
+    date: 1, // TODO: change it to valid current date
+    index: currentPosts.length,
+  };
+
+  Posts.add(newPost)
+    .then(post => {
+      res.status(201).json(post);
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    });
 });
 
 // PUT START HERE --------------
