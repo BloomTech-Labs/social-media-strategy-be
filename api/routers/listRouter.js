@@ -1,62 +1,68 @@
 const express = require("express");
-const lists = require("../models/listModel.js");
+const Lists = require("../models/listModel.js");
+const Posts = require("../models/postsModel.js");
 const router = express.Router();
-const { lengthcheck, routerModels } = require("../models/helpers");
 
 // TODO: Add updated authorization middleware
 
-router.get("/", (req, res) => {
-  routerModels(lists.find(), req, res);
+//get lists
+router.get("/", async (req, res) => {
+  await Lists.get()
+    .then(lists => {
+      res.status(200).json(lists);
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    })
 });
 
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  if ((await lengthcheck(lists.find({ id }))) === 0) {
-    return res.status(404).json("not found");
-  } else {
-    routerModels(lists.find({ id: req.params.id }), req, res);
-  }
-});
+//get lists by id
+router.get("/:id", (req, res) => {
+  Lists.findBy(req.params.id)
+    .then(list => {
+      res.status(200).json(list)
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    })
+})
 
-router.get("/:id/user", async (req, res) => {
-  const { id } = req.params;
-  const { sortby } = req.query;
-  console.log(req.query);
-  if ((await lengthcheck(lists.find({ user_id: id }))) === 0) {
-    return res.status(404).json("no lists found");
-  } else {
-    routerModels(lists.getLists({ sortby }, id), req, res);
-  }
-});
-
-// POST START HERE ----------------
-
-router.post("/:id/user", (req, res) => {
-  const id = req.decodedToken.okta_userid;
-  const listbody = { ...req.body, user_id: id };
-
-  routerModels(lists.add(listbody), req, res);
+//get posts by list id
+router.get("/:id/posts", (req, res) => {
+  Posts.findBy({list_id: req.params.id})
+    .then(posts => {
+      res.status(200).json(posts)
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    })
 });
 
 // PUT START HERE --------------
-router.put("/:id", async (req, res) => {
+router.put('/:id', (req, res) => {
   const { id } = req.params;
-  const update = req.body;
-  if ((await lengthcheck(lists.find({ id: id }))) === 0) {
-    return res.status(404).json("no lists found");
-  } else {
-    routerModels(lists.update(update, id), req, res);
-  }
-});
+  const changes = req.body;
+
+  Lists.update(id, changes)
+    .then(updated => {
+      res.status(200).json(updated)
+    })
+    .catch(err => {
+      res.status(500).json(err)
+    })
+})
 
 // DELETE START HERE ------------
-router.delete("/:id", async (req, res) => {
+router.delete('/:id', (req, res) => {
   const { id } = req.params;
-  if ((await lengthcheck(lists.find({ id: id }))) === 0) {
-    return res.status(404).json("no lists found");
-  } else {
-    routerModels(lists.remove(id), req, res);
-  }
+
+  Lists.remove(id)
+    .then(deleted => {
+      res.status(200).json({message: "list deleted", deleted})
+    })
+    .catch(err => {
+      res.status(500).json(err)
+    })
 });
 
 module.exports = router;
