@@ -7,7 +7,7 @@ const router = express.Router();
 
 //get lists
 router.get("/", async (req, res) => {
-  await Lists.find()
+  await Lists.get()
     .then(lists => {
       res.status(200).json(lists);
     })
@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
 
 //get lists by id
 router.get("/:id", (req, res) => {
-  Lists.find(req.params.id)
+  Lists.findBy(req.params.id)
     .then(list => {
       res.status(200).json(list)
     })
@@ -29,7 +29,7 @@ router.get("/:id", (req, res) => {
 
 //get posts by list id
 router.get("/:id/posts", (req, res) => {
-  Posts.find({list_id: req.params.id})
+  Posts.findBy({list_id: req.params.id})
     .then(posts => {
       res.status(200).json(posts)
     })

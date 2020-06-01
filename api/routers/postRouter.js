@@ -4,7 +4,7 @@ const Posts = require("../models/postsModel.js");
 
 //get posts
 router.get("/", async (req, res) => {
-  await Posts.find()
+  await Posts.get()
     .then(posts => {
       res.status(200).json(posts);
     })
@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
 
 //get posts by id
 router.get("/:id", (req, res) => {
-  Posts.find(req.params.id)
+  Posts.findBy(req.params.id)
     .then(post => {
       res.status(200).json(post)
     })
@@ -26,7 +26,7 @@ router.get("/:id", (req, res) => {
 
 //get posts by list id
 router.get("/:id/posts", (req, res) => {
-  Posts.find({list_id: req.params.id})
+  Posts.findBy({list_id: req.params.id})
     .then(posts => {
       res.status(200).json(posts)
     })
