@@ -9,6 +9,7 @@ const {
   remove,
   update,
 } = require("../models/helpers");
+const Post = require("../models/postsModel.js");
 
 require("dotenv").config();
 var moment = require("moment-timezone");
@@ -37,6 +38,29 @@ router.get("/:id/user", async (req, res) => {
   } else {
     routerModels(find("posts", { user_id: id }), req, res);
   }
+});
+
+// POST
+router.post("/", async (req, res) => {
+  const okta_uid = req.jwt.claims.uid;
+  const posts = await Post.find({ list_id: req.body.list_id });
+  
+  let newPost = { 
+    ...req.body,
+    okta_uid,
+    date: 1, // TODO: change it to a valid date
+    index: posts.length
+  };
+
+  routerModels(Post.add(newPost), req, res);
+});
+
+// PATCH START HERE --------------
+router.patch("/:id", async (req, res) => {
+  const { id } = req.params;
+  const update = req.body;
+  
+  routerModels(Post.update(update, id), req, res);
 });
 
 //  POST TO GET REC TIME FROM DS -------

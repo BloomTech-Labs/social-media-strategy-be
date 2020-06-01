@@ -12,11 +12,9 @@ function find(filter) {
   }
 }
 
-async function add(lists) {
-  let addlist = await db("lists").insert(lists);
-
-  // return find(lists);
-  return addlist.rowCount;
+async function add(list) {
+  let [addlist] = await db("lists").insert(list, '*');
+  return addlist;
 }
 
 function remove(id) {
@@ -26,17 +24,10 @@ function remove(id) {
     .then((res) => find());
 }
 
-function update(list, id) {
+function update(update, id) {
   return db("lists")
     .where("id", id)
-    .update(list)
-    .then((updated) =>
-      updated > 0
-        ? find({ id })
-            .first()
-            .then((check) => getlistCards(check.user_id)) & console.log(updated)
-        : null
-    );
+    .update(update, '*');
 }
 
 function getlistCards(userId) {
