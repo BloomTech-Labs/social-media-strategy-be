@@ -68,7 +68,7 @@ router.put("/", async (req, res) => {
   }
 });
 
-router.get("/lists/:id", async (req, res) => {
+router.get("/lists", async (req, res) => {
   await Lists.find({ okta_uid: req.jwt.claims.uid })
     .then((lists) => {
       res.status(200).json(lists);
