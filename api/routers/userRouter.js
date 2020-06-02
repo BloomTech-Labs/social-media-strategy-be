@@ -62,7 +62,8 @@ router.put("/:id", async (req, res) => {
     twitter_handle,
   };
 
-  const user = await Users.findBy({ okta_uid: uid });
+  const [user] = await Users.findBy({ okta_uid: uid });
+  console.log("user", user);
   if (!user) {
     const newUser = await Users.add(currentUser);
     res.status(201).json(newUser);
@@ -123,8 +124,8 @@ router.post("/:id/lists/:list_id/posts", async (req, res) => {
     okta_uid,
     list_id,
     index: currentPosts.length,
-    date: 1 // TODO: change to real current date
-  }
+    date: 1, // TODO: change to real current date
+  };
 
   Posts.add(newPost)
     .then((post) => {
