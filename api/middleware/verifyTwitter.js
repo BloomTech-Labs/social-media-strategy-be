@@ -1,12 +1,12 @@
 const axios = require("axios");
-const Twit = require("twit");
+const Twitter = require("twit");
 
 async function verifyTwitter(req, res, next) {
-  const { okta_uid } = req.jwt.claims;
+  const okta_uid = req.jwt.claims.uid;
 
   try {
     let ax = await axios.get(
-      `https://${process.env.OKTA_DOMAIN}/users/${okta_userid}`,
+      `https://${process.env.OKTA_DOMAIN}/users/${okta_uid}`,
       {
         headers: {
           Authorization: process.env.OKTA_AUTH,
@@ -16,7 +16,7 @@ async function verifyTwitter(req, res, next) {
 
     // console.log("AX IN TWITINFO", ax);
 
-    var T = new Twit({
+    var T = new Twitter({
       consumer_key: process.env.CONSUMER_KEY,
       consumer_secret: process.env.CONSUMER_SECRET,
       access_token: ax.data.profile.Oauth_token,
