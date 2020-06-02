@@ -29,34 +29,32 @@ https://api.so-me.net
 
 | Method | URL                    | Description                                                                                                     |
 | ------ | ---------------------- | --------------------------------------------------------------------------------------------------------------- |
-| POST   | /api/auth/register     | Creates a user ( **Email, Password, Role**)                                                                     |
-| POST   | /api/auth/login        | Login into account (**Email, Password**)                                                                        |
-| POST   | /api/:id/callback      | After Twitter Oauth sign-in, it sends oauth id to Okta for secure storage(`Auth Required`)                      |
-| POST   | /api/auth/dsteam       | Creates a new user login for DS team to secure routes between web BE and DS flask (`Auth Required`)             |
-| POST   | /api/posts/:id/user    | Submits a Tweet to DS for an optimal time and adds it to a user profile (`Auth Required`)                       |
-| POST   | /api/topics/:id/user   | Creates a Topic to store all Post cards for the Font-End **CARDS ARE STORED AS JSON STRINGS** (`Auth Required`) |
-| POST   | /api/posts/:id/postnow | Posts a Tweet to Twitter immediately without scheduling or getting DS input (`Auth Required`)                   |
-| GET    | /api/:id/oauth         | Retrieves an OAuth token from Twitter for API use (`Auth Required`)                                             |
-| GET    | /api/auth/userInfo     | Retrieves a user's Twitter Information (`Auth Required`)                                                        |
-| GET    | /api/auth/userStream   | Retrieves a user's Twitter stream Homepage information (`Auth Required`)                                        |
-| GET    | /api/users/            | Retrieves a list of users (`Auth Required`)                                                                     |
-| GET    | /api/users/user        | Retrieves current active user's info (`Auth Required`)                                                          |
-| GET    | /api/users/:id         | Retrieves user based on given id (`Auth Required`)                                                              |
-| GET    | /api/posts/            | Retrieves a list of all posts (`Auth Required`)                                                                 |
-| GET    | /api/posts/:id/user    | Retrieves all the Tweets by a specific user's ID (`Auth Required`)                                              |
-| GET    | /api/posts/:id/        | Retrieves a post by id (`Auth Required`)                                                                        |
-| GET    | /api/topics/           | Retrieves a list of all topics (`Auth Required`)                                                                |
-| GET    | /api/topics/:id        | Retrieves a topic by id (`Auth Required`)                                                                       |
-| GET    | /api/topics/:id/user   | Retrieves all topics of a specific user(`Auth Required`)                                                        |
-| PUT    | /api/users/:id         | Updates a user in the local database (`Auth Required`) (`Admin role required`)                                  |
-| PUT    | /api/posts/:id         | Updates a Tweet in our database without posting to Twitter (`Auth Required`)                                    |
-| PUT    | /api/posts/:id/twitter | Updates a Tweet's contents and posts it to Twitter (`AuthRequired`)                                             |
-| PUT    | /api/topics/:id        | Updates a topic (`Auth Required`)                                                                               |
-| DELETE | /api/users/:id         | Delete user from local and Okta database (`Auth Required`)                                                      |
-| DELETE | /api/users/:id/local   | Delete user locally only (`Auth Required`)(`Admin role required`)                                               |
-| DELETE | /api/posts/:id         | Delete and cancel a scheduled Tweet from database (`Auth Required`)                                             |
-| DELETE | /api/posts/:id/local   | Delete a Tweet from the database only (`Auth Required`)                                                         |
-| DELETE | /api/topics/:id        | Delete a topic, it will delete all cards associated (`Auth Required`)                                           |
+| POST   | /api/auth/twitter/callback   |  |
+| POST   | /api/lists/                  | Adds a new list for the current user. (`Auth Required`) |
+| POST   | /api/lists/:id/posts         | Adds a new post to the list with the (:id) parameter. (`Auth Required`) |
+| POST   | /api/posts                   | Adds a new post for the current user. (`Auth Required`) |
+| POST   | /api/users/:id/lists         | Adds a new list for the curent user. (`Auth Required`) |
+| POST   | /api/users/:id/lists/:list_id/posts  | Adds a new post to list with id: (:list_id) for current user. (`Auth Required`) |
+| GET    | /api/twitter/authorize       |  |
+| GET    | /api/auth/twitter/disconnect | Removes Twitter Oauth information from user Okta profile. (`Auth Required`) |
+| GET    | /api/lists                   | Returns all lists. (`Auth Required`) |
+| GET    | /api/lists/:id               | Returns list with (:id) parameter. (`Auth Required`) |
+| GET    | /api/lists/:id/posts         | Returns posts for list with (:id) parameter. (`Auth Required`) |
+| GET    | /api/posts                   | Returns all posts. (`Auth Required`) |
+| GET    | /api/posts/:id               | Returns post with (:id) parameter. (`Auth Required`) |
+| GET    | /api/users                   | Returns list of all users. (`Auth Required`) |
+| GET    | /api/users/:id               | Returns user info for current user. (`Auth Required`) |
+| GET    | /api/users/:id/lists         | Returns lists for current user. (`Auth Required`) |
+| GET    | /api/users/:id/posts         | Returns posts for current user. (`Auth Required`) |
+| PUT    | /api/lists/:id               | Updates list with (:id) parameter. (`Auth Required`) |
+| PUT    | /api/posts/:id               | Updates post with (:id) parameter. (`Auth Required`) |
+| PUT    | /api/users/:id               | Updates current user. (`Auth Required`) |
+| PATCH    | /api/lists/:id             | Updates list with (:id) parameter. (`Auth Required`) |
+| PATCH    | /api/posts/:id             | Updates post with (:id) parameter. (`Auth Required`) |
+| DELETE   | /api/lists/:id             | Deletes list with (:id) parameter. (`Auth Required`) |
+| DELETE   | /api/posts/:id             | Deletes post with (:id) parameter. (`Auth Required`) |
+| DELETE   | /api/users/:id             | Removes user with (:id) parameter from SoMe Okta. (`Auth Required`) |
+
 
 **Endpoint Specifics -**
 
