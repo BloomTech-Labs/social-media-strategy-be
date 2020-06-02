@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const Posts = require("../models/postsModel.js");
-const Twitter = require("twit");
-
 const verifyTwitter = require("../middleware/verifyTwitter");
 
 //get posts
