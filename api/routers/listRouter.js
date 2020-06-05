@@ -56,10 +56,10 @@ router.post("/", async (req, res) => {
   };
 
   Lists.add(newList)
-    .then(list => {
+    .then((list) => {
       res.status(201).json(list);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).json(err);
     });
 });
@@ -73,15 +73,15 @@ router.post("/:id/posts", async (req, res) => {
   let newPost = {
     ...req.body,
     okta_uid,
-    date: 1, // TODO: change it to valid current date
+    created_at: Date.now(),
     index: currentPosts.length,
   };
 
   Posts.add(newPost)
-    .then(post => {
+    .then((post) => {
       res.status(201).json(post);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).json(err);
     });
 });

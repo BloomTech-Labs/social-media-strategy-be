@@ -1,38 +1,25 @@
 exports.up = function (knex) {
   return knex.schema
     .raw('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"')
-    .createTable("users", (tbl) => {
-      tbl.string("okta_uid").notNullable().unique();
-      tbl.string("email").notNullable().unique();
-      tbl.string("twitter_handle");
-    })
     .createTable("lists", (tbl) => {
-      tbl.uuid("id")
+      tbl
+        .uuid("id")
         .notNullable()
         .unique()
         .primary()
-        .defaultTo(knex.raw('uuid_generate_v4()'));
-      tbl
-        .string("okta_uid")
-        .notNullable()
-        .references("users.okta_uid")
-        .onUpdate("CASCADE")
-        .onDelete("CASCADE");
+        .defaultTo(knex.raw("uuid_generate_v4()"));
+      tbl.string("okta_uid").notNullable();
       tbl.integer("index").notNullable();
       tbl.string("title").notNullable();
     })
     .createTable("posts", (tbl) => {
-      tbl.uuid("id")
+      tbl
+        .uuid("id")
         .notNullable()
         .unique()
         .primary()
-        .defaultTo(knex.raw('uuid_generate_v4()'));
-      tbl
-        .string("okta_uid")
-        .notNullable()
-        .references("users.okta_uid")
-        .onUpdate("CASCADE")
-        .onDelete("CASCADE");
+        .defaultTo(knex.raw("uuid_generate_v4()"));
+      tbl.string("okta_uid").notNullable();
       tbl
         .uuid("list_id")
         .notNullable()
