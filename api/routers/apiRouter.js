@@ -8,13 +8,15 @@ const ListRouter = require("./listRouter");
 const PostRouter = require("./postRouter");
 
 router.get("/", (req, res) => {
-  res.status(200).json({ welcome: "API router" });
+  res.status(200).json({ welcome: "API router" });  /*   /api     */
 });
 
+/*          /api           */
+
 router.use(verifyJWT);
-router.use("/auth", AuthRouter);
-router.use("/users", UserRouter);
-router.use("/lists", ListRouter);
-router.use("/posts", PostRouter);
+router.use("/auth", AuthRouter);   /*   /api/auth      */
+router.use("/users", UserRouter);  /*   /api/users     */
+router.use("/lists", ListRouter);  /*   /api/lists     */
+router.use("/posts", PostRouter);  /*   /api/posts     */
 
 module.exports = router;

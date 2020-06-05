@@ -10,20 +10,20 @@ module.exports = {
   remove,
 };
 
-function find() {
+function find() {  // test 1
   return db("users");
 }
 
-function findBy(filter) {
+function findBy(filter) {  // test 2
   return db("users").where(filter);
 }
 
-async function add(newUser) {
+async function add(newUser) { // test 3
   const [user] = await db("users").insert(newUser, "*");
   return user;
 }
 
-function findByOktaUID(okta_uid) {
+function findByOktaUID(okta_uid) { // test 4
   return db("users").where({ okta_uid }).first();
 }
 

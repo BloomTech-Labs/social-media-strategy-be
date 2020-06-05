@@ -1,10 +1,10 @@
 const db = require("../../data/dbConfig");
 var knex = require("knex");
 
-module.exports = { add, get, findBy, remove, update };
+module.exports = { get, add, findBy, remove, update };
 
 function get() {
-  return db("lists");
+  return db("lists"); 
 }
 
 async function add(list) {
