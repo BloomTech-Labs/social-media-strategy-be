@@ -10,12 +10,14 @@ const verifyUserId = require("../middleware/verifyUserId");
 // middleware to verify if id param matches to user id
 router.use("/:id", verifyUserId);
 
+// test 2
 router.get("/", (req, res) => {
   Users.find()
     .then((users) => res.status(200).json(users))
     .catch((err) => res.status(500).json(err.message));
 });
 
+// test 3
 router.get("/:id", (req, res) => {
   const { id } = req.params;
   Users.findBy({ okta_uid: id })
@@ -23,6 +25,7 @@ router.get("/:id", (req, res) => {
     .catch((err) => res.status(500).json(err.message));
 });
 
+// test 4
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -55,6 +58,7 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// test 5
 router.put("/:id", async (req, res) => {
   const { uid, email, twitter_handle } = req.jwt.claims;
   const currentUser = {
@@ -74,6 +78,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+// test 6
 router.get("/:id/lists", async (req, res) => {
   Lists.findBy({ okta_uid: req.jwt.claims.uid })
     .then((lists) => {
@@ -84,6 +89,7 @@ router.get("/:id/lists", async (req, res) => {
     });
 });
 
+// test 7
 router.post("/:id/lists", async (req, res) => {
   const okta_uid = req.jwt.claims.uid;
   const lists = await Lists.findBy({ okta_uid });
@@ -103,6 +109,7 @@ router.post("/:id/lists", async (req, res) => {
     });
 });
 
+// test 8
 router.get("/:id/posts", async (req, res) => {
   await Posts.findBy({ okta_uid: req.jwt.claims.uid })
     .then((posts) => {
@@ -113,6 +120,7 @@ router.get("/:id/posts", async (req, res) => {
     });
 });
 
+// test 9
 router.post("/:id/lists/:list_id/posts", async (req, res) => {
   const okta_uid = req.jwt.claims.uid;
   const { list_id } = req.params;
