@@ -19,7 +19,7 @@ function verifyJWT(req, res, next) {
     .verifyAccessToken(accessToken, audience)
     .then((jwt) => {
       req.jwt = jwt;
-      console.log(req.jwt);
+      // console.log(req.jwt);
       next();
     })
     .catch((err) => {

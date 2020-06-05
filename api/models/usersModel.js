@@ -20,6 +20,7 @@ function findBy(filter) {  // test 2
 
 async function add(newUser) { // test 3
   const [user] = await db("users").insert(newUser, "*");
+  console.log("add newUser", user);
   return user;
 }
 
@@ -28,7 +29,8 @@ function findByOktaUID(okta_uid) { // test 4
 }
 
 async function updateByOktaUID(okta_uid, updates) {
-  const [user] = await db("users").where({ okta_uid }).update(updates, '*');
+  const user = await db("users").where({ okta_uid }).update(updates);
+  console.log("updateByOktaUID user", user);
   return user;
 }
 

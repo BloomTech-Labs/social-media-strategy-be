@@ -1,9 +1,9 @@
-require("dotenv").config();
 const express = require("express");
-const Posts = require("../models/postsModel.js");
 const router = express.Router();
+const Posts = require("../models/postsModel.js");
+const verifyTwitter = require("../middleware/verifyTwitter");
 
-//// GET --------------
+//get posts
 router.get("/", async (req, res) => {
   await Posts.get()
     .then((posts) => {
@@ -25,27 +25,55 @@ router.get("/:id", (req, res) => {
     });
 });
 
+//get posts by list id
+router.get("/:id/posts", (req, res) => {
+  Posts.findBy({ list_id: req.params.id })
+    .then((posts) => {
+      res.status(200).json(posts);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
 // POST
 router.post("/", async (req, res) => {
   const okta_uid = req.jwt.claims.uid;
-  const posts = await Posts.find({ list_id: req.body.list_id });
+  const currentPosts = await Posts.findBy({ list_id: req.body.list_id });
 
   let newPost = {
     ...req.body,
     okta_uid,
-    date: 1, // TODO: change it to a valid date
-    index: posts.length,
+    date: 1, // TODO: change it to valid current date
+    index: currentPosts.length,
   };
 
-  Posts.add(newPost);
+  Posts.add(newPost)
+    .then((post) => {
+      res.status(201).json(post);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
 });
 
-// PATCH START HERE --------------
-router.patch("/:id", async (req, res) => {
+router.put("/:id/postnow", verifyTwitter, async (req, res, next) => {
   const { id } = req.params;
-  const update = req.body;
+  try {
+    const [postToTweet] = await Posts.findBy({ id });
+    if (!postToTweet) {
+      next({ code: 404, message: "Post not found!" });
+    }
 
-  Posts.update(id, update);
+    const results = await req.twit.post("statuses/update", {
+      status: postToTweet.post_text,
+    });
+    let postedTweet = await Posts.update(id, { ...postToTweet, posted: true });
+    return res.status(200).json(postedTweet);
+  } catch (err) {
+    //console.error(err);
+    res.status(500).json(err);
+  }
 });
 
 // PUT START HERE --------------
@@ -56,6 +84,20 @@ router.put("/:id", (req, res) => {
   Posts.update(id, changes)
     .then((updated) => {
       res.status(200).json(updated);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
+// PATCH START HERE --------------
+router.patch("/:id", async (req, res) => {
+  const { id } = req.params;
+  const update = req.body;
+
+  Posts.update(id, update)
+    .then((post) => {
+      res.json(post);
     })
     .catch((err) => {
       res.status(500).json(err);
