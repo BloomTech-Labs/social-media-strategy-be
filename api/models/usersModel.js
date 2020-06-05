@@ -10,38 +10,45 @@ module.exports = {
   remove,
 };
 
-function find() {  // test 1
+// test 1
+function find() {  
   return db("users");
 }
 
-function findBy(filter) {  // test 2
+// test 2
+function findBy(filter) {  
   return db("users").where(filter);
 }
 
-async function add(newUser) { // test 3
+// test 3
+async function add(newUser) { 
   const [user] = await db("users").insert(newUser, "*");
   console.log("add newUser", user);
   return user;
 }
 
-function findByOktaUID(okta_uid) { // test 4
+// test 4
+function findByOktaUID(okta_uid) { 
   return db("users").where({ okta_uid }).first();
 }
 
-async function updateByOktaUID(okta_uid, updates) { // test 5
+// test 5
+async function updateByOktaUID(okta_uid, updates) { 
   const user = await db("users").where({ okta_uid }).update(updates);
   console.log("updateByOktaUID user", user);
   return user;
 }
 
-function update(payload, okta_uid) { // test 6
+// test 6
+function update(payload, okta_uid) { 
   return db("users")
     .where("okta_uid", okta_uid)
     .update(payload)
     .then((updated) => (updated > 0 ? find("users", { okta_uid }) : null));
 }
 
-function remove(okta_uid) {  // test 7
+// test 7
+function remove(okta_uid) {  
   return db("users")
     .where({ okta_uid })
     .del()
