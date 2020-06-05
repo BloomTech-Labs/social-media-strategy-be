@@ -28,7 +28,7 @@ function findByOktaUID(okta_uid) { // test 4
   return db("users").where({ okta_uid }).first();
 }
 
-async function updateByOktaUID(okta_uid, updates) {
+async function updateByOktaUID(okta_uid, updates) { // test 5
   const user = await db("users").where({ okta_uid }).update(updates);
   console.log("updateByOktaUID user", user);
   return user;

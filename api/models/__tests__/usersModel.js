@@ -67,19 +67,10 @@ const usersModelTesting = endpoint => {
             expect(usersNumber).toHaveLength(1);               
         });
 
-        // test 4
-        // test('returns 1 row using okta_uid', async () => {
-        //     let usersNumber;
-        //     usersNumber = await Users.find();
-        //     expect(usersNumber).toHaveLength(0);         
-        //     await Users.add({                
-        //         okta_uid: 111, 
-        //         email: 'edmadrigal@yahoo.com', 
-        //         twitter_handle: '@edmadrigal'
-        //     });                
-        //     usersNumber = await Users.findByOktaUID({ okta_uid: 111 });
-        //     expect(usersNumber).toHaveLength(1);               
-        // });
+        // test 4: ref to findByOktaUID is not found in userRouter.js
+        
+        // test 5
+        
 
     })
 };
