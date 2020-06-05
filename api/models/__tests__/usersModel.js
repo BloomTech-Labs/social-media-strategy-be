@@ -67,9 +67,57 @@ const usersModelTesting = endpoint => {
             expect(usersNumber).toHaveLength(1);               
         });
 
-        // test 4: ref to findByOktaUID is not found in userRouter.js
+        // test 4
+        test('updates a user email', async () => {
+            let usersNumber;
+            usersNumber = await Users.find();
+            expect(usersNumber).toHaveLength(0);         
+            await Users.add({                
+                okta_uid: 111, 
+                email: 'edmadrigal@yahoo.com', 
+                twitter_handle: '@edmadrigal'
+            });                
+            usersNumber = await Users.find();
+            expect(usersNumber).toHaveLength(1); 
+            await Users.updateByOktaUID(111, {
+                email: 'example@mail.com',
+                twitter_handle: '@edmadrigal'
+            });
+            let actualObj;
+            actualObj = await Users.findByOktaUID(111);
+            const expectedObj = ({
+                "email": "example@mail.com", 
+                "okta_uid": "111", 
+                "twitter_handle": "@edmadrigal"
+            });
+            expect(actualObj).toMatchObject(expectedObj)
+        });
         
         // test 5
+        test('updates a user email', async () => {
+            let usersNumber;
+            usersNumber = await Users.find();
+            expect(usersNumber).toHaveLength(0);         
+            await Users.add({                
+                okta_uid: 111, 
+                email: 'edmadrigal@yahoo.com', 
+                twitter_handle: '@edmadrigal'
+            });                
+            usersNumber = await Users.find();
+            expect(usersNumber).toHaveLength(1); 
+            await Users.updateByOktaUID(111, {
+                email: 'example@mail.com',
+                twitter_handle: '@edmadrigal'
+            });
+            let actualObj;
+            actualObj = await Users.findByOktaUID(111);
+            const expectedObj = ({
+                "email": "example@mail.com", 
+                "okta_uid": "111", 
+                "twitter_handle": "@edmadrigal"
+            });
+            expect(actualObj).toMatchObject(expectedObj)
+        });
         
 
     })
