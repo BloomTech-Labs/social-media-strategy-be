@@ -118,6 +118,8 @@ const usersModelTesting = endpoint => {
             });
             expect(actualObj).toMatchObject(expectedObj)
         });
+
+        // test 6
         
 
     })
