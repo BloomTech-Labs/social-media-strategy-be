@@ -6,6 +6,7 @@ const Lists = require("../models/listModel");
 const Posts = require("../models/postsModel");
 const verifyUserId = require("../middleware/verifyUserId");
 
+// test 1
 // middleware to verify if id param matches to user id
 router.use("/:id", verifyUserId);
 
