@@ -120,6 +120,8 @@ const usersModelTesting = endpoint => {
         });
 
         // test 6
+
+        // test 7
         
 
     })

@@ -34,14 +34,14 @@ async function updateByOktaUID(okta_uid, updates) { // test 5
   return user;
 }
 
-function update(payload, okta_uid) {
+function update(payload, okta_uid) { // test 6
   return db("users")
     .where("okta_uid", okta_uid)
     .update(payload)
     .then((updated) => (updated > 0 ? find("users", { okta_uid }) : null));
 }
 
-function remove(okta_uid) {
+function remove(okta_uid) {  // test 7
   return db("users")
     .where({ okta_uid })
     .del()
