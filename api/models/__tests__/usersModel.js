@@ -122,6 +122,21 @@ const usersModelTesting = endpoint => {
         // test 6
 
         // test 7
+        test('removes a user by okta_uid', async () => {
+            let usersNumber;
+            usersNumber = await Users.find();
+            expect(usersNumber).toHaveLength(0);         
+            await Users.add({                
+                okta_uid: 111, 
+                email: 'edmadrigal@yahoo.com', 
+                twitter_handle: '@edmadrigal'
+            });                
+            usersNumber = await Users.find();
+            expect(usersNumber).toHaveLength(1);
+            await Users.remove(111);
+            usersNumber = await Users.find();
+            expect(usersNumber).toHaveLength(0);         
+        });
         
 
     })
