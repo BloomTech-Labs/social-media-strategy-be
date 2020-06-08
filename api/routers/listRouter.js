@@ -20,19 +20,16 @@ router.get("/", async (req, res) => {
 // Returns list by id belonging to logged in user
 router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
-  try {
-    const list = await Lists.findBy({ okta_uid: req.jwt.claims.uid, id });
-    if (!list) {
-      next({
-        code: 404,
-        message: "List not found",
-      });
-    } else {
+
+  Lists.findBy({ okta_uid: req.jwt.claims.uid, id })
+    .then(([list]) => {
+      if (!list) return next({ code: 404, message: "List not found" });
       res.status(200).json(list);
-    }
-  } catch (err) {
-    next();
-  }
+    })
+    .catch((err) => {
+      console.error(err);
+      next({ code: 500, message: "There was a problem retrieving the list" });
+    });
 });
 
 // GET /api/lists/:id/posts
