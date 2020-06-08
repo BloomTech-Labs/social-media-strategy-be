@@ -16,10 +16,10 @@ function findBy(filter) {
   return db("lists").where(filter);
 }
 
-function remove(id) {
-  return db("lists").where({ id }).del();
+function remove(id, okta_uid) {
+  return db("lists").where({ id, okta_uid }).del();
 }
 
-function update(update, id) {
-  return db("lists").where("id", id).update(update, "*");
+function update(update, id, okta_uid) {
+  return db("lists").where({ id, okta_uid }).update(update, "*");
 }

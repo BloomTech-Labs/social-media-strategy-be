@@ -3,23 +3,25 @@ const Lists = require("../models/listModel.js");
 const Posts = require("../models/postsModel.js");
 const router = express.Router();
 
-// TODO: Add updated authorization middleware
-
-//get lists
-router.get("/", (req, res) => {
-  Lists.get()
+// GET /api/lists
+// Returns all lists belonging to logged in user
+router.get("/", async (req, res) => {
+  console.log(req);
+  Lists.findBy({ okta_uid: req.jwt.claims.uid })
     .then((lists) => {
       res.status(200).json(lists);
     })
     .catch((err) => {
-      next({ message: err });
+      res.status(500).json(err);
     });
 });
 
+// GET /api/lists/:id
+// Returns list by id belonging to logged in user
 router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
-    const list = await Lists.findBy(id);
+    const list = await Lists.findBy({ okta_uid: req.jwt.claims.uid, id });
     if (!list) {
       next({
         code: 404,
@@ -33,9 +35,10 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-//get posts by list id
+// GET /api/lists/:id/posts
+// Returns posts by list id belonging to logged in user
 router.get("/:id/posts", (req, res) => {
-  Posts.findBy({ list_id: req.params.id })
+  Posts.findBy({ okta_uid: req.jwt.claims.uid, list_id: req.params.id })
     .then((posts) => {
       res.status(200).json(posts);
     })
@@ -44,7 +47,9 @@ router.get("/:id/posts", (req, res) => {
     });
 });
 
-// POST START HERE ----------------
+// POST /api/lists
+// Creates a new list belonging logged in user
+// Returns the new list
 router.post("/", async (req, res) => {
   const okta_uid = req.jwt.claims.uid;
   const currentLists = await Lists.findBy({ okta_uid });
@@ -64,7 +69,9 @@ router.post("/", async (req, res) => {
     });
 });
 
-// CREATE NEW POST TO THE LIST
+// POST /api/lists/:id/posts
+// Creates a new post for the list with :id belonging to logged in user
+// Returns the new post
 router.post("/:id/posts", async (req, res) => {
   const okta_uid = req.jwt.claims.uid;
   const list_id = req.params.id;
@@ -86,12 +93,14 @@ router.post("/:id/posts", async (req, res) => {
     });
 });
 
-// PUT START HERE --------------
-router.put("/:id", (req, res) => {
+// PUT /api/lists/:id
+// Updates list with :id belonging to logged in user
+// Returns the updated list
+router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const changes = req.body;
 
-  Lists.update(changes, id)
+  Lists.update(changes, id, req.jwt.claims.uid)
     .then((updated) => {
       res.status(200).json(updated);
     })
@@ -100,13 +109,15 @@ router.put("/:id", (req, res) => {
     });
 });
 
-// PATCH START HERE --------------
+// PATCH /api/lists/:id
+// Updates list with :id belonging to logged in user
+// Returns the updated list
 router.patch("/:id", async (req, res, next) => {
   const { id } = req.params;
   const update = req.body;
 
   try {
-    const list = await Lists.update(update, id);
+    const list = await Lists.update(update, id, req.jwt.claims.uid);
     if (!list) {
       next({
         code: 404,
@@ -120,13 +131,15 @@ router.patch("/:id", async (req, res, next) => {
   }
 });
 
-// DELETE START HERE ------------
+// DELETE /api/lists/:id
+// Deletes list with :id belonging to logged in user
+// Returns deleted count
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
 
-  Lists.remove(id)
+  Lists.remove(id, req.jwt.claims.uid)
     .then((deleted) => {
-      res.status(200).json({ message: "list deleted", deleted });
+      res.status(200).json({ deleted });
     })
     .catch((err) => {
       res.status(500).json(err);
