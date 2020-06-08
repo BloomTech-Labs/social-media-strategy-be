@@ -9,6 +9,7 @@ exports.up = function (knex) {
         .primary()
         .defaultTo(knex.raw("uuid_generate_v4()"));
       tbl.string("okta_uid").notNullable();
+      tbl.timestamp("created_at").defaultTo(knex.fn.now());
       tbl.integer("index").notNullable();
       tbl.string("title").notNullable();
     })
@@ -26,12 +27,12 @@ exports.up = function (knex) {
         .references("lists.id")
         .onUpdate("CASCADE")
         .onDelete("CASCADE");
-      tbl.integer("date").notNullable();
+      tbl.timestamp("created_at").defaultTo(knex.fn.now());
       tbl.integer("index").notNullable();
-      tbl.text("post_score");
       tbl.text("post_text");
       tbl.boolean("posted").notNullable().defaultsTo(false);
       tbl.integer("optimal_time");
+      tbl.integer("scheduled_time");
     });
 };
 
