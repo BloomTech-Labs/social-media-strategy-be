@@ -6,7 +6,6 @@ const router = express.Router();
 // GET /api/lists
 // Returns all lists belonging to logged in user
 router.get("/", async (req, res) => {
-  console.log(req);
   Lists.findBy({ okta_uid: req.jwt.claims.uid })
     .then((lists) => {
       res.status(200).json(lists);
@@ -77,7 +76,6 @@ router.post("/:id/posts", async (req, res) => {
   let newPost = {
     ...req.body,
     okta_uid,
-    created_at: Date.now(),
     index: currentPosts.length,
   };
 
@@ -86,6 +84,7 @@ router.post("/:id/posts", async (req, res) => {
       res.status(201).json(post);
     })
     .catch((err) => {
+      console.error(err);
       res.status(500).json(err);
     });
 });
