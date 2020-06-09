@@ -24,11 +24,11 @@ To get the server running locally:
 ### Auth
 Valid JWT required for `/api/auth` routes
 
-| Method | URL                           | Description                                                                                           |
-| ------ | ----------------------------- | ----------------------------------------------------------------------------------------------------- |
-| GET    | /api/auth/twitter/authorize   | Returns a redirect URL with an OAuth request token in order to authorize the user's Twitter account   |
-| POST   | /api/auth/twitter/callback    | Receives the user's OAuth token and verifier to obtain and securely store their Twitter access token. |
-| GET    | /api/auth//twitter/disconnect | Deletes user's Twitter information and access token from Okta.                                        |
+| Method | URL                          | Description                                                                                           |
+| ------ | ---------------------------- | ----------------------------------------------------------------------------------------------------- |
+| GET    | /api/auth/twitter/authorize  | Returns a redirect URL with an OAuth request token in order to authorize the user's Twitter account   |
+| POST   | /api/auth/twitter/callback   | Receives the user's OAuth token and verifier to obtain and securely store their Twitter access token. |
+| GET    | /api/auth/twitter/disconnect | Deletes user's Twitter information and access token from Okta.                                        |
 
 ### Lists
 Valid JWT required for `/api/lists` routes
