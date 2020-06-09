@@ -35,7 +35,7 @@ Valid JWT required for `/api/lists` routes
 
 | Method | URL                  | Description                                                                                 |
 | ------ | -------------------- | ------------------------------------------------------------------------------------------- |
-| GET    | /api/lists/          | Returns all lists belonging to logged in user.                                              |
+| GET    | /api/lists/          | Returns an array of all lists belonging to logged in user.                                  |
 | GET    | /api/lists/:id       | Returns list by id belonging to logged in user.                                             |
 | GET    | /api/lists/:id/posts | Returns posts by list id belonging to logged in user.                                       |
 | POST   | /api/lists           | Creates a new list belonging logged in user. Returns the new list.                          |
