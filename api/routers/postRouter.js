@@ -3,9 +3,10 @@ const router = express.Router();
 const Posts = require("../models/postsModel.js");
 const verifyTwitter = require("../middleware/verifyTwitter");
 
-//get posts
-router.get("/", async (req, res) => {
-  await Posts.get()
+// GET /api/posts
+// Returns an array of all posts belonging to logged in user
+router.get("/", (req, res) => {
+  Posts.findBy({ okta_uid: req.jwt.claims.uid })
     .then((posts) => {
       res.status(200).json(posts);
     })
@@ -14,10 +15,12 @@ router.get("/", async (req, res) => {
     });
 });
 
-//get posts by id
+// GET /api/posts/:id
+// Returns post with :id belonging to logged in user
 router.get("/:id", (req, res) => {
-  Posts.findBy(req.params.id)
-    .then((post) => {
+  const { id } = req.params;
+  Posts.findBy({ id, okta_uid: req.jwt.claims.uid })
+    .then(([post]) => {
       res.status(200).json(post);
     })
     .catch((err) => {
@@ -25,42 +28,15 @@ router.get("/:id", (req, res) => {
     });
 });
 
-//get posts by list id
-router.get("/:id/posts", (req, res) => {
-  Posts.findBy({ list_id: req.params.id })
-    .then((posts) => {
-      res.status(200).json(posts);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
-
-// POST
-router.post("/", async (req, res) => {
-  const okta_uid = req.jwt.claims.uid;
-  const currentPosts = await Posts.findBy({ list_id: req.body.list_id });
-
-  let newPost = {
-    ...req.body,
-    okta_uid,
-    date: 1, // TODO: change it to valid current date
-    index: currentPosts.length,
-  };
-
-  Posts.add(newPost)
-    .then((post) => {
-      res.status(201).json(post);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
-
+// PUT /api/posts/:id/postnow
+// Tweets the post with :id belonging to logged in user
 router.put("/:id/postnow", verifyTwitter, async (req, res, next) => {
   const { id } = req.params;
   try {
-    const [postToTweet] = await Posts.findBy({ id });
+    const [postToTweet] = await Posts.findBy({
+      id,
+      okta_uid: req.jwt.claims.uid,
+    });
     if (!postToTweet) {
       next({ code: 404, message: "Post not found!" });
     }
@@ -71,17 +47,18 @@ router.put("/:id/postnow", verifyTwitter, async (req, res, next) => {
     let postedTweet = await Posts.update(id, { ...postToTweet, posted: true });
     return res.status(200).json(postedTweet);
   } catch (err) {
-    //console.error(err);
+    console.error(err);
     res.status(500).json(err);
   }
 });
 
-// PUT START HERE --------------
+// PUT /api/posts/:id
+// Updates the post with :id belonging to logged in user
 router.put("/:id", (req, res) => {
   const { id } = req.params;
   const changes = req.body;
 
-  Posts.update(id, changes)
+  Posts.update(id, changes, req.jwt.claims.uid)
     .then((updated) => {
       res.status(200).json(updated);
     })
@@ -90,12 +67,13 @@ router.put("/:id", (req, res) => {
     });
 });
 
-// PATCH START HERE --------------
+// PATCH /api/posts/:id
+// Updates the post with :id belonging to logged in user
 router.patch("/:id", async (req, res) => {
   const { id } = req.params;
   const update = req.body;
 
-  Posts.update(id, update)
+  Posts.update(id, update, req.jwt.claims.uid)
     .then((post) => {
       res.json(post);
     })
@@ -104,11 +82,12 @@ router.patch("/:id", async (req, res) => {
     });
 });
 
-// DELETE START HERE ------------
+// DELETE /api/posts/:id
+// Deletes the post with :id belonging to logged in user
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
 
-  Posts.remove(id)
+  Posts.remove(id, req.jwt.claims.uid)
     .then((deleted) => {
       res.status(200).json({ message: "post deleted", deleted });
     })

@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const AuthRouter = require("./auth/authRouter");
 const verifyJWT = require("../middleware/verifyJWT");
-const UserRouter = require("./userRouter");
+const AuthRouter = require("./auth/authRouter");
 const ListRouter = require("./listRouter");
 const PostRouter = require("./postRouter");
 
@@ -12,7 +11,6 @@ router.get("/", (req, res) => {
 
 router.use(verifyJWT);
 router.use("/auth", AuthRouter);
-router.use("/users", UserRouter);
 router.use("/lists", ListRouter);
 router.use("/posts", PostRouter);
 

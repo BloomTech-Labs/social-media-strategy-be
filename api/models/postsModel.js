@@ -23,10 +23,10 @@ async function add(newPost) {
   return post;
 }
 
-function remove(id) {
-  return db("posts").where({ id }).del();
+function remove(id, okta_uid) {
+  return db("posts").where({ id, okta_uid }).del();
 }
 
-function update(id, changes) {
-  return db("posts").where({ id }).update(changes);
+function update(id, changes, okta_uid) {
+  return db("posts").where({ id, okta_uid }).update(changes);
 }
