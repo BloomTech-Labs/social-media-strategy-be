@@ -24,18 +24,21 @@ To get the server running locally:
 ### Auth
 Valid JWT required for `/api/auth` routes
 
-| Method | URL       | Description                                   |
-| ------ | --------- | --------------------------------------------- |
-| GET    | /api/auth | Returns all lists belonging to logged in user |
+| Method | URL                           | Description                                                                                         |
+| ------ | ----------------------------- | --------------------------------------------------------------------------------------------------- |
+| GET    | /api/auth/twitter/authorize   | Returns a redirect URL with an OAuth request token in order to authorize the user's Twitter account |
+| POST   | /api/auth/twitter/callback    | Receives the user's OAuth token and verifier in order to obtain                                     |
+|        |                               | and securely store their Twitter access token.                                                      |
+| GET    | /api/auth//twitter/disconnect | Deletes user's Twitter information and access token from Okta.                                      |
 
 ### Lists
 Valid JWT required for `/api/lists` routes
 
 | Method | URL                  | Description                                                                                 |
 | ------ | -------------------- | ------------------------------------------------------------------------------------------- |
-| GET    | /api/lists/          | Returns all lists belonging to logged in user                                               |
-| GET    | /api/lists/:id       | Returns list by id belonging to logged in user                                              |
-| GET    | /api/lists/:id/posts | Returns posts by list id belonging to logged in user                                        |
+| GET    | /api/lists/          | Returns all lists belonging to logged in user.                                              |
+| GET    | /api/lists/:id       | Returns list by id belonging to logged in user.                                             |
+| GET    | /api/lists/:id/posts | Returns posts by list id belonging to logged in user.                                       |
 | POST   | /api/lists           | Creates a new list belonging logged in user. Returns the new list.                          |
 | POST   | /api/lists/:id/posts | Creates a new post for the list with :id belonging to logged in user. Returns the new post. |
 | PUT    | /api/lists/:id       | Updates list with :id belonging to logged in user. Returns the updated list.                |
@@ -45,9 +48,14 @@ Valid JWT required for `/api/lists` routes
 ### Posts
 Valid JWT required for `/api/posts` routes
 
-| Method | URL                | Description                                 |
-| ------ | ------------------ | ------------------------------------------- |
-| POST   | /api/auth/register | Creates a user ( **Email, Password, Role**) |
+| Method | URL                    | Description                                                |
+| ------ | ---------------------- | ---------------------------------------------------------- |
+| GET    | /api/posts             | Returns an array of all posts belonging to logged in user. |
+| GET    | /api/posts/:id         | Returns post with :id belonging to logged in user.         |
+| PUT    | /api/posts/:id/postnow | Tweets the post with :id belonging to logged in user.      |
+| PUT    | /api/posts/:id         | Updates the post with :id belonging to logged in user.     |
+| PATCH  | /api/posts/:id         | Updates the post with :id belonging to logged in user.     |
+| DELETE | /api/posts/:id         | Deletes the post with :id belonging to logged in user.     |
 
 
 ## Contributing
