@@ -16,7 +16,6 @@ const testJWT = {
 function verifyJWT(req, res, next) {
   if (process.env.NODE_ENV === "testing") {
     req.jwt = testJWT;
-    console.log(req.jwt);
     return next();
   }
   const authHeader = req.headers.authorization || "";
