@@ -13,7 +13,7 @@ describe("GET /api/lists", () => {
       });
   });
 
-  it("returns 3 lists", () => {
+  it("returns the correct number of lists", () => {
     return request(server)
       .get("/api/lists/")
       .then((res) => {
