@@ -4,7 +4,21 @@ const oktaJwtVerifier = new OktaJwtVerifier({
   issuer: `https://${process.env.OKTA_SUBDOMAIN}.okta.com/oauth2/default`, // required
 });
 
+const testJWT = {
+  claims: {
+    uid: "00ucj17sgcvh8Axqr4x6",
+    twitter_handle: "SoMe_Strategy",
+    sub: "alice@gmail.com",
+    email: "alice@gmail.com",
+  },
+};
+
 function verifyJWT(req, res, next) {
+  if (process.env.NODE_ENV === "testing") {
+    req.jwt = testJWT;
+    console.log(req.jwt);
+    return next();
+  }
   const authHeader = req.headers.authorization || "";
   const match = authHeader.match(/Bearer (.+)/);
 
@@ -19,7 +33,7 @@ function verifyJWT(req, res, next) {
     .verifyAccessToken(accessToken, audience)
     .then((jwt) => {
       req.jwt = jwt;
-      // console.log(req.jwt);
+      console.log(req.jwt);
       next();
     })
     .catch((err) => {
