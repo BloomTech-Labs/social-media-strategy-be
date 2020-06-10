@@ -9,8 +9,26 @@ describe("GET /api/lists", () => {
     return request(server)
       .get("/api/lists/")
       .then((res) => {
-        console.log(res.body);
         expect(res.status).toBe(200);
+      });
+  });
+
+  it("returns 3 lists", () => {
+    return request(server)
+      .get("/api/lists/")
+      .then((res) => {
+        expect(res.body.length).toBe(3);
+      });
+  });
+
+  it("only returns lists with the user's okta_uid", () => {
+    return request(server)
+      .get("/api/lists/")
+      .then((res) => {
+        expect(
+          res.body.filter((list) => list.okta_uid === "00ucj17sgcvh8Axqr4x6")
+            .length
+        ).toBe(3);
       });
   });
 });
