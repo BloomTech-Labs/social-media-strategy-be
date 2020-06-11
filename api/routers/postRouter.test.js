@@ -28,7 +28,7 @@ describe("GET /api/posts", () => {
         expect(
           res.body.filter((post) => post.okta_uid === "00ucj17sgcvh8Axqr4x6")
             .length
-        ).toBe(7);
+        ).toBe(res.body.length);
       });
   });
 });
