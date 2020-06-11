@@ -32,3 +32,37 @@ describe("GET /api/posts", () => {
       });
   });
 });
+
+describe("GET /api/posts/:id", () => {
+  it("returns 200", () => {
+    return request(server)
+      .get("/api/posts/634b0e5c-af78-425b-8ad6-4622986e2e0f")
+      .then((res) => {
+        expect(res.status).toBe(200);
+      });
+  });
+
+  it("returns a post that actually belongs to the logged in user", () => {
+    return request(server)
+      .get("/api/posts/634b0e5c-af78-425b-8ad6-4622986e2e0f")
+      .then((res) => {
+        expect(res.body.okta_uid).toBe("00ucj17sgcvh8Axqr4x6");
+      });
+  });
+
+  it("returns 404 when trying to access another user's post", () => {
+    return request(server)
+      .get("/api/lists/41670103-3eba-4cb3-8d17-8fd79d9d3dfa")
+      .then((res) => {
+        expect(res.status).toBe(404);
+      });
+  });
+
+  it("returns 500 for an invalid id", () => {
+    return request(server)
+      .get("/api/posts/foo")
+      .then((res) => {
+        expect(res.status).toBe(500);
+      });
+  });
+});
