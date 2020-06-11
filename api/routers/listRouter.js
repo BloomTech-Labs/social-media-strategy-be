@@ -144,8 +144,12 @@ router.patch("/:id", async (req, res, next) => {
 // DELETE /api/lists/:id
 // Deletes list with :id belonging to logged in user
 // Returns deleted count
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
   const { id } = req.params;
+  const okta_uid = req.jwt.claims.uid;
+
+  const [list] = await Lists.findBy({ okta_uid, id });
+  if (!list) return next({ code: 404, message: "List not found" });
 
   Lists.remove(id, req.jwt.claims.uid)
     .then((deleted) => {
