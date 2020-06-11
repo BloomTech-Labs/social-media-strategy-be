@@ -32,19 +32,24 @@ router.get("/:id", (req, res) => {
 // Tweets the post with :id belonging to logged in user
 router.put("/:id/postnow", verifyTwitter, async (req, res, next) => {
   const { id } = req.params;
+  const okta_uid = req.jwt.claims.uid;
   try {
-    const [postToTweet] = await Posts.findBy({
-      id,
-      okta_uid: req.jwt.claims.uid,
-    });
+    const [postToTweet] = await Posts.findBy({ id, okta_uid });
     if (!postToTweet) {
       next({ code: 404, message: "Post not found!" });
     }
 
-    const results = await req.twit.post("statuses/update", {
-      status: postToTweet.post_text,
-    });
-    let postedTweet = await Posts.update(id, { ...postToTweet, posted: true });
+    if (process.env.NODE_ENV !== "testing") {
+      await req.twit.post("statuses/update", {
+        status: postToTweet.post_text,
+      });
+    }
+
+    const [postedTweet] = await Posts.update(
+      id,
+      { ...postToTweet, posted: true },
+      okta_uid
+    );
     return res.status(200).json(postedTweet);
   } catch (err) {
     console.error(err);
