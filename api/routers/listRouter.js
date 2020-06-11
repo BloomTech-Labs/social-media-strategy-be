@@ -71,13 +71,22 @@ router.post("/", async (req, res, next) => {
 // POST /api/lists/:id/posts
 // Creates a new post for the list with :id belonging to logged in user
 // Returns the new post
-router.post("/:id/posts", async (req, res) => {
+router.post("/:id/posts", async (req, res, next) => {
   const okta_uid = req.jwt.claims.uid;
   const list_id = req.params.id;
-  const currentPosts = await Posts.findBy({ okta_uid, list_id });
 
-  let newPost = {
-    ...req.body,
+  const [list] = await Lists.findBy({ okta_uid, id: list_id });
+  if (!list) return next({ code: 404, message: "List not found" });
+
+  const currentPosts = await Posts.findBy({ okta_uid, list_id });
+  const { post_text } = req.body;
+
+  if (!post_text)
+    return next({ code: 400, message: "Please provide text for your post" });
+
+  const newPost = {
+    post_text,
+    list_id,
     okta_uid,
     index: currentPosts.length,
   };
