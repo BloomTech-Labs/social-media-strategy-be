@@ -233,3 +233,29 @@ describe("PATCH /api/lists/:id", () => {
       });
   });
 });
+
+describe("DELETE /api/lists/:id", () => {
+  it("returns 200 on success", () => {
+    return request(server)
+      .delete("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321")
+      .then((res) => {
+        expect(res.status).toBe(200);
+      });
+  });
+
+  it("returns the number of deleted lists", () => {
+    return request(server)
+      .delete("/api/lists/d2b3833d-08b3-4dd8-96fe-822e3a608d82")
+      .then((res) => {
+        expect(res.body.deleted).toBe(1);
+      });
+  });
+
+  it("returns 404 when trying to delete a list that does not belong to logged in user", () => {
+    return request(server)
+      .delete("/api/lists/013e4ab9-77e0-48de-9efe-4d96542e791f")
+      .then((res) => {
+        expect(res.status).toBe(404);
+      });
+  });
+});
