@@ -28,5 +28,5 @@ function remove(id, okta_uid) {
 }
 
 function update(id, changes, okta_uid) {
-  return db("posts").where({ id, okta_uid }).update(changes);
+  return db("posts").where({ id, okta_uid }).update(changes, "*");
 }
