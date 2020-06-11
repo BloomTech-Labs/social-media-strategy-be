@@ -121,3 +121,32 @@ describe("PUT /api/posts/:id", () => {
       });
   });
 });
+
+describe("PATCH /api/posts/:id", () => {
+  it("returns 200", () => {
+    return request(server)
+      .patch("/api/posts/a7112c6c-75e9-4a84-aa44-357d0d90ff32")
+      .send({ post_text: "updated text" })
+      .then((res) => {
+        expect(res.status).toBe(200);
+      });
+  });
+
+  it("returns the updated post", () => {
+    return request(server)
+      .patch("/api/posts/a7112c6c-75e9-4a84-aa44-357d0d90ff32")
+      .send({ post_text: "updated text again" })
+      .then((res) => {
+        expect(res.body.post_text).toBe("updated text again");
+      });
+  });
+
+  it("returns 404 when trying to update a post that does not belong to logged in user", () => {
+    return request(server)
+      .patch("/api/posts/41670103-3eba-4cb3-8d17-8fd79d9d3dfa")
+      .send({ post_text: "trying to update another user's post" })
+      .then((res) => {
+        expect(res.status).toBe(404);
+      });
+  });
+});
