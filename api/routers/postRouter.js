@@ -59,15 +59,17 @@ router.put("/:id/postnow", verifyTwitter, async (req, res, next) => {
 
 // PUT /api/posts/:id
 // Updates the post with :id belonging to logged in user
-router.put("/:id", (req, res) => {
+router.put("/:id", (req, res, next) => {
   const { id } = req.params;
   const changes = req.body;
 
   Posts.update(id, changes, req.jwt.claims.uid)
-    .then((updated) => {
+    .then(([updated]) => {
+      if (!updated) return next({ code: 404, message: "Post not found" });
       res.status(200).json(updated);
     })
     .catch((err) => {
+      console.error(err);
       res.status(500).json(err);
     });
 });
