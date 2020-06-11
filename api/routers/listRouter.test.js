@@ -108,3 +108,32 @@ describe("GET /api/lists/:id/posts", () => {
       });
   });
 });
+
+describe("POST /api/lists", () => {
+  it("returns 201 on success", () => {
+    return request(server)
+      .post("/api/lists/")
+      .send({ title: "hello" })
+      .then((res) => {
+        expect(res.status).toBe(201);
+      });
+  });
+
+  it("returns the list with the correct index and title", () => {
+    return request(server)
+      .post("/api/lists/")
+      .send({ title: "hello again" })
+      .then((res) => {
+        expect(res.body.title).toBe("hello again");
+        expect(res.body.index).toBe(4);
+      });
+  });
+
+  it("returns 400 when no title is provided", () => {
+    return request(server)
+      .post("/api/lists/")
+      .then((res) => {
+        expect(res.status).toBe(400);
+      });
+  });
+});
