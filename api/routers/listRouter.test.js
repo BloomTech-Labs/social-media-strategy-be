@@ -175,3 +175,32 @@ describe("POST /api/lists/:id/posts", () => {
       });
   });
 });
+
+describe("PUT /api/lists/:id", () => {
+  it("returns 200 on success", () => {
+    return request(server)
+      .put("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321")
+      .send({ title: "updated title" })
+      .then((res) => {
+        expect(res.status).toBe(200);
+      });
+  });
+
+  it("returns the updated list", () => {
+    return request(server)
+      .put("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321")
+      .send({ title: "updated title again" })
+      .then((res) => {
+        expect(res.body[0].title).toBe("updated title again");
+      });
+  });
+
+  it("returns 404 when trying to update a list that does not belong to logged in user", () => {
+    return request(server)
+      .put("/api/lists/013e4ab9-77e0-48de-9efe-4d96542e791f")
+      .send({ title: "trying to update another user's list" })
+      .then((res) => {
+        expect(res.status).toBe(404);
+      });
+  });
+});
