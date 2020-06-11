@@ -44,14 +44,17 @@ router.get("/:id/posts", (req, res) => {
 });
 
 // POST /api/lists
-// Creates a new list belonging logged in user
+// Creates a new list belonging to logged in user
 // Returns the new list
-router.post("/", async (req, res) => {
+router.post("/", async (req, res, next) => {
   const okta_uid = req.jwt.claims.uid;
   const currentLists = await Lists.findBy({ okta_uid });
+  const { title } = req.body;
 
-  let newList = {
-    ...req.body,
+  if (!title) return next({ code: 400, message: "Please provide a title" });
+
+  const newList = {
+    title,
     okta_uid,
     index: currentLists.length,
   };
