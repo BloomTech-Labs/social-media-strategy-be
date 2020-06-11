@@ -137,3 +137,41 @@ describe("POST /api/lists", () => {
       });
   });
 });
+
+describe("POST /api/lists/:id/posts", () => {
+  it("returns 201 on success", () => {
+    return request(server)
+      .post("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321/posts")
+      .send({ post_text: "new post" })
+      .then((res) => {
+        expect(res.status).toBe(201);
+      });
+  });
+
+  it("returns the new post with the correct index and post_text", () => {
+    return request(server)
+      .post("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321/posts")
+      .send({ post_text: "another new post" })
+      .then((res) => {
+        expect(res.body.index).toBe(4);
+        expect(res.body.post_text).toBe("another new post");
+      });
+  });
+
+  it("returns 400 when no post_text is provided", () => {
+    return request(server)
+      .post("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321/posts")
+      .then((res) => {
+        expect(res.status).toBe(400);
+      });
+  });
+
+  it("returns 404 when trying to post to a list that does not belong to logged in user", () => {
+    return request(server)
+      .post("/api/lists/013e4ab9-77e0-48de-9efe-4d96542e791f/posts")
+      .send({ post_text: "trying to post to another user's list" })
+      .then((res) => {
+        expect(res.status).toBe(404);
+      });
+  });
+});
