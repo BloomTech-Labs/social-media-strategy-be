@@ -76,13 +76,14 @@ router.put("/:id", (req, res, next) => {
 
 // PATCH /api/posts/:id
 // Updates the post with :id belonging to logged in user
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", (req, res, next) => {
   const { id } = req.params;
-  const update = req.body;
+  const changes = req.body;
 
-  Posts.update(id, update, req.jwt.claims.uid)
-    .then((post) => {
-      res.json(post);
+  Posts.update(id, changes, req.jwt.claims.uid)
+    .then(([updated]) => {
+      if (!updated) return next({ code: 404, message: "Post not found" });
+      res.json(updated);
     })
     .catch((err) => {
       res.status(500).json(err);
