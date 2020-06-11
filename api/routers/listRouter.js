@@ -27,7 +27,6 @@ router.get("/:id", async (req, res, next) => {
       res.status(200).json(list);
     })
     .catch((err) => {
-      console.error(err);
       next({ code: 500, message: "There was a problem retrieving the list" });
     });
 });
