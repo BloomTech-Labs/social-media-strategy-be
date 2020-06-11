@@ -92,11 +92,12 @@ router.patch("/:id", (req, res, next) => {
 
 // DELETE /api/posts/:id
 // Deletes the post with :id belonging to logged in user
-router.delete("/:id", (req, res) => {
+router.delete("/:id", (req, res, next) => {
   const { id } = req.params;
 
   Posts.remove(id, req.jwt.claims.uid)
     .then((deleted) => {
+      if (!deleted) return next({ code: 404, message: "Post not found" });
       res.status(200).json({ message: "post deleted", deleted });
     })
     .catch((err) => {
