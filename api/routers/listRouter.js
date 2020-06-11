@@ -104,11 +104,15 @@ router.post("/:id/posts", async (req, res, next) => {
 // PUT /api/lists/:id
 // Updates list with :id belonging to logged in user
 // Returns the updated list
-router.put("/:id", async (req, res) => {
+router.put("/:id", async (req, res, next) => {
   const { id } = req.params;
+  const okta_uid = req.jwt.claims.uid;
   const changes = req.body;
 
-  Lists.update(changes, id, req.jwt.claims.uid)
+  const [list] = await Lists.findBy({ okta_uid, id });
+  if (!list) return next({ code: 404, message: "List not found" });
+
+  Lists.update(changes, id, okta_uid)
     .then((updated) => {
       res.status(200).json(updated);
     })
