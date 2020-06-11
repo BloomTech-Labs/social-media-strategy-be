@@ -126,21 +126,19 @@ router.put("/:id", async (req, res, next) => {
 // Returns the updated list
 router.patch("/:id", async (req, res, next) => {
   const { id } = req.params;
-  const update = req.body;
+  const okta_uid = req.jwt.claims.uid;
+  const changes = req.body;
 
-  try {
-    const list = await Lists.update(update, id, req.jwt.claims.uid);
-    if (!list) {
-      next({
-        code: 404,
-        message: "Error while updating",
-      });
-    } else {
-      res.status(200).json(list);
-    }
-  } catch (err) {
-    next({ message: err });
-  }
+  const [list] = await Lists.findBy({ okta_uid, id });
+  if (!list) return next({ code: 404, message: "List not found" });
+
+  Lists.update(changes, id, okta_uid)
+    .then((updated) => {
+      res.status(200).json(updated);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
 });
 
 // DELETE /api/lists/:id
