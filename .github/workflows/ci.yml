@@ -25,7 +25,9 @@ jobs:
         image: postgres
         # Provide the password for postgres
         env:
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: some-test
+          POSTGRES_USER: some-test
+          POSTGRES_PASSWORD: some-test
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
