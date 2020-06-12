@@ -20,6 +20,7 @@ function remove(id, okta_uid) {
   return db("lists").where({ id, okta_uid }).del();
 }
 
-function update(update, id, okta_uid) {
-  return db("lists").where({ id, okta_uid }).update(update, "*");
+async function update(update, id, okta_uid) {
+  const [updated] = await db("lists").where({ id, okta_uid }).update(update, "*");
+  return updated;
 }
