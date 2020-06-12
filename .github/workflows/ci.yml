@@ -47,7 +47,7 @@ jobs:
           node-version: "12"
 
       # Run the NPM ci command before proceeding
-      - run: npm ci && knex:migrate latest --env testing
+      - run: npm ci && npm run migrate:testing
 
       # A GitHub action for running tests and publishing coverage
       - uses: paambaati/codeclimate-action@v2.4.0
