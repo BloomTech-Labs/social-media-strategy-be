@@ -2,8 +2,17 @@
 name: build
 
 # What conditions trigger the workflow
-#  In this case, all pushes and pull requests
-on: [pull_request]
+# Trigger the workflow on push or pull request,
+# but only for the master branch
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the master branch
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 # The jobs that will be run, usually in parallel
 jobs:
