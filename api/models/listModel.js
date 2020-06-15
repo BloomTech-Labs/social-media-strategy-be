@@ -21,6 +21,8 @@ function remove(id, okta_uid) {
 }
 
 async function update(update, id, okta_uid) {
-  const [updated] = await db("lists").where({ id, okta_uid }).update(update, "*");
+  const [updated] = await db("lists")
+    .where({ id, okta_uid })
+    .update(update, "*");
   return updated;
 }
