@@ -191,7 +191,7 @@ describe("PUT /api/lists/:id", () => {
       .put("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321")
       .send({ title: "updated title again" })
       .then((res) => {
-        expect(res.body[0].title).toBe("updated title again");
+        expect(res.body.title).toBe("updated title again");
       });
   });
 
@@ -220,7 +220,7 @@ describe("PATCH /api/lists/:id", () => {
       .patch("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321")
       .send({ title: "updated title again" })
       .then((res) => {
-        expect(res.body[0].title).toBe("updated title again");
+        expect(res.body.title).toBe("updated title again");
       });
   });
 

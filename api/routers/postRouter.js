@@ -45,7 +45,7 @@ router.put("/:id/postnow", verifyTwitter, async (req, res, next) => {
       });
     }
 
-    const [postedTweet] = await Posts.update(
+    const postedTweet = await Posts.update(
       id,
       { ...postToTweet, posted: true },
       okta_uid
@@ -64,13 +64,13 @@ router.put("/:id", (req, res, next) => {
   const changes = req.body;
 
   Posts.update(id, changes, req.jwt.claims.uid)
-    .then(([updated]) => {
+    .then((updated) => {
       if (!updated) return next({ code: 404, message: "Post not found" });
-      res.status(200).json(updated);
+      res.json(updated);
     })
     .catch((err) => {
       console.error(err);
-      res.status(500).json(err);
+      next({ code: 500, message: "There was a problem updating the post" });
     });
 });
 
@@ -81,12 +81,13 @@ router.patch("/:id", (req, res, next) => {
   const changes = req.body;
 
   Posts.update(id, changes, req.jwt.claims.uid)
-    .then(([updated]) => {
+    .then((updated) => {
       if (!updated) return next({ code: 404, message: "Post not found" });
       res.json(updated);
     })
     .catch((err) => {
-      res.status(500).json(err);
+      console.error(err);
+      next({ code: 500, message: "There was a problem updating the post" });
     });
 });
 
