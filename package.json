@@ -4,7 +4,7 @@
   "description": "Labs22 SocialMediaProject",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=testing jest --watch",
+    "test": "cross-env NODE_ENV=testing jest --watch --detectOpenHandles --runInBand",
     "start": "node index.js",
     "server": "nodemon",
     "server:c9": "export PORT=5000 && export APP_URL=https://$C9_HOSTNAME:3000 && nodemon index.js",
