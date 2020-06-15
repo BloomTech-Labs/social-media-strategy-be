@@ -54,6 +54,8 @@ jobs:
         env:
           # An environment variable, the value is a GitHub repo secret
           CC_TEST_REPORTER_ID: ${{ secrets.CodeClimateReporterId }}
+          PG_USERNAME: some-test
+          PG_PASSWORD: some-test
         with:
           # Run our `coverage` command from our `package.json`
           coverageCommand: npm run coverage
