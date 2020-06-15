@@ -46,7 +46,7 @@ jobs:
         with:
           node-version: "12"
 
-      # Run the NPM ci command before proceeding
+      # Run the NPM ci command to install node_modules and run testing migrations on DB
       - run: npm ci && npm run migrate:testing
         env:
           PG_USERNAME: some-test
@@ -60,6 +60,8 @@ jobs:
           PG_PASSWORD: some-test
           NODE_ENV: testing
           CC_TEST_REPORTER_ID: ${{ secrets.CodeClimateReporterId }}
+          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
           OKTA_AUTH: ${{ secrets.OKTA_AUTH }}
           OKTA_DOMAIN: ${{ secrets.OKTA_DOMAIN }}
         with:
