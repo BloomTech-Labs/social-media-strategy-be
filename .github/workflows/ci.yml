@@ -23,7 +23,7 @@ jobs:
         image: postgres
         # Provide the password for postgres
         env:
-          POSTGRES_DB: postgres
+          POSTGRES_DB: some-test
           POSTGRES_USER: some-test
           POSTGRES_PASSWORD: some-test
         # Set health checks to wait until postgres has started
@@ -59,6 +59,7 @@ jobs:
           CC_TEST_REPORTER_ID: ${{ secrets.CodeClimateReporterId }}
           PG_USERNAME: some-test
           PG_PASSWORD: some-test
+          NODE_ENV: testing
         with:
           # Run our `coverage` command from our `package.json`
           coverageCommand: npm run coverage

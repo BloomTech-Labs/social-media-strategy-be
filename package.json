@@ -9,7 +9,7 @@
     "server": "nodemon",
     "server:c9": "export PORT=5000 && export APP_URL=https://$C9_HOSTNAME:3000 && nodemon index.js",
     "coverage": "jest --coverage --detectOpenHandles --forceExit || true",
-    "setup-ci-db": "node createDB.js && knex migrate:latest --env testing"
+    "setup-ci-db": "knex migrate:latest --env testing"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
