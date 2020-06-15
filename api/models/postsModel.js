@@ -27,6 +27,9 @@ function remove(id, okta_uid) {
   return db("posts").where({ id, okta_uid }).del();
 }
 
-function update(id, changes, okta_uid) {
-  return db("posts").where({ id, okta_uid }).update(changes, "*");
+async function update(id, changes, okta_uid) {
+  const [updated] = await db("posts")
+    .where({ id, okta_uid })
+    .update(changes, "*");
+  return updated;
 }
