@@ -13,6 +13,7 @@ checks:
 exclude_patterns:
   - "tests/"
   - "spec/"
+  - "coverage/"
   - "**/*.spec.js"
   - "**/*.spec.jsx"
   - "**/*.spec.ts"
