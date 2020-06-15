@@ -2,7 +2,16 @@ const request = require("supertest");
 const server = require("../../server.js");
 const db = require("../../../data/dbConfig");
 
-beforeAll(async () => await db.seed.run());
+beforeAll(async () => {
+  await db("posts").del();
+  await db("lists").del();
+  await db.seed.run();
+});
+
+afterAll(async () => {
+  await db("posts").del();
+  await db("lists").del();
+});
 
 describe("GET /api/posts", () => {
   it("returns 200", async () => {
