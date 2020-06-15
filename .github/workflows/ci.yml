@@ -15,7 +15,7 @@ jobs:
     # The OS on which the job will run
     runs-on: ubuntu-latest
 
-    # Service containers to run with `container-job`
+    # Service containers to run with `coverage`
     services:
       # Label used to access the service container
       postgres:
@@ -28,6 +28,7 @@ jobs:
           POSTGRES_PASSWORD: some-test
         # Set health checks to wait until postgres has started
         options: >-
+          --volume=pg-vol:/var/lib/postgresql/data
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
