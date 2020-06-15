@@ -56,11 +56,12 @@ jobs:
       - uses: paambaati/codeclimate-action@v2.4.0
         env:
           # Environment variables. Secrets are set in GitHub repo Settings > Secrets
-          CC_TEST_REPORTER_ID: ${{ secrets.CodeClimateReporterId }}
           PG_USERNAME: some-test
           PG_PASSWORD: some-test
           NODE_ENV: testing
+          CC_TEST_REPORTER_ID: ${{ secrets.CodeClimateReporterId }}
           OKTA_AUTH: ${{ secrets.OKTA_AUTH }}
+          OKTA_DOMAIN: ${{ secrets.OKTA_DOMAIN }}
         with:
           # Run our `coverage` command from our `package.json`
           coverageCommand: npm run coverage
