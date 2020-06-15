@@ -47,7 +47,7 @@ jobs:
           node-version: "12"
 
       # Run the NPM ci command before proceeding
-      - run: npm ci && npm run migrate:testing
+      - run: npm ci &&  && npm run setup-ci-db
         env:
           PG_USERNAME: some-test
           PG_PASSWORD: some-test

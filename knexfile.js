@@ -31,7 +31,6 @@ module.exports = {
       user: process.env.PG_USERNAME,
       password: process.env.PG_PASSWORD,
     },
-
     pool: {
       min: 2,
       max: 10,
