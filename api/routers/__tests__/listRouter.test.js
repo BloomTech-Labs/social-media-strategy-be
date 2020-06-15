@@ -6,7 +6,7 @@ beforeAll(() => db.seed.run());
 
 describe("GET /api/lists", () => {
   it("returns 200", () => {
-    return request(server)
+    request(server)
       .get("/api/lists/")
       .then((res) => {
         expect(res.status).toBe(200);
@@ -14,7 +14,7 @@ describe("GET /api/lists", () => {
   });
 
   it("returns the correct number of lists", () => {
-    return request(server)
+    request(server)
       .get("/api/lists/")
       .then((res) => {
         expect(res.body.length).toBe(3);
@@ -22,7 +22,7 @@ describe("GET /api/lists", () => {
   });
 
   it("only returns lists with the user's okta_uid", () => {
-    return request(server)
+    request(server)
       .get("/api/lists/")
       .then((res) => {
         expect(
@@ -35,7 +35,7 @@ describe("GET /api/lists", () => {
 
 describe("GET /api/lists/:id", () => {
   it("returns 200 for a list that exists belonging to the logged in user", () => {
-    return request(server)
+    request(server)
       .get("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321")
       .then((res) => {
         expect(res.status).toBe(200);
@@ -43,7 +43,7 @@ describe("GET /api/lists/:id", () => {
   });
 
   it("returns a list that actually belongs to the logged in user", () => {
-    return request(server)
+    request(server)
       .get("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321")
       .then((res) => {
         expect(res.body.okta_uid).toBe("00ucj17sgcvh8Axqr4x6");
@@ -51,7 +51,7 @@ describe("GET /api/lists/:id", () => {
   });
 
   it("returns 404 when trying to access another user's list", () => {
-    return request(server)
+    request(server)
       .get("/api/lists/013e4ab9-77e0-48de-9efe-4d96542e791f")
       .then((res) => {
         expect(res.status).toBe(404);
@@ -59,7 +59,7 @@ describe("GET /api/lists/:id", () => {
   });
 
   it("returns 500 for an invalid id", () => {
-    return request(server)
+    request(server)
       .get("/api/lists/foo")
       .then((res) => {
         expect(res.status).toBe(500);
@@ -69,7 +69,7 @@ describe("GET /api/lists/:id", () => {
 
 describe("GET /api/lists/:id/posts", () => {
   it("returns 200 for a list that exists belonging to the logged in user", () => {
-    return request(server)
+    request(server)
       .get("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321/posts")
       .then((res) => {
         expect(res.status).toBe(200);
@@ -77,7 +77,7 @@ describe("GET /api/lists/:id/posts", () => {
   });
 
   it("returns an array", () => {
-    return request(server)
+    request(server)
       .get("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321/posts")
       .then((res) => {
         expect(Array.isArray(res.body)).toBe(true);
@@ -85,7 +85,7 @@ describe("GET /api/lists/:id/posts", () => {
   });
 
   it("returns the correct number of posts", () => {
-    return request(server)
+    request(server)
       .get("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321/posts")
       .then((res) => {
         expect(res.body.length).toBe(3);
@@ -93,7 +93,7 @@ describe("GET /api/lists/:id/posts", () => {
   });
 
   it("returns 404 when trying to access another user's list", () => {
-    return request(server)
+    request(server)
       .get("/api/lists/013e4ab9-77e0-48de-9efe-4d96542e791f")
       .then((res) => {
         expect(res.status).toBe(404);
@@ -101,7 +101,7 @@ describe("GET /api/lists/:id/posts", () => {
   });
 
   it("returns 500 for an invalid id", () => {
-    return request(server)
+    request(server)
       .get("/api/lists/foo")
       .then((res) => {
         expect(res.status).toBe(500);
@@ -111,7 +111,7 @@ describe("GET /api/lists/:id/posts", () => {
 
 describe("POST /api/lists", () => {
   it("returns 201 on success", () => {
-    return request(server)
+    request(server)
       .post("/api/lists/")
       .send({ title: "hello" })
       .then((res) => {
@@ -119,18 +119,22 @@ describe("POST /api/lists", () => {
       });
   });
 
-  it("returns the list with the correct index and title", () => {
-    return request(server)
-      .post("/api/lists/")
-      .send({ title: "hello again" })
-      .then((res) => {
-        expect(res.body.title).toBe("hello again");
-        expect(res.body.index).toBe(4);
-      });
+  it("returns the list with the correct index and title", async () => {
+    let response;
+    try {
+      response = await request(server)
+        .post("/api/lists/")
+        .send({ title: "hello again" });
+    } catch (err) {
+      console.log(err);
+    }
+
+    expect(response.body.title).toBe("hello again");
+    expect(response.body.index).toBe(4);
   });
 
   it("returns 400 when no title is provided", () => {
-    return request(server)
+    request(server)
       .post("/api/lists/")
       .then((res) => {
         expect(res.status).toBe(400);
@@ -140,7 +144,7 @@ describe("POST /api/lists", () => {
 
 describe("POST /api/lists/:id/posts", () => {
   it("returns 201 on success", () => {
-    return request(server)
+    request(server)
       .post("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321/posts")
       .send({ post_text: "new post" })
       .then((res) => {
@@ -148,18 +152,23 @@ describe("POST /api/lists/:id/posts", () => {
       });
   });
 
-  it("returns the new post with the correct index and post_text", () => {
-    return request(server)
-      .post("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321/posts")
-      .send({ post_text: "another new post" })
-      .then((res) => {
-        expect(res.body.index).toBe(4);
-        expect(res.body.post_text).toBe("another new post");
-      });
+  it("returns the new post with the correct index and post_text", async () => {
+    let response;
+
+    try {
+      response = await request(server)
+        .post("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321/posts")
+        .send({ post_text: "another new post" });
+    } catch (err) {
+      console.log(err);
+    }
+
+    expect(response.body.index).toBe(4);
+    expect(response.body.post_text).toBe("another new post");
   });
 
   it("returns 400 when no post_text is provided", () => {
-    return request(server)
+    request(server)
       .post("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321/posts")
       .then((res) => {
         expect(res.status).toBe(400);
@@ -167,7 +176,7 @@ describe("POST /api/lists/:id/posts", () => {
   });
 
   it("returns 404 when trying to post to a list that does not belong to logged in user", () => {
-    return request(server)
+    request(server)
       .post("/api/lists/013e4ab9-77e0-48de-9efe-4d96542e791f/posts")
       .send({ post_text: "trying to post to another user's list" })
       .then((res) => {
@@ -178,7 +187,7 @@ describe("POST /api/lists/:id/posts", () => {
 
 describe("PUT /api/lists/:id", () => {
   it("returns 200 on success", () => {
-    return request(server)
+    request(server)
       .put("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321")
       .send({ title: "updated title" })
       .then((res) => {
@@ -187,7 +196,7 @@ describe("PUT /api/lists/:id", () => {
   });
 
   it("returns the updated list", () => {
-    return request(server)
+    request(server)
       .put("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321")
       .send({ title: "updated title again" })
       .then((res) => {
@@ -196,7 +205,7 @@ describe("PUT /api/lists/:id", () => {
   });
 
   it("returns 404 when trying to update a list that does not belong to logged in user", () => {
-    return request(server)
+    request(server)
       .put("/api/lists/013e4ab9-77e0-48de-9efe-4d96542e791f")
       .send({ title: "trying to update another user's list" })
       .then((res) => {
@@ -207,7 +216,7 @@ describe("PUT /api/lists/:id", () => {
 
 describe("PATCH /api/lists/:id", () => {
   it("returns 200 on success", () => {
-    return request(server)
+    request(server)
       .patch("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321")
       .send({ title: "updated title" })
       .then((res) => {
@@ -216,7 +225,7 @@ describe("PATCH /api/lists/:id", () => {
   });
 
   it("returns the updated list", () => {
-    return request(server)
+    request(server)
       .patch("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321")
       .send({ title: "updated title again" })
       .then((res) => {
@@ -225,7 +234,7 @@ describe("PATCH /api/lists/:id", () => {
   });
 
   it("returns 404 when trying to update a list that does not belong to logged in user", () => {
-    return request(server)
+    request(server)
       .patch("/api/lists/013e4ab9-77e0-48de-9efe-4d96542e791f")
       .send({ title: "trying to update another user's list" })
       .then((res) => {
@@ -236,7 +245,7 @@ describe("PATCH /api/lists/:id", () => {
 
 describe("DELETE /api/lists/:id", () => {
   it("returns 200 on success", () => {
-    return request(server)
+    request(server)
       .delete("/api/lists/fc85a964-eec3-42eb-a076-4d7d2634b321")
       .then((res) => {
         expect(res.status).toBe(200);
@@ -244,7 +253,7 @@ describe("DELETE /api/lists/:id", () => {
   });
 
   it("returns the number of deleted lists", () => {
-    return request(server)
+    request(server)
       .delete("/api/lists/d2b3833d-08b3-4dd8-96fe-822e3a608d82")
       .then((res) => {
         expect(res.body.deleted).toBe(1);
@@ -252,7 +261,7 @@ describe("DELETE /api/lists/:id", () => {
   });
 
   it("returns 404 when trying to delete a list that does not belong to logged in user", () => {
-    return request(server)
+    request(server)
       .delete("/api/lists/013e4ab9-77e0-48de-9efe-4d96542e791f")
       .then((res) => {
         expect(res.status).toBe(404);
