@@ -21,7 +21,7 @@ jobs:
       postgres:
         # Docker Hub image
         image: postgres
-        # Provide the password for postgres
+        # Provide username, password, and default DB for Postgres
         env:
           POSTGRES_DB: some-test
           POSTGRES_USER: some-test
@@ -55,11 +55,12 @@ jobs:
       # A GitHub action for running tests and publishing coverage
       - uses: paambaati/codeclimate-action@v2.4.0
         env:
-          # An environment variable, the value is a GitHub repo secret
+          # Environment variables. Secrets are set in GitHub repo Settings > Secrets
           CC_TEST_REPORTER_ID: ${{ secrets.CodeClimateReporterId }}
           PG_USERNAME: some-test
           PG_PASSWORD: some-test
           NODE_ENV: testing
+          OKTA_AUTH: ${{ secrets.OKTA_AUTH }}
         with:
           # Run our `coverage` command from our `package.json`
           coverageCommand: npm run coverage
