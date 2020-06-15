@@ -2,8 +2,15 @@
 name: build
 
 # What conditions trigger the workflow
-#  In this case, all pushes and pull requests
-on: [push, pull_request]
+# Trigger the workflow on push or pull request,
+# but only for the master branch
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 # The jobs that will be run, usually in parallel
 jobs:
@@ -15,6 +22,27 @@ jobs:
     # The OS on which the job will run
     runs-on: ubuntu-latest
 
+    # Service containers to run with `coverage`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide username, password, and default DB for Postgres
+        env:
+          POSTGRES_DB: some-test
+          POSTGRES_USER: some-test
+          POSTGRES_PASSWORD: some-test
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
     # The steps for the job, executed in sequence
     steps:
       # A GitHub action for checking out the current branch
@@ -23,16 +51,26 @@ jobs:
       # A GitHub action to setup Node.js
       - uses: actions/setup-node@master
         with:
-          node-version: '12'
+          node-version: "12"
 
-      # Run the NPM install command before proceeding
-      - run: npm install
+      # Run the NPM ci command to install node_modules and run testing migrations on DB
+      - run: npm ci && npm run migrate:testing
+        env:
+          PG_USERNAME: some-test
+          PG_PASSWORD: some-test
 
       # A GitHub action for running tests and publishing coverage
       - uses: paambaati/codeclimate-action@v2.4.0
         env:
-          # An environment variable, the value is a GitHub repo secret
+          # Environment variables. Secrets are set in GitHub repo Settings > Secrets
+          PG_USERNAME: some-test
+          PG_PASSWORD: some-test
+          NODE_ENV: testing
           CC_TEST_REPORTER_ID: ${{ secrets.CodeClimateReporterId }}
+          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+          OKTA_AUTH: ${{ secrets.OKTA_AUTH }}
+          OKTA_DOMAIN: ${{ secrets.OKTA_DOMAIN }}
         with:
           # Run our `coverage` command from our `package.json`
           coverageCommand: npm run coverage
