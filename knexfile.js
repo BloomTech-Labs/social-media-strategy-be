@@ -25,8 +25,12 @@ module.exports = {
 
   testing: {
     client: "pg",
-    connection: process.env.DATABASE_URL,
-
+    connection: {
+      host: "localhost",
+      database: "some-test",
+      user: process.env.PG_USERNAME,
+      password: process.env.PG_PASSWORD,
+    },
     pool: {
       min: 2,
       max: 10,
@@ -34,6 +38,9 @@ module.exports = {
     migrations: {
       directory: "./data/migrations",
       tableName: "knex_migrations",
+    },
+    seeds: {
+      directory: "./data/seeds",
     },
   },
 

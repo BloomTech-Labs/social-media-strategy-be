@@ -11,6 +11,7 @@ router.get("/", async (req, res) => {
       res.status(200).json(lists);
     })
     .catch((err) => {
+      console.error(err);
       res.status(500).json(err);
     });
 });
@@ -26,7 +27,6 @@ router.get("/:id", async (req, res, next) => {
       res.status(200).json(list);
     })
     .catch((err) => {
-      console.error(err);
       next({ code: 500, message: "There was a problem retrieving the list" });
     });
 });
@@ -44,14 +44,17 @@ router.get("/:id/posts", (req, res) => {
 });
 
 // POST /api/lists
-// Creates a new list belonging logged in user
+// Creates a new list belonging to logged in user
 // Returns the new list
-router.post("/", async (req, res) => {
+router.post("/", async (req, res, next) => {
   const okta_uid = req.jwt.claims.uid;
   const currentLists = await Lists.findBy({ okta_uid });
+  const { title } = req.body;
 
-  let newList = {
-    ...req.body,
+  if (!title) return next({ code: 400, message: "Please provide a title" });
+
+  const newList = {
+    title,
     okta_uid,
     index: currentLists.length,
   };
@@ -68,13 +71,22 @@ router.post("/", async (req, res) => {
 // POST /api/lists/:id/posts
 // Creates a new post for the list with :id belonging to logged in user
 // Returns the new post
-router.post("/:id/posts", async (req, res) => {
+router.post("/:id/posts", async (req, res, next) => {
   const okta_uid = req.jwt.claims.uid;
   const list_id = req.params.id;
-  const currentPosts = await Posts.findBy({ okta_uid, list_id });
 
-  let newPost = {
-    ...req.body,
+  const [list] = await Lists.findBy({ okta_uid, id: list_id });
+  if (!list) return next({ code: 404, message: "List not found" });
+
+  const currentPosts = await Posts.findBy({ okta_uid, list_id });
+  const { post_text } = req.body;
+
+  if (!post_text)
+    return next({ code: 400, message: "Please provide text for your post" });
+
+  const newPost = {
+    post_text,
+    list_id,
     okta_uid,
     index: currentPosts.length,
   };
@@ -92,11 +104,15 @@ router.post("/:id/posts", async (req, res) => {
 // PUT /api/lists/:id
 // Updates list with :id belonging to logged in user
 // Returns the updated list
-router.put("/:id", async (req, res) => {
+router.put("/:id", async (req, res, next) => {
   const { id } = req.params;
+  const okta_uid = req.jwt.claims.uid;
   const changes = req.body;
 
-  Lists.update(changes, id, req.jwt.claims.uid)
+  const [list] = await Lists.findBy({ okta_uid, id });
+  if (!list) return next({ code: 404, message: "List not found" });
+
+  Lists.update(changes, id, okta_uid)
     .then((updated) => {
       res.status(200).json(updated);
     })
@@ -110,28 +126,30 @@ router.put("/:id", async (req, res) => {
 // Returns the updated list
 router.patch("/:id", async (req, res, next) => {
   const { id } = req.params;
-  const update = req.body;
+  const okta_uid = req.jwt.claims.uid;
+  const changes = req.body;
 
-  try {
-    const list = await Lists.update(update, id, req.jwt.claims.uid);
-    if (!list) {
-      next({
-        code: 404,
-        message: "Error while updating",
-      });
-    } else {
-      res.status(200).json(list);
-    }
-  } catch (err) {
-    next({ message: err });
-  }
+  const [list] = await Lists.findBy({ okta_uid, id });
+  if (!list) return next({ code: 404, message: "List not found" });
+
+  Lists.update(changes, id, okta_uid)
+    .then((updated) => {
+      res.status(200).json(updated);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
 });
 
 // DELETE /api/lists/:id
 // Deletes list with :id belonging to logged in user
 // Returns deleted count
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
   const { id } = req.params;
+  const okta_uid = req.jwt.claims.uid;
+
+  const [list] = await Lists.findBy({ okta_uid, id });
+  if (!list) return next({ code: 404, message: "List not found" });
 
   Lists.remove(id, req.jwt.claims.uid)
     .then((deleted) => {

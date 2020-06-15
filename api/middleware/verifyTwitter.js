@@ -14,8 +14,6 @@ async function verifyTwitter(req, res, next) {
       }
     );
 
-    // console.log("AX IN TWITINFO", ax);
-
     var T = new Twitter({
       consumer_key: process.env.CONSUMER_KEY,
       consumer_secret: process.env.CONSUMER_SECRET,
@@ -23,7 +21,6 @@ async function verifyTwitter(req, res, next) {
       access_token_secret: ax.data.profile.Oauth_secret,
     });
 
-    console.log("TWITTER STUFF", T);
     req.okta = ax;
     req.twit = T;
     next();
