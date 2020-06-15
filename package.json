@@ -8,7 +8,7 @@
     "start": "node index.js",
     "server": "nodemon",
     "server:c9": "export PORT=5000 && export APP_URL=https://$C9_HOSTNAME:3000 && nodemon index.js",
-    "coverage": "jest --coverage --detectOpenHandles --forceExit || true",
+    "coverage": "jest --coverage --detectOpenHandles --forceExit",
     "migrate:testing": "knex migrate:latest --env testing"
   },
   "dependencies": {
