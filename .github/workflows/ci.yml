@@ -23,12 +23,11 @@ jobs:
         image: postgres
         # Provide the password for postgres
         env:
-          POSTGRES_DB: some-test
+          POSTGRES_DB: postgres
           POSTGRES_USER: some-test
           POSTGRES_PASSWORD: some-test
         # Set health checks to wait until postgres has started
         options: >-
-          --volume=pg-vol:/var/lib/postgresql/data
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
