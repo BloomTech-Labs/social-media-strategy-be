@@ -185,3 +185,26 @@ describe("DELETE /api/posts/:id", () => {
       });
   });
 });
+
+describe("PUT /api/posts/:id/schedule", () => {
+  it("returns status 400 for an invalid date", async () => {
+    await request(server)
+      .put("/api/posts/a7112c6c-75e9-4a84-aa44-357d0d90ff32/schedule")
+      .send({ date: new Date() })
+      .then((res) => expect(res.status).toBe(400));
+  });
+
+  it("returns status 404 when trying to schedule another user's post", async () => {
+    await request(server)
+      .put("/api/posts/41670103-3eba-4cb3-8d17-8fd79d9d3dfa/schedule")
+      .send({ date: new Date(Date.now() + 10000) })
+      .then((res) => expect(res.status).toBe(404));
+  });
+
+  it("returns status 200 on success", async () => {
+    await request(server)
+      .put("/api/posts/a7112c6c-75e9-4a84-aa44-357d0d90ff32/schedule")
+      .send({ date: new Date(Date.now() + 10000) })
+      .then((res) => expect(res.status).toBe(200));
+  });
+});
