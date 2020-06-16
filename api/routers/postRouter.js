@@ -146,10 +146,13 @@ router.put("/:id/schedule", verifyTwitter, async (req, res, next) => {
     });
   } catch (err) {
     console.error(err);
-    next({ code: 500, message: "There was a problem scheduling the post" });
+    return next({
+      code: 500,
+      message: "There was a problem scheduling the post",
+    });
   }
 
-  res.status(200).send();
+  return res.status(200).send();
 });
 
 module.exports = router;
