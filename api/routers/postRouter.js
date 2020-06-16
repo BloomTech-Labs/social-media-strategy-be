@@ -1,4 +1,5 @@
 const express = require("express");
+const schedule = require("node-schedule");
 const router = express.Router();
 const Posts = require("../models/postsModel.js");
 const verifyTwitter = require("../middleware/verifyTwitter");
@@ -104,6 +105,54 @@ router.delete("/:id", (req, res, next) => {
     .catch((err) => {
       res.status(500).json(err);
     });
+});
+
+// PUT /api/posts/:id/schedule
+// Schedules a post to be Tweeted at a later time
+router.put("/:id/schedule", verifyTwitter, async (req, res, next) => {
+  const { id } = req.params;
+  const okta_uid = req.jwt.claims.uid;
+  const date = new Date(req.body.date);
+
+  // check to see if date to schedule
+  // is a valid date in the future
+  if (!(Date.now() < date)) {
+    return next({ code: 400, message: "Invalid date" });
+  }
+
+  try {
+    var [postToTweet] = await Posts.findBy({ id, okta_uid });
+    if (!postToTweet) return next({ code: 404, message: "Post not found" });
+  } catch (err) {
+    console.error(err);
+    return next({ code: 500, message: "There was a problem getting the post" });
+  }
+
+  try {
+    schedule.scheduleJob(date, function () {
+      if (process.env.NODE_ENV !== "testing") {
+        req.twit
+          .post("statuses/update", {
+            status: postToTweet.post_text,
+          })
+          .then(() => {
+            const { id } = postToTweet;
+            Posts.update(id, { ...postToTweet, posted: true }, okta_uid);
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    return next({
+      code: 500,
+      message: "There was a problem scheduling the post",
+    });
+  }
+
+  return res.status(200).send();
 });
 
 module.exports = router;
