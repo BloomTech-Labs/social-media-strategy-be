@@ -129,6 +129,8 @@ router.put("/:id/schedule", verifyTwitter, async (req, res, next) => {
 	}
 
 	try {
+		const { id } = postToTweet;
+
 		schedule.scheduleJob(date, function () {
 			if (process.env.NODE_ENV !== "testing") {
 				req.twit
@@ -136,18 +138,21 @@ router.put("/:id/schedule", verifyTwitter, async (req, res, next) => {
 						status: postToTweet.post_text,
 					})
 					.then(async () => {
-						const { id } = postToTweet;
-						await Posts.update(
-							id,
-							{ scheduled_time: date, posted: true },
-							okta_uid,
-						);
+						await Posts.update(id, { posted: true }, okta_uid);
 					})
 					.catch((err) => {
 						console.error(err);
 					});
 			}
 		});
+
+		// update scheduled_time and return updated Post
+		const updatedPost = await Posts.update(
+			id,
+			{ scheduled_time: date },
+			okta_uid,
+		);
+		res.json(updatedPost);
 	} catch (err) {
 		console.error(err);
 		return next({
