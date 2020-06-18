@@ -131,20 +131,29 @@ router.put("/:id/schedule", verifyTwitter, async (req, res, next) => {
 	try {
 		const { id } = postToTweet;
 
-		schedule.scheduleJob(date, function () {
-			if (process.env.NODE_ENV !== "testing") {
-				req.twit
-					.post("statuses/update", {
-						status: postToTweet.post_text,
-					})
-					.then(async () => {
-						await Posts.update(id, { posted: true }, okta_uid);
-					})
-					.catch((err) => {
-						console.error(err);
-					});
-			}
-		});
+		const scheduledJob = schedule.scheduledJobs[id];
+
+		// check if post has been scheduled before
+		if (scheduledJob) {
+			// reschedule existing job
+			scheduledJob.reschedule(date);
+		} else {
+			// schedule job sending unique post id to be able to access it later to reschedule/cancel
+			schedule.scheduleJob(id, date, function () {
+				if (process.env.NODE_ENV !== "testing") {
+					req.twit
+						.post("statuses/update", {
+							status: postToTweet.post_text,
+						})
+						.then(async () => {
+							await Posts.update(id, { posted: true }, okta_uid);
+						})
+						.catch((err) => {
+							console.error(err);
+						});
+				}
+			});
+		}
 
 		// update scheduled_time and return updated Post
 		const updatedPost = await Posts.update(
