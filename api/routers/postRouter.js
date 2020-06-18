@@ -48,7 +48,7 @@ router.put("/:id/postnow", verifyTwitter, async (req, res, next) => {
 
 		const postedTweet = await Posts.update(
 			id,
-			{ ...postToTweet, posted: true },
+			{ posted: true, scheduled_time: new Date().toISOString() },
 			okta_uid,
 		);
 		return res.status(200).json(postedTweet);
