@@ -43,6 +43,7 @@ exports.up = function (knex) {
 				.references("lists.id")
 				.onUpdate("CASCADE")
 				.onDelete("CASCADE");
+			tbl.string("okta_uid").notNullable();
 			tbl.integer("week_day").notNullable();
 			tbl.integer("hour").notNullable();
 			tbl.integer("minute").notNullable();
@@ -54,7 +55,7 @@ exports.up = function (knex) {
 
 exports.down = function (knex) {
 	return knex.schema
+		.dropTableIfExists("list_schedule")
 		.dropTableIfExists("posts")
-		.dropTableIfExists("lists")
-		.dropTableIfExists("users");
+		.dropTableIfExists("lists");
 };
