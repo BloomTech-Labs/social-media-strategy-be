@@ -1,7 +1,9 @@
 const express = require("express");
+const schedule = require("node-schedule");
 const Lists = require("../models/listModel.js");
 const Posts = require("../models/postsModel.js");
 const router = express.Router();
+const verifyTwitter = require("../middleware/verifyTwitter");
 
 // GET /api/lists
 // Returns all lists belonging to logged in user
@@ -160,6 +162,17 @@ router.delete("/:id", async (req, res, next) => {
 		});
 });
 
+// GET /api/lists/schedule
+// Returns next schedule
+router.get("/schedule", async (req, res, next) => {
+	const { id } = req.params;
+	const okta_uid = req.jwt.claims.uid;
+
+	const schedule = await Lists.getSchedule(id, okta_uid);
+
+	res.json(schedule);
+});
+
 // GET /api/lists/:id/schedule
 // Returns all schedules from a list
 router.get("/:id/schedule", async (req, res, next) => {
@@ -175,7 +188,7 @@ router.get("/:id/schedule", async (req, res, next) => {
 // Add new schedule to a list
 // Expects body = {weekday, hour, minute}
 // Returns the new scheduled added
-router.post("/:id/schedule", async (req, res, next) => {
+router.post("/:id/schedule", verifyTwitter, async (req, res, next) => {
 	const { id } = req.params;
 	const okta_uid = req.jwt.claims.uid;
 
@@ -199,6 +212,39 @@ router.post("/:id/schedule", async (req, res, next) => {
 		hour,
 		minute,
 	});
+
+	// schedule cron job with node-schedule
+	schedule.scheduleJob(
+		schedule.id,
+		{
+			dayOfWeek: schedule.weekday,
+			hour: schedule.hour,
+			minute: schedule.minute,
+		},
+		async () => {
+			if (process.env.NODE_ENV !== "testing") {
+				// Look for the post in the list with the index = 0
+				const [post] = await Posts.findBy({
+					okta_uid,
+					list_id: schedule.list_id,
+					index: 0,
+				});
+
+				if (post) {
+					req.twit
+						.post("statuses/update", {
+							status: post.post_text,
+						})
+						.then(async () => {
+							await Posts.update(post.id, { posted: true }, okta_uid);
+						})
+						.catch((err) => {
+							console.error(err);
+						});
+				}
+			}
+		},
+	);
 
 	res.json(schedule);
 });

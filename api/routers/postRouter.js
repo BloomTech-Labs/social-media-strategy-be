@@ -143,7 +143,7 @@ router.put("/:id/schedule", verifyTwitter, async (req, res, next) => {
 				if (process.env.NODE_ENV !== "testing") {
 					// check if post still exists to avoid publishing a post that was deleted
 					const [post] = await Posts.findBy({ id, okta_uid });
-					onsole.log(post);
+
 					if (post) {
 						req.twit
 							.post("statuses/update", {
