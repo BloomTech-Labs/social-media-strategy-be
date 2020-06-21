@@ -4,6 +4,8 @@ const Lists = require("../models/listModel.js");
 const Posts = require("../models/postsModel.js");
 const router = express.Router();
 const verifyTwitter = require("../middleware/verifyTwitter");
+var moment = require("moment-timezone");
+moment().tz("America/Los_Angeles").format();
 
 // GET /api/lists
 // Returns all lists belonging to logged in user
@@ -162,26 +164,129 @@ router.delete("/:id", async (req, res, next) => {
 		});
 });
 
-// GET /api/lists/schedule
-// Returns next schedule
-router.get("/schedule", async (req, res, next) => {
-	const { id } = req.params;
-	const okta_uid = req.jwt.claims.uid;
-
-	const schedule = await Lists.getSchedule(id, okta_uid);
-
-	res.json(schedule);
-});
-
 // GET /api/lists/:id/schedule
-// Returns all schedules from a list
+// Returns all weekly schedules of a list
 router.get("/:id/schedule", async (req, res, next) => {
 	const { id } = req.params;
 	const okta_uid = req.jwt.claims.uid;
 
-	const schedule = await Lists.getSchedule(id, okta_uid);
+	const [list] = await Lists.findBy({ okta_uid, id });
+	if (!list) return next({ code: 404, message: "List not found" });
 
-	res.json(schedule);
+	const scheduleList = await Lists.getSchedule(id, okta_uid);
+
+	// create cron jobs in case server restarted
+	scheduleList.forEach((current) => {
+		const scheduledJob = schedule.scheduledJobs[current.id];
+
+		if (!scheduledJob) {
+			// schedule cron job with node-schedule
+			schedule.scheduleJob(
+				current.id,
+				{
+					dayOfWeek: current.weekday,
+					hour: current.hour,
+					minute: current.minute,
+				},
+				async () => {
+					if (process.env.NODE_ENV !== "testing") {
+						// Look for the post in the list with the index = 0
+						const [post] = await Posts.findBy({
+							okta_uid,
+							list_id: current.list_id,
+							index: 0,
+						});
+
+						if (post) {
+							req.twit
+								.post("statuses/update", {
+									status: post.post_text,
+								})
+								.then(async () => {
+									await Posts.update(post.id, { posted: true, index: null }, okta_uid);
+
+									const postsToUpdate = await Posts.findBy({
+										list_id: post.list_id,
+										posted: false,
+									});
+									postsToUpdate.map(async (current) => {
+										await Posts.update(post.id, { index: current.index - 1 }, okta_uid);
+									});
+								})
+								.catch((err) => {
+									console.error(err);
+								});
+						}
+					}
+				},
+			);
+		}
+	});
+
+	res.json(scheduleList);
+});
+
+// GET /api/lists/:id/schedule/:posts
+// Returns next schedule(s) from a list
+router.get("/:id/schedule/:posts", async (req, res, next) => {
+	const { id } = req.params;
+	const okta_uid = req.jwt.claims.uid;
+
+	const [list] = await Lists.findBy({ okta_uid, id });
+	if (!list) return next({ code: 404, message: "List not found" });
+
+	const scheduleList = await Lists.getSchedule(id, okta_uid);
+
+	const result = [];
+
+	if (scheduleList.length > 0) {
+		// Sort schedule list based on todays date
+		const sortedSchedule = scheduleList.sort((a, b) => {
+			const date1 = schedule.scheduledJobs[a.id].nextInvocation();
+			const date2 = schedule.scheduledJobs[b.id].nextInvocation();
+
+			if (date1 < date2) {
+				return -1;
+			}
+
+			return 1;
+		});
+
+		const { posts } = req.params;
+
+		// get the total number of posts/schedule dates requested. If none sets to 1
+		const total = posts ? parseInt(posts) : 1;
+
+		for (let i = 0; i < total; i++) {
+			// Rotate array at end of for loop. First element is always going to be the next schedule
+			const nextSchedule = sortedSchedule[0];
+
+			const scheduledJob = schedule.scheduledJobs[nextSchedule.id];
+
+			// get next invocation for that job from today
+			let nextDate = moment(new Date(scheduledJob.nextInvocation())).format();
+
+			// get the number of iterations in the whole schedule array
+			const iteration = Math.floor(i / sortedSchedule.length);
+
+			// get next invocation date taking in consideration the iterations
+			if (iteration > 0) {
+				nextDate = moment(nextDate).add(1, "weeks").format();
+			}
+
+			result.push({
+				...nextSchedule,
+				date: nextDate,
+			});
+
+			// remove first element in the array
+			const removed = sortedSchedule.shift();
+			// add same element to the end of the array
+			sortedSchedule.push(removed);
+		}
+	}
+
+	res.json(result);
 });
 
 // POST /api/lists/:id/schedule
@@ -205,7 +310,7 @@ router.post("/:id/schedule", verifyTwitter, async (req, res, next) => {
 		return next({ code: 400, massege: "Missing required field" });
 	}
 
-	const schedule = await Lists.addSchedule({
+	const newSchedule = await Lists.addSchedule({
 		list_id: id,
 		okta_uid,
 		weekday,
@@ -215,20 +320,18 @@ router.post("/:id/schedule", verifyTwitter, async (req, res, next) => {
 
 	// schedule cron job with node-schedule
 	schedule.scheduleJob(
-		schedule.id,
+		newSchedule.id,
 		{
-			dayOfWeek: schedule.weekday,
-			hour: schedule.hour,
-			minute: schedule.minute,
+			dayOfWeek: newSchedule.weekday,
+			hour: newSchedule.hour,
+			minute: newSchedule.minute,
 		},
 		async () => {
 			if (process.env.NODE_ENV !== "testing") {
 				// Look for the post in the list with the index = 0
-				const [post] = await Posts.findBy({
-					okta_uid,
-					list_id: schedule.list_id,
-					index: 0,
-				});
+				const [post] = await Posts.findBy(
+					`okta_uid = ${okta_uid} AND list_id = ${newSchedule.list_id} AND posted = false ORDER BY INDEX`,
+				);
 
 				if (post) {
 					req.twit
@@ -237,6 +340,14 @@ router.post("/:id/schedule", verifyTwitter, async (req, res, next) => {
 						})
 						.then(async () => {
 							await Posts.update(post.id, { posted: true }, okta_uid);
+
+							const postsToUpdate = await Posts.findBy({
+								list_id: post.list_id,
+								posted: false,
+							});
+							postsToUpdate.map(async (current) => {
+								await Posts.update(post.id, { index: current.index - 1 }, okta_uid);
+							});
 						})
 						.catch((err) => {
 							console.error(err);
@@ -246,7 +357,7 @@ router.post("/:id/schedule", verifyTwitter, async (req, res, next) => {
 		},
 	);
 
-	res.json(schedule);
+	res.json(newSchedule);
 });
 
 // DELETE /api/lists/:id/schedule/:schedule_id
