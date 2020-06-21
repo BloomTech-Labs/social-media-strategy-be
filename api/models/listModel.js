@@ -41,8 +41,8 @@ function getSchedule(id, okta_uid) {
 }
 
 async function addSchedule(schedule) {
-	let [schedule] = await db("list_schedule").insert(schedule, "*");
-	return schedule;
+	let [addSchedule] = await db("list_schedule").insert(schedule, "*");
+	return addSchedule;
 }
 
 async function removeSchedule(schedule_id, list_id, okta_uid) {

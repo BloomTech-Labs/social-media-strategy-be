@@ -173,25 +173,29 @@ router.get("/:id/schedule", async (req, res, next) => {
 
 // POST /api/lists/:id/schedule
 // Add new schedule to a list
-// Expects body = {week_day, hour, minute}
+// Expects body = {weekday, hour, minute}
 // Returns the new scheduled added
 router.post("/:id/schedule", async (req, res, next) => {
 	const { id } = req.params;
 	const okta_uid = req.jwt.claims.uid;
 
-	const [list] = await Lists.findBy({ okta_uid, id: list_id });
+	const [list] = await Lists.findBy({ okta_uid, id });
 	if (!list) return next({ code: 404, message: "List not found" });
 
-	const { week_day, hour, minute } = body;
+	const { weekday, hour, minute } = req.body;
 
-	if (!week_day || !hour || !minute) {
+	if (
+		typeof weekday === "undefined" ||
+		typeof hour === "undefined" ||
+		typeof minute === "undefined"
+	) {
 		return next({ code: 400, massege: "Missing required field" });
 	}
 
 	const schedule = await Lists.addSchedule({
 		list_id: id,
 		okta_uid,
-		week_day,
+		weekday,
 		hour,
 		minute,
 	});
