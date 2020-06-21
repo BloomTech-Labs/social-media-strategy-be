@@ -28,7 +28,7 @@ exports.up = function (knex) {
 				.onUpdate("CASCADE")
 				.onDelete("CASCADE");
 			tbl.timestamp("created_at").defaultTo(knex.fn.now());
-			tbl.integer("index").notNullable();
+			tbl.integer("index");
 			tbl.text("post_text");
 			tbl.boolean("posted").notNullable().defaultsTo(false);
 			tbl.timestamp("optimal_time");
