@@ -256,6 +256,13 @@ router.delete("/:id/schedule/:schedule_id", async (req, res, next) => {
 	const { id, schedule_id } = req.params;
 	const okta_uid = req.jwt.claims.uid;
 
+	const scheduledJob = schedule.scheduledJobs[schedule_id];
+
+	if (scheduledJob) {
+		// cancel existing job
+		scheduledJob.cancel();
+	}
+
 	const [count] = await Lists.removeSchedule(schedule_id, id, okta_uid);
 
 	res.json({ count });
