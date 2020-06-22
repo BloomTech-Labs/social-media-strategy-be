@@ -92,7 +92,7 @@ router.post("/:id/posts", async (req, res, next) => {
 		post_text,
 		list_id,
 		okta_uid,
-		index: currentPosts.length,
+		index: currentPosts.filter((post) => post.index !== null).length,
 	};
 
 	Posts.add(newPost)
@@ -209,8 +209,8 @@ router.get("/:id/schedule", async (req, res, next) => {
 										list_id: post.list_id,
 										posted: false,
 									});
-									postsToUpdate.map(async (current) => {
-										await Posts.update(post.id, { index: current.index - 1 }, okta_uid);
+									postsToUpdate.map(async (e) => {
+										await Posts.update(e.id, { index: e.index - 1 }, okta_uid);
 									});
 								})
 								.catch((err) => {
@@ -271,7 +271,7 @@ router.get("/:id/schedule/:posts", async (req, res, next) => {
 
 			// get next invocation date taking in consideration the iterations
 			if (iteration > 0) {
-				nextDate = moment(nextDate).add(1, "weeks").format();
+				nextDate = moment(nextDate).add(iteration, "weeks").format();
 			}
 
 			result.push({
@@ -329,9 +329,12 @@ router.post("/:id/schedule", verifyTwitter, async (req, res, next) => {
 		async () => {
 			if (process.env.NODE_ENV !== "testing") {
 				// Look for the post in the list with the index = 0
-				const [post] = await Posts.findBy(
-					`okta_uid = ${okta_uid} AND list_id = ${newSchedule.list_id} AND posted = false ORDER BY INDEX`,
-				);
+				const [post] = await Posts.findBy({
+					okta_uid,
+					list_id: newSchedule.list_id,
+					posted: false,
+					index: 0,
+				});
 
 				if (post) {
 					req.twit
@@ -339,14 +342,17 @@ router.post("/:id/schedule", verifyTwitter, async (req, res, next) => {
 							status: post.post_text,
 						})
 						.then(async () => {
-							await Posts.update(post.id, { posted: true }, okta_uid);
+							await Posts.update(post.id, { posted: true, index: null }, okta_uid);
 
 							const postsToUpdate = await Posts.findBy({
-								list_id: post.list_id,
+								list_id: id,
 								posted: false,
 							});
+
 							postsToUpdate.map(async (current) => {
-								await Posts.update(post.id, { index: current.index - 1 }, okta_uid);
+								if (current.index !== null) {
+									await Posts.update(current.id, { index: current.index - 1 }, okta_uid);
+								}
 							});
 						})
 						.catch((err) => {

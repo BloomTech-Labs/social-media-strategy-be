@@ -21,7 +21,7 @@ async function add(list) {
 	return addlist;
 }
 
-function findBy(filter) {
+async function findBy(filter) {
 	return db("lists").where(filter);
 }
 
