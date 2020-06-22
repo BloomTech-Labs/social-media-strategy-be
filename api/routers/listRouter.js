@@ -79,13 +79,14 @@ router.post("/:id/posts", async (req, res, next) => {
   if (!list) return next({ code: 404, message: "List not found" });
 
   const currentPosts = await Posts.findBy({ okta_uid, list_id });
-  const { post_text } = req.body;
+  const { post_text, image_url } = req.body;
 
   if (!post_text)
     return next({ code: 400, message: "Please provide text for your post" });
 
   const newPost = {
     post_text,
+    image_url,
     list_id,
     okta_uid,
     index: currentPosts.length,
