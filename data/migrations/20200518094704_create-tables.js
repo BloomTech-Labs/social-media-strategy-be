@@ -28,18 +28,34 @@ exports.up = function (knex) {
 				.onUpdate("CASCADE")
 				.onDelete("CASCADE");
 			tbl.timestamp("created_at").defaultTo(knex.fn.now());
-			tbl.integer("index").notNullable();
+			tbl.integer("index");
 			tbl.text("post_text");
 			tbl.boolean("posted").notNullable().defaultsTo(false);
 			tbl.timestamp("optimal_time");
 			tbl.timestamp("scheduled_time");
 			tbl.string("image_url");
-		});
+		})
+		.createTable("list_schedule", (tbl) => {
+			tbl.uuid("id").primary().defaultTo(knex.raw("uuid_generate_v4()"));
+			tbl
+				.uuid("list_id")
+				.notNullable()
+				.references("lists.id")
+				.onUpdate("CASCADE")
+				.onDelete("CASCADE");
+			tbl.string("okta_uid").notNullable();
+			tbl.integer("weekday").notNullable();
+			tbl.integer("hour").notNullable();
+			tbl.integer("minute").notNullable();
+		})
+		.raw(
+			"ALTER TABLE list_schedule ADD CONSTRAINT check_schedule CHECK (weekday >= 0 AND weekday <= 6 AND hour >= 0 AND hour <= 23 AND minute >= 0 AND minute <= 59)",
+		);
 };
 
 exports.down = function (knex) {
 	return knex.schema
+		.dropTableIfExists("list_schedule")
 		.dropTableIfExists("posts")
-		.dropTableIfExists("lists")
-		.dropTableIfExists("users");
+		.dropTableIfExists("lists");
 };

@@ -48,9 +48,18 @@ router.put("/:id/postnow", verifyTwitter, async (req, res, next) => {
 
     const postedTweet = await Posts.update(
       id,
-      { posted: true, scheduled_time: new Date().toISOString() },
+      { posted: true, scheduled_time: new Date().toISOString(), index: null },
       okta_uid
     );
+
+    const postsToUpdate = await Posts.findBy({
+      list_id: post.list_id,
+      posted: false,
+    });
+    postsToUpdate.map(async (current) => {
+      await Posts.update(post.id, { index: current.index - 1 }, okta_uid);
+    });
+
     return res.status(200).json(postedTweet);
   } catch (err) {
     console.error(err);
@@ -143,13 +152,26 @@ router.put("/:id/schedule", verifyTwitter, async (req, res, next) => {
         if (process.env.NODE_ENV !== "testing") {
           // check if post still exists to avoid publishing a post that was deleted
           const [post] = await Posts.findBy({ id, okta_uid });
+
           if (post) {
             req.twit
               .post("statuses/update", {
                 status: post.post_text,
               })
               .then(async () => {
-                await Posts.update(id, { posted: true }, okta_uid);
+                await Posts.update(id, { posted: true, index: null }, okta_uid);
+
+                const postsToUpdate = await Posts.findBy({
+                  list_id: post.list_id,
+                  posted: false,
+                });
+                postsToUpdate.map(async (current) => {
+                  await Posts.update(
+                    post.id,
+                    { index: current.index - 1 },
+                    okta_uid
+                  );
+                });
               })
               .catch((err) => {
                 console.error(err);
