@@ -76,6 +76,7 @@ router.post("/", async (req, res, next) => {
 // Creates a new post for the list with :id belonging to logged in user
 // Returns the new post
 router.post("/:id/posts", async (req, res, next) => {
+<<<<<<< HEAD
 	const okta_uid = req.jwt.claims.uid;
 	const list_id = req.params.id;
 
@@ -103,6 +104,36 @@ router.post("/:id/posts", async (req, res, next) => {
 			console.error(err);
 			res.status(500).json(err);
 		});
+=======
+  const okta_uid = req.jwt.claims.uid;
+  const list_id = req.params.id;
+
+  const [list] = await Lists.findBy({ okta_uid, id: list_id });
+  if (!list) return next({ code: 404, message: "List not found" });
+
+  const currentPosts = await Posts.findBy({ okta_uid, list_id });
+  const { post_text, image_url } = req.body;
+
+  if (!post_text)
+    return next({ code: 400, message: "Please provide text for your post" });
+
+  const newPost = {
+    post_text,
+    image_url,
+    list_id,
+    okta_uid,
+    index: currentPosts.length,
+  };
+
+  Posts.add(newPost)
+    .then((post) => {
+      res.status(201).json(post);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json(err);
+    });
+>>>>>>> bc1dadef303441f63be009f3d30976d60213da72
 });
 
 // PUT /api/lists/:id
