@@ -14,7 +14,7 @@
   "dependencies": {
     "@hapi/joi": "^17.1.1",
     "@okta/jwt-verifier": "^1.0.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
